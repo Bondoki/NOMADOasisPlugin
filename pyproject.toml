@@ -77,7 +77,7 @@ select = [
     "UP",
     # isort
     "I",
-    # pylint 
+    # pylint
     "PL",
 ]
 
@@ -113,6 +113,7 @@ where = ["src"]
 [project.entry-points.'nomad.plugin']
 
 schema_package_entry_point = "crc1415testsample.schema_packages:schema_package_entry_point"
+CRC1415_A04_schema = "crc1415testsample.schema_packages:CRC1415_A04_schema"
 
 
 
