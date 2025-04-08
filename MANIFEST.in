@@ -1,0 +1,2 @@
+recursive-include * nomad_plugin.yaml
+graft src/crc1415testsample/example_uploads
