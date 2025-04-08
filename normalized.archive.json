@@ -1,0 +1,117 @@
+{
+  "data": {
+    "m_def": "crc1415testsample.schema_packages.CRC1415_A04_schema.Sample",
+    "datetime": "2025-04-08T17:10:20.131538+00:00"
+  },
+  "metadata": {
+    "entry_name": "Default Sample Name",
+    "entry_type": "Sample",
+    "mainfile": "/workspaces/NOMADOasisPlugin/tests/data/test_schema.archive.yaml",
+    "text_search_contents": [],
+    "n_quantities": 11,
+    "quantities": [
+      "",
+      "data",
+      "data.datetime",
+      "metadata",
+      "metadata.entry_name",
+      "metadata.entry_type",
+      "metadata.mainfile",
+      "metadata.quantities",
+      "metadata.section_defs",
+      "metadata.section_defs.definition_id",
+      "metadata.section_defs.definition_qualified_name",
+      "metadata.section_defs.used_directly",
+      "metadata.sections",
+      "results",
+      "results.eln",
+      "results.eln.names",
+      "results.eln.sections",
+      "results.properties"
+    ],
+    "sections": [
+      "crc1415testsample.schema_packages.CRC1415_A04_schema.Sample",
+      "nomad.datamodel.datamodel.EntryArchive",
+      "nomad.datamodel.datamodel.EntryMetadata",
+      "nomad.datamodel.results.ELN",
+      "nomad.datamodel.results.Properties",
+      "nomad.datamodel.results.Results"
+    ],
+    "section_defs": [
+      {
+        "definition_qualified_name": "crc1415testsample.schema_packages.CRC1415_A04_schema.Sample",
+        "definition_id": "08e033f5dcb1f0b5dc5651e55e95afdcc01b6171",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.data.ArchiveSection",
+        "definition_id": "7047cbff9980abff17cce4b1b6b0d1c783505b7f",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.data.EntryData",
+        "definition_id": "538f52fd8d52b29372066f878319c6aeb03b74d2",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryArchive",
+        "definition_id": "4216415b63b9b0d253c23c64a73e327879c12e91",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.datamodel.EntryMetadata",
+        "definition_id": "6edfa503af63b84d6a6021c227d00137b4c1cc9c",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.eln.ElnBaseSection",
+        "definition_id": "01bd0ff2d4b348b4f4175477cb3ac68a46ae1970",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.eln.ElnWithFormulaBaseSection",
+        "definition_id": "771b719dbb6e20ab686d851c628bf2e3a2da0c56",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.eln.Sample",
+        "definition_id": "cbbef1bba83d0804b1499e87b1223f63651d3e76",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.ELN",
+        "definition_id": "eeed330bd18d40f3a2a00cc35ba6f58808d0c543",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Properties",
+        "definition_id": "668532333a833a28e493a1e496d3702081567b42",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Results",
+        "definition_id": "c0333058eb872eda870d53ca35021694cc06dc2e",
+        "used_directly": true
+      }
+    ],
+    "search_quantities": [
+      {
+        "id": "data.datetime#crc1415testsample.schema_packages.CRC1415_A04_schema.Sample",
+        "definition": "nomad.datamodel.metainfo.eln.ElnBaseSection.datetime",
+        "path_archive": "data.datetime",
+        "datetime_value": "2025-04-08T17:10:20.131538+00:00"
+      }
+    ]
+  },
+  "results": {
+    "properties": {},
+    "eln": {
+      "sections": [
+        "Sample"
+      ],
+      "names": [
+        "Default Sample Name"
+      ]
+    }
+  }
+}
