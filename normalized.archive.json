@@ -2,7 +2,7 @@
   "data": {
     "m_def": "crc1415testsample.schema_packages.ELN_schema.CRCChemical",
     "name": "test sample",
-    "datetime": "2025-04-10T10:31:54.311127+00:00"
+    "datetime": "2025-04-10T11:58:48.939782+00:00"
   },
   "metadata": {
     "entry_name": "test_sample.archive.yaml",
@@ -109,7 +109,7 @@
         "id": "data.datetime#crc1415testsample.schema_packages.ELN_schema.CRCChemical",
         "definition": "nomad.datamodel.metainfo.eln.ElnBaseSection.datetime",
         "path_archive": "data.datetime",
-        "datetime_value": "2025-04-10T10:31:54.311127+00:00"
+        "datetime_value": "2025-04-10T11:58:48.939782+00:00"
       }
     ]
   },
