@@ -1,22 +1,50 @@
 {
   "data": {
-    "m_def": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
-    "name": "test sample",
-    "datetime": "2025-04-10T15:48:51.709583+00:00"
+    "m_def": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+    "datetime": "2025-04-10T16:21:15.798102+00:00",
+    "short_name": "Default-Sample-Name",
+    "molecular_formula": "CuF2",
+    "elemental_composition": [
+      {
+        "element": "Cu",
+        "atomic_fraction": 0.3333333333333333,
+        "mass_fraction": 0.6258050397945275
+      },
+      {
+        "element": "F",
+        "atomic_fraction": 0.6666666666666666,
+        "mass_fraction": 0.3741949602054725
+      }
+    ],
+    "pure_substance": {
+      "name": "CuF2",
+      "molecular_formula": "CuF2"
+    }
   },
   "metadata": {
-    "entry_name": "test_sample.archive.yaml",
-    "entry_type": "CRC1415Chemical",
+    "entry_name": "Default Sample Name",
+    "entry_type": "CRC1415Sample",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_sample.archive.yaml",
     "text_search_contents": [
-      "test sample"
+      "Default-Sample-Name",
+      "Cu",
+      "CuF2",
+      "F"
     ],
-    "n_quantities": 12,
+    "n_quantities": 41,
     "quantities": [
       "",
       "data",
       "data.datetime",
-      "data.name",
+      "data.elemental_composition",
+      "data.elemental_composition.atomic_fraction",
+      "data.elemental_composition.element",
+      "data.elemental_composition.mass_fraction",
+      "data.molecular_formula",
+      "data.pure_substance",
+      "data.pure_substance.molecular_formula",
+      "data.pure_substance.name",
+      "data.short_name",
       "metadata",
       "metadata.entry_name",
       "metadata.entry_type",
@@ -31,20 +59,36 @@
       "results.eln",
       "results.eln.names",
       "results.eln.sections",
+      "results.material",
+      "results.material.chemical_formula_anonymous",
+      "results.material.chemical_formula_descriptive",
+      "results.material.chemical_formula_hill",
+      "results.material.chemical_formula_iupac",
+      "results.material.chemical_formula_reduced",
+      "results.material.elemental_composition",
+      "results.material.elemental_composition.atomic_fraction",
+      "results.material.elemental_composition.element",
+      "results.material.elemental_composition.mass",
+      "results.material.elemental_composition.mass_fraction",
+      "results.material.elements",
       "results.properties"
     ],
     "sections": [
-      "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
+      "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
       "nomad.datamodel.datamodel.EntryArchive",
       "nomad.datamodel.datamodel.EntryMetadata",
+      "nomad.datamodel.metainfo.basesections.v1.ElementalComposition",
+      "nomad.datamodel.metainfo.basesections.v1.PureSubstanceSection",
       "nomad.datamodel.results.ELN",
+      "nomad.datamodel.results.ElementalComposition",
+      "nomad.datamodel.results.Material",
       "nomad.datamodel.results.Properties",
       "nomad.datamodel.results.Results"
     ],
     "section_defs": [
       {
-        "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
-        "definition_id": "e6b9cc565770b8cc08be8162a54d0542a2a12df8",
+        "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition_id": "45ad85f82e217b57ca1db0a7c6042ec2db60a2e0",
         "used_directly": true
       },
       {
@@ -68,23 +112,58 @@
         "used_directly": true
       },
       {
-        "definition_qualified_name": "nomad.datamodel.metainfo.eln.Chemical",
-        "definition_id": "b9741b05b0c3c9d1577b08bb60d11c8950d1e85c",
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.v1.BaseSection",
+        "definition_id": "106bafb5140238b4afe8128b8c341b5b3e927838",
+        "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition",
+        "definition_id": "f783e37dc3beba62062d737a37cabaada9170c4b",
         "used_directly": true
       },
       {
-        "definition_qualified_name": "nomad.datamodel.metainfo.eln.ElnBaseSection",
-        "definition_id": "01bd0ff2d4b348b4f4175477cb3ac68a46ae1970",
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.v1.Entity",
+        "definition_id": "8d478d6cfa9d129aeafe2e6f77d6fe3da6c000a0",
         "used_directly": false
       },
       {
-        "definition_qualified_name": "nomad.datamodel.metainfo.eln.ElnWithFormulaBaseSection",
-        "definition_id": "771b719dbb6e20ab686d851c628bf2e3a2da0c56",
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.v1.PureSubstance",
+        "definition_id": "93da507927f66777c1c2b85e76b530ea739939fa",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.v1.PureSubstanceSection",
+        "definition_id": "bb9f03f138b31b4076ea8af37612715870233ed9",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.v1.ReadableIdentifiers",
+        "definition_id": "82393157fea24eda218211daa554460dd10124a0",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.basesections.v1.System",
+        "definition_id": "fb1d2c5b8eeaca91ea337b8e02dcb480b272f2dd",
         "used_directly": false
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.eln.ELNSubstance",
+        "definition_id": "416ea944567254a9a7b4763d07cce0b414882723",
+        "used_directly": true
       },
       {
         "definition_qualified_name": "nomad.datamodel.results.ELN",
         "definition_id": "eeed330bd18d40f3a2a00cc35ba6f58808d0c543",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.ElementalComposition",
+        "definition_id": "03caacc0ad1a3a12490851aa3c1ee459a69cfc3e",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.results.Material",
+        "definition_id": "f65d92c920055565f3da06d77840703e279e6ac3",
         "used_directly": true
       },
       {
@@ -100,27 +179,107 @@
     ],
     "search_quantities": [
       {
-        "id": "data.name#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
-        "definition": "nomad.datamodel.metainfo.eln.ElnBaseSection.name",
-        "path_archive": "data.name",
-        "str_value": "test sample"
+        "id": "data.molecular_formula#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample.molecular_formula",
+        "path_archive": "data.molecular_formula",
+        "str_value": "CuF2"
       },
       {
-        "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
-        "definition": "nomad.datamodel.metainfo.eln.ElnBaseSection.datetime",
+        "id": "data.elemental_composition.element#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.element",
+        "path_archive": "data.elemental_composition.0.element",
+        "str_value": "Cu"
+      },
+      {
+        "id": "data.elemental_composition.atomic_fraction#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.atomic_fraction",
+        "path_archive": "data.elemental_composition.0.atomic_fraction",
+        "float_value": 0.3333333333333333
+      },
+      {
+        "id": "data.elemental_composition.mass_fraction#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.mass_fraction",
+        "path_archive": "data.elemental_composition.0.mass_fraction",
+        "float_value": 0.6258050397945275
+      },
+      {
+        "id": "data.elemental_composition.element#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.element",
+        "path_archive": "data.elemental_composition.1.element",
+        "str_value": "F"
+      },
+      {
+        "id": "data.elemental_composition.atomic_fraction#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.atomic_fraction",
+        "path_archive": "data.elemental_composition.1.atomic_fraction",
+        "float_value": 0.6666666666666666
+      },
+      {
+        "id": "data.elemental_composition.mass_fraction#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.mass_fraction",
+        "path_archive": "data.elemental_composition.1.mass_fraction",
+        "float_value": 0.3741949602054725
+      },
+      {
+        "id": "data.pure_substance.name#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.PureSubstanceSection.name",
+        "path_archive": "data.pure_substance.name",
+        "str_value": "CuF2"
+      },
+      {
+        "id": "data.pure_substance.molecular_formula#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.PureSubstanceSection.molecular_formula",
+        "path_archive": "data.pure_substance.molecular_formula",
+        "str_value": "CuF2"
+      },
+      {
+        "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.BaseSection.datetime",
         "path_archive": "data.datetime",
-        "datetime_value": "2025-04-10T15:48:51.709583+00:00"
+        "datetime_value": "2025-04-10T16:21:15.798102+00:00"
+      },
+      {
+        "id": "data.short_name#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.ReadableIdentifiers.short_name",
+        "path_archive": "data.short_name",
+        "str_value": "Default-Sample-Name"
       }
     ]
   },
   "results": {
+    "material": {
+      "elements": [
+        "Cu",
+        "F"
+      ],
+      "chemical_formula_descriptive": "CuF2",
+      "chemical_formula_reduced": "CuF2",
+      "chemical_formula_hill": "CuF2",
+      "chemical_formula_iupac": "CuF2",
+      "chemical_formula_anonymous": "A2B",
+      "elemental_composition": [
+        {
+          "element": "Cu",
+          "mass": 1.0552061567359032e-25,
+          "atomic_fraction": 0.3333333333333333,
+          "mass_fraction": 0.6258050397945275
+        },
+        {
+          "element": "F",
+          "mass": 3.1547590760694746e-26,
+          "atomic_fraction": 0.6666666666666666,
+          "mass_fraction": 0.3741949602054725
+        }
+      ]
+    },
     "properties": {},
     "eln": {
       "sections": [
-        "CRC1415Chemical"
+        "CRC1415Sample",
+        "CRC1415Sample"
       ],
       "names": [
-        "test sample"
+        "Default Sample Name"
       ]
     }
   }

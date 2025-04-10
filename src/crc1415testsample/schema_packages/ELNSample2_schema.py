@@ -268,6 +268,14 @@ class CRC1415Sample(ELNSubstance, ReadableIdentifiers, PureSubstance, PureSubsta
         },
         shape=["*"],
     )
+    
+    molecular_formula = Quantity(
+        type=str,
+        a_eln={
+            "component": "StringEditQuantity"
+        },
+        )
+    
     IR_Instrument = SubSection(
         section_def=IRInstrument,
         repeats=True,
@@ -280,6 +288,7 @@ class CRC1415Sample(ELNSubstance, ReadableIdentifiers, PureSubstance, PureSubsta
         section_def=XRDMeasurement,
         repeats=True,
     )
+    
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         '''
@@ -290,6 +299,12 @@ class CRC1415Sample(ELNSubstance, ReadableIdentifiers, PureSubstance, PureSubsta
             normalized.
             logger (BoundLogger): A structlog logger.
         '''
+        if self.molecular_formula and self.pure_substance is None:
+            #if self.substance_name and self.pure_substance is None:
+            self.pure_substance = PureSubstanceSection(name=self.molecular_formula, molecular_formula=self.molecular_formula)
+            #self.pure_substance = PubChemPureSubstanceSection(name=self.molecular_formula)
+            self.pure_substance.normalize(archive, logger)
+            
         super().normalize(archive, logger)
 
 
