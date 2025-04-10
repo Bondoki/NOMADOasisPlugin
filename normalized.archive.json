@@ -1,24 +1,24 @@
 {
   "data": {
     "m_def": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
-    "datetime": "2025-04-10T16:21:15.798102+00:00",
+    "datetime": "2025-04-10T16:48:05.497672+00:00",
     "short_name": "Default-Sample-Name",
-    "molecular_formula": "CuF2",
+    "molecular_formula": "NaK0.5",
     "elemental_composition": [
       {
-        "element": "Cu",
+        "element": "K",
         "atomic_fraction": 0.3333333333333333,
-        "mass_fraction": 0.6258050397945275
+        "mass_fraction": 0.4595591597267301
       },
       {
-        "element": "F",
+        "element": "Na",
         "atomic_fraction": 0.6666666666666666,
-        "mass_fraction": 0.3741949602054725
+        "mass_fraction": 0.5404408402732699
       }
     ],
     "pure_substance": {
-      "name": "CuF2",
-      "molecular_formula": "CuF2"
+      "name": "NaK0.5",
+      "molecular_formula": "NaK0.5"
     }
   },
   "metadata": {
@@ -26,10 +26,10 @@
     "entry_type": "CRC1415Sample",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_sample.archive.yaml",
     "text_search_contents": [
+      "NaK0.5",
+      "Na",
       "Default-Sample-Name",
-      "Cu",
-      "CuF2",
-      "F"
+      "K"
     ],
     "n_quantities": 41,
     "quantities": [
@@ -88,7 +88,7 @@
     "section_defs": [
       {
         "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
-        "definition_id": "45ad85f82e217b57ca1db0a7c6042ec2db60a2e0",
+        "definition_id": "11aaaa74e2a92f9c34ac1fde6fae257a8ca71409",
         "used_directly": true
       },
       {
@@ -182,13 +182,13 @@
         "id": "data.molecular_formula#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample.molecular_formula",
         "path_archive": "data.molecular_formula",
-        "str_value": "CuF2"
+        "str_value": "NaK0.5"
       },
       {
         "id": "data.elemental_composition.element#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.element",
         "path_archive": "data.elemental_composition.0.element",
-        "str_value": "Cu"
+        "str_value": "K"
       },
       {
         "id": "data.elemental_composition.atomic_fraction#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
@@ -200,13 +200,13 @@
         "id": "data.elemental_composition.mass_fraction#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.mass_fraction",
         "path_archive": "data.elemental_composition.0.mass_fraction",
-        "float_value": 0.6258050397945275
+        "float_value": 0.4595591597267301
       },
       {
         "id": "data.elemental_composition.element#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.element",
         "path_archive": "data.elemental_composition.1.element",
-        "str_value": "F"
+        "str_value": "Na"
       },
       {
         "id": "data.elemental_composition.atomic_fraction#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
@@ -218,25 +218,25 @@
         "id": "data.elemental_composition.mass_fraction#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "nomad.datamodel.metainfo.basesections.v1.ElementalComposition.mass_fraction",
         "path_archive": "data.elemental_composition.1.mass_fraction",
-        "float_value": 0.3741949602054725
+        "float_value": 0.5404408402732699
       },
       {
         "id": "data.pure_substance.name#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "nomad.datamodel.metainfo.basesections.v1.PureSubstanceSection.name",
         "path_archive": "data.pure_substance.name",
-        "str_value": "CuF2"
+        "str_value": "NaK0.5"
       },
       {
         "id": "data.pure_substance.molecular_formula#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "nomad.datamodel.metainfo.basesections.v1.PureSubstanceSection.molecular_formula",
         "path_archive": "data.pure_substance.molecular_formula",
-        "str_value": "CuF2"
+        "str_value": "NaK0.5"
       },
       {
         "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "nomad.datamodel.metainfo.basesections.v1.BaseSection.datetime",
         "path_archive": "data.datetime",
-        "datetime_value": "2025-04-10T16:21:15.798102+00:00"
+        "datetime_value": "2025-04-10T16:48:05.497672+00:00"
       },
       {
         "id": "data.short_name#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
@@ -249,26 +249,26 @@
   "results": {
     "material": {
       "elements": [
-        "Cu",
-        "F"
+        "K",
+        "Na"
       ],
-      "chemical_formula_descriptive": "CuF2",
-      "chemical_formula_reduced": "CuF2",
-      "chemical_formula_hill": "CuF2",
-      "chemical_formula_iupac": "CuF2",
+      "chemical_formula_descriptive": "NaK0.5",
+      "chemical_formula_reduced": "KNa2",
+      "chemical_formula_hill": "KNa2",
+      "chemical_formula_iupac": "KNa2",
       "chemical_formula_anonymous": "A2B",
       "elemental_composition": [
         {
-          "element": "Cu",
-          "mass": 1.0552061567359032e-25,
+          "element": "K",
+          "mass": 6.492425467835483e-26,
           "atomic_fraction": 0.3333333333333333,
-          "mass_fraction": 0.6258050397945275
+          "mass_fraction": 0.4595591597267301
         },
         {
-          "element": "F",
-          "mass": 3.1547590760694746e-26,
+          "element": "Na",
+          "mass": 3.817541007489682e-26,
           "atomic_fraction": 0.6666666666666666,
-          "mass_fraction": 0.3741949602054725
+          "mass_fraction": 0.5404408402732699
         }
       ]
     },

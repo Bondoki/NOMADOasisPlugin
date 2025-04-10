@@ -1,5 +1,5 @@
 data:
   #m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical
   m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample
-  molecular_formula: 'CuF2'
+  molecular_formula: 'NaK0.5'
   #data_file: test.csv

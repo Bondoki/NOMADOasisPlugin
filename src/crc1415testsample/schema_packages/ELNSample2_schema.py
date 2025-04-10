@@ -211,16 +211,16 @@ class CRC1415Sample(ELNSubstance, ReadableIdentifiers, PureSubstance, PureSubsta
         a_eln={
             "properties": {
                 "order": [
+                    "tags",
                     "name",
                     "short_name",
                     "institute",
                     "owner",
                     "datetime",
                     "lab_id",
-                    "substrate_type",
+                    "substance_type",
                     "sample_is_from_collaboration",
                     "Sample_reference_from_collaboration",
-                    "tags",
                     "description",
                     "chemicals"
                 ]
@@ -247,7 +247,7 @@ class CRC1415Sample(ELNSubstance, ReadableIdentifiers, PureSubstance, PureSubsta
         },
         shape=["*"],
     )
-    substrate_type = Quantity(
+    substance_type = Quantity(
         type=MEnum(['crystalline solid', 'powder', 'solution', 'other']),
         a_eln={
             "component": "RadioEnumEditQuantity"
