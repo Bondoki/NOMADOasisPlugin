@@ -218,6 +218,7 @@ class CRC1415Sample(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection
                     "owner",
                     "datetime",
                     "lab_id",
+                    "molecular_formula",
                     "substance_type",
                     "sample_is_from_collaboration",
                     "Sample_reference_from_collaboration",
@@ -299,10 +300,15 @@ class CRC1415Sample(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection
             normalized.
             logger (BoundLogger): A structlog logger.
         '''
+        # in case only molecular_formula is provided
         if self.molecular_formula and self.pure_substance is None:
             #if self.substance_name and self.pure_substance is None:
             self.pure_substance = PureSubstanceSection(name=self.molecular_formula, molecular_formula=self.molecular_formula)
             #self.pure_substance = PubChemPureSubstanceSection(name=self.molecular_formula)
+            self.pure_substance.normalize(archive, logger)
+        elif self.molecular_formula and self.pure_substance is not None:
+            # PureSubstanceSection already exists and we need to update
+            self.pure_substance.molecular_formula = self.molecular_formula
             self.pure_substance.normalize(archive, logger)
             
         super().normalize(archive, logger)

@@ -1,7 +1,7 @@
 {
   "data": {
     "m_def": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
-    "datetime": "2025-04-10T17:02:28.745853+00:00",
+    "datetime": "2025-04-10T17:24:29.342838+00:00",
     "short_name": "test-sample",
     "molecular_formula": "VK0.5",
     "elemental_composition": [
@@ -26,10 +26,10 @@
     "entry_type": "CRC1415Sample",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_sample.archive.yaml",
     "text_search_contents": [
-      "K",
-      "VK0.5",
+      "test-sample",
       "V",
-      "test-sample"
+      "VK0.5",
+      "K"
     ],
     "n_quantities": 41,
     "quantities": [
@@ -236,7 +236,7 @@
         "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
         "definition": "nomad.datamodel.metainfo.basesections.v1.ReadableIdentifiers.datetime",
         "path_archive": "data.datetime",
-        "datetime_value": "2025-04-10T17:02:28.745853+00:00"
+        "datetime_value": "2025-04-10T17:24:29.342838+00:00"
       },
       {
         "id": "data.short_name#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample",
