@@ -1,18 +1,22 @@
 {
   "data": {
-    "m_def": "crc1415testsample.schema_packages.CRC1415_A04_schema.Sample",
-    "datetime": "2025-04-08T17:10:20.131538+00:00"
+    "m_def": "crc1415testsample.schema_packages.ELN_schema.CRCChemical",
+    "name": "test sample",
+    "datetime": "2025-04-10T10:31:54.311127+00:00"
   },
   "metadata": {
-    "entry_name": "Default Sample Name",
-    "entry_type": "Sample",
-    "mainfile": "/workspaces/NOMADOasisPlugin/tests/data/test_schema.archive.yaml",
-    "text_search_contents": [],
-    "n_quantities": 11,
+    "entry_name": "test_sample.archive.yaml",
+    "entry_type": "CRCChemical",
+    "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_sample.archive.yaml",
+    "text_search_contents": [
+      "test sample"
+    ],
+    "n_quantities": 12,
     "quantities": [
       "",
       "data",
       "data.datetime",
+      "data.name",
       "metadata",
       "metadata.entry_name",
       "metadata.entry_type",
@@ -30,7 +34,7 @@
       "results.properties"
     ],
     "sections": [
-      "crc1415testsample.schema_packages.CRC1415_A04_schema.Sample",
+      "crc1415testsample.schema_packages.ELN_schema.CRCChemical",
       "nomad.datamodel.datamodel.EntryArchive",
       "nomad.datamodel.datamodel.EntryMetadata",
       "nomad.datamodel.results.ELN",
@@ -39,8 +43,8 @@
     ],
     "section_defs": [
       {
-        "definition_qualified_name": "crc1415testsample.schema_packages.CRC1415_A04_schema.Sample",
-        "definition_id": "08e033f5dcb1f0b5dc5651e55e95afdcc01b6171",
+        "definition_qualified_name": "crc1415testsample.schema_packages.ELN_schema.CRCChemical",
+        "definition_id": "8fda887966bcd3c48d8b009f305cbd4709799bfe",
         "used_directly": true
       },
       {
@@ -55,12 +59,17 @@
       },
       {
         "definition_qualified_name": "nomad.datamodel.datamodel.EntryArchive",
-        "definition_id": "4216415b63b9b0d253c23c64a73e327879c12e91",
+        "definition_id": "36080703de72d343f7c484958cb972ba94cff9b5",
         "used_directly": true
       },
       {
         "definition_qualified_name": "nomad.datamodel.datamodel.EntryMetadata",
-        "definition_id": "6edfa503af63b84d6a6021c227d00137b4c1cc9c",
+        "definition_id": "4352c3a5f8d884d07080cc356cc2d29d61d22c37",
+        "used_directly": true
+      },
+      {
+        "definition_qualified_name": "nomad.datamodel.metainfo.eln.Chemical",
+        "definition_id": "b9741b05b0c3c9d1577b08bb60d11c8950d1e85c",
         "used_directly": true
       },
       {
@@ -74,32 +83,33 @@
         "used_directly": false
       },
       {
-        "definition_qualified_name": "nomad.datamodel.metainfo.eln.Sample",
-        "definition_id": "cbbef1bba83d0804b1499e87b1223f63651d3e76",
-        "used_directly": true
-      },
-      {
         "definition_qualified_name": "nomad.datamodel.results.ELN",
         "definition_id": "eeed330bd18d40f3a2a00cc35ba6f58808d0c543",
         "used_directly": true
       },
       {
         "definition_qualified_name": "nomad.datamodel.results.Properties",
-        "definition_id": "668532333a833a28e493a1e496d3702081567b42",
+        "definition_id": "de7f5d432823a8b2fb004a26fdb4b12236d7f30f",
         "used_directly": true
       },
       {
         "definition_qualified_name": "nomad.datamodel.results.Results",
-        "definition_id": "c0333058eb872eda870d53ca35021694cc06dc2e",
+        "definition_id": "2b648a77437e2a95120a43bf67350a183cd04cbf",
         "used_directly": true
       }
     ],
     "search_quantities": [
       {
-        "id": "data.datetime#crc1415testsample.schema_packages.CRC1415_A04_schema.Sample",
+        "id": "data.name#crc1415testsample.schema_packages.ELN_schema.CRCChemical",
+        "definition": "nomad.datamodel.metainfo.eln.ElnBaseSection.name",
+        "path_archive": "data.name",
+        "str_value": "test sample"
+      },
+      {
+        "id": "data.datetime#crc1415testsample.schema_packages.ELN_schema.CRCChemical",
         "definition": "nomad.datamodel.metainfo.eln.ElnBaseSection.datetime",
         "path_archive": "data.datetime",
-        "datetime_value": "2025-04-08T17:10:20.131538+00:00"
+        "datetime_value": "2025-04-10T10:31:54.311127+00:00"
       }
     ]
   },
@@ -107,10 +117,10 @@
     "properties": {},
     "eln": {
       "sections": [
-        "Sample"
+        "CRCChemical"
       ],
       "names": [
-        "Default Sample Name"
+        "test sample"
       ]
     }
   }

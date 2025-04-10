@@ -30,3 +30,17 @@ CRC1415_A04_schema = CRC1414SchemaEntryPoint(
     name='CRC1415Schema',
     description='New test schema package for CRC1415.',
 )
+
+class CRC1414SampleEntryPoint(SchemaPackageEntryPoint):
+    parameter: int = Field(0, description='Custom configuration parameter for sample')
+
+    def load(self):
+        from crc1415testsample.schema_packages.ELN_schema import m_package
+
+        return m_package
+
+
+CRCChemical = CRC1414SampleEntryPoint(
+    name='CRCChemical',
+    description='New test sample package for CRC1415.',
+)
