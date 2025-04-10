@@ -1,12 +1,12 @@
 {
   "data": {
-    "m_def": "crc1415testsample.schema_packages.ELN_schema.CRCChemical",
+    "m_def": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
     "name": "test sample",
-    "datetime": "2025-04-10T13:09:26.326674+00:00"
+    "datetime": "2025-04-10T15:48:51.709583+00:00"
   },
   "metadata": {
     "entry_name": "test_sample.archive.yaml",
-    "entry_type": "CRCChemical",
+    "entry_type": "CRC1415Chemical",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_sample.archive.yaml",
     "text_search_contents": [
       "test sample"
@@ -34,7 +34,7 @@
       "results.properties"
     ],
     "sections": [
-      "crc1415testsample.schema_packages.ELN_schema.CRCChemical",
+      "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
       "nomad.datamodel.datamodel.EntryArchive",
       "nomad.datamodel.datamodel.EntryMetadata",
       "nomad.datamodel.results.ELN",
@@ -43,8 +43,8 @@
     ],
     "section_defs": [
       {
-        "definition_qualified_name": "crc1415testsample.schema_packages.ELN_schema.CRCChemical",
-        "definition_id": "8fda887966bcd3c48d8b009f305cbd4709799bfe",
+        "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
+        "definition_id": "e6b9cc565770b8cc08be8162a54d0542a2a12df8",
         "used_directly": true
       },
       {
@@ -100,16 +100,16 @@
     ],
     "search_quantities": [
       {
-        "id": "data.name#crc1415testsample.schema_packages.ELN_schema.CRCChemical",
+        "id": "data.name#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
         "definition": "nomad.datamodel.metainfo.eln.ElnBaseSection.name",
         "path_archive": "data.name",
         "str_value": "test sample"
       },
       {
-        "id": "data.datetime#crc1415testsample.schema_packages.ELN_schema.CRCChemical",
+        "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical",
         "definition": "nomad.datamodel.metainfo.eln.ElnBaseSection.datetime",
         "path_archive": "data.datetime",
-        "datetime_value": "2025-04-10T13:09:26.326674+00:00"
+        "datetime_value": "2025-04-10T15:48:51.709583+00:00"
       }
     ]
   },
@@ -117,7 +117,7 @@
     "properties": {},
     "eln": {
       "sections": [
-        "CRCChemical"
+        "CRC1415Chemical"
       ],
       "names": [
         "test sample"
