@@ -1,5 +1,8 @@
 data:
-  #m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical
-  m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample
-  molecular_formula: 'VK0.5'
-  #data_file: test.csv
+  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical
+  #
+  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample
+  # molecular_formula: 'VK0.5'
+  #
+  m_def: crc1415testsample.schema_packages.ELNSample2_schema.XRDMeasurement
+  data_file: test.xyd

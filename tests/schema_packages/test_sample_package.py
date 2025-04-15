@@ -9,10 +9,6 @@ def test_schema_package():
     normalize_all(entry_archive)
     print("Run Sample")
 
-    assert entry_archive.data.molecular_formula == 'VK0.5' 
+    assert entry_archive.data.data_file == 'test.xyd' 
     
-    entry_archive.data.molecular_formula = 'AlK7' 
-    normalize_all(entry_archive)
-    print("Run Sample2")
-
-    assert entry_archive.data.molecular_formula == 'AlK7' 
+    

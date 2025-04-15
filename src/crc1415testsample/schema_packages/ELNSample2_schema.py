@@ -51,6 +51,7 @@ from nomad.datamodel.data import (
 from nomad.metainfo.metainfo import (
     Category,
 )
+from nomad.units import ureg
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
         EntryArchive,
@@ -189,7 +190,7 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
     data_file = Quantity(
         type=str,
         description='''
-        A reference to an uploaded .csv produced by the XRD instrument.
+        A reference to an uploaded .xyd produced by the XRD instrument.
         ''',
         a_tabular_parser={
             "parsing_options": {
@@ -210,14 +211,45 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
             "name": "Deg2Theta"
         },
         shape=["*"],
+        unit='deg',
+        description='The 2-theta range of the diffractogram',
     )
-    Counts = Quantity(
+    Intensity = Quantity(
         type=np.float64,
         a_tabular={
             "name": "Counts"
         },
         shape=["*"],
+        unit='dimensionless',
+        description='The count at each 2-theta value, dimensionless',
     )
+    
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
+        """
+        The normalize function of the `XRDMeasurement` section.
+
+        Args:
+            archive (EntryArchive): The archive containing the section that is being
+            normalized.
+            logger (BoundLogger): A structlog logger.
+        """
+        # Check if any file is provided
+        if self.data_file:
+            # Check if the file has the correct extension
+            if not self.data_file.endswith('.xyd'):
+                logger.warning('The file must have a .xyd extension.')
+                #raise ValueError("The file must have a .xyd extension.")
+                return
+            # Otherwise parse the file
+            with archive.m_context.raw_file(self.data_file) as xydfile:
+                # Load the data from the file
+                dataxydfile = np.loadtxt(xydfile)
+                
+                # Separate the columns into two variables and copy to 
+                self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
+                self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+            
+            
 
 
 class CRC1415Sample(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
