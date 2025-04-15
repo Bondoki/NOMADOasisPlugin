@@ -11,4 +11,14 @@ def test_schema_package():
 
     assert entry_archive.data.data_file == 'test.xyd' 
     
+def test_IRMeasurement_package():
+    test_file = os.path.join('tests', 'data', 'test_IRMeasurement.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run IRMeasurement")
+
+    assert entry_archive.data.data_file == 'IRtest.dpt' 
+    
+    assert len(entry_archive.data.Transmittance) == 3525 
+    
     
