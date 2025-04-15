@@ -68,6 +68,12 @@ if TYPE_CHECKING:
 
 m_package = Package(name='CRC1415 Sample ELN Molecule')
 
+
+class DataFileError(Exception):
+    """Custom exception for data file errors."""
+    pass
+
+
 class CRC1415Category(EntryDataCategory):
     """
     A category for all plugins defined in the `crc1415-plugin` plugin.
@@ -282,22 +288,24 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
             normalized.
             logger (BoundLogger): A structlog logger.
         """
-        # Check if any file is provided
-        if self.data_file:
-            # Check if the file has the correct extension
-            if not self.data_file.endswith('.xyd'):
-                logger.warning('The file must have a .xyd extension.')
-                #raise ValueError("The file must have a .xyd extension.")
-                return
-            # Otherwise parse the file
-            with archive.m_context.raw_file(self.data_file) as xydfile:
-                # Load the data from the file
-                dataxydfile = np.loadtxt(xydfile)
-                
-                # Separate the columns into two variables and copy to 
-                self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
-                self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
-        
+        try:
+            # Check if any file is provided
+            if self.data_file:
+                # Check if the file has the correct extension
+                if not self.data_file.endswith('.xyd'):
+                    raise DataFileError(f"The file '{self.data_file}' must have a .xyd extension.")
+                    
+                # Otherwise parse the file
+                with archive.m_context.raw_file(self.data_file) as xydfile:
+                    # Load the data from the file
+                    dataxydfile = np.loadtxt(xydfile)
+                    
+                    # Separate the columns into two variables and copy to 
+                    self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
+                    self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+        except Exception as e:
+            logger.error('Invalid file extension for parsing.', exc_info=e)
+            #logger.error('Invalid file extension for parsing.', exc_info=e)
         # In case something is odd here -> just return
         # if not self.results:
         #    return
@@ -427,13 +435,13 @@ class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
             normalized.
             logger (BoundLogger): A structlog logger.
         """
-        # Check if any file is provided
-        if self.data_file:
-            # Check if the file has the correct extension
-            if not self.data_file.endswith('.dpt'):
-                logger.warning('The file must have a .dpt extension.')
-                #raise ValueError("The file must have a .xyd extension.")
-                return
+        try:
+            # Check if any file is provided
+            if self.data_file:
+                # Check if the file has the correct extension
+                if not self.data_file.endswith('.dpt'):
+                    raise DataFileError(f"The file '{self.data_file}' must have a .dpt extension.")
+            
             # Otherwise parse the file
             with archive.m_context.raw_file(self.data_file) as xyfile:
                 # Load the data from the file
@@ -443,6 +451,8 @@ class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
                 self.Wavenumber = ureg.Quantity(dataxyfile[:, 0], '1/cm') # dataxydfile[:, 0]  # First column
                 self.Transmittance = ureg.Quantity(dataxyfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
         
+        except Exception as e:
+            logger.error('Invalid file extension for parsing.', exc_info=e)
         # In case something is odd here -> just return
         # if not self.results:
         #    return

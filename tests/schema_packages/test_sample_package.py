@@ -10,6 +10,7 @@ def test_schema_package():
     print("Run Sample")
 
     assert entry_archive.data.data_file == 'test.xyd' 
+    #assert entry_archive.data.data_file == 'test.csv' 
     
 def test_IRMeasurement_package():
     test_file = os.path.join('tests', 'data', 'test_IRMeasurement.archive.yaml')
