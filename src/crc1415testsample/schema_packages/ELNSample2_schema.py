@@ -241,39 +241,35 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
         #if self.wavelength is None:
         #    return figures
 
-        for key in ['transmittance', 'absorbance']:
-            if getattr(self, key) is None:
-                continue
+        x_label = '2Theta'
+        xaxis_title = f'{x_label} (°)'
+        x = self.Deg2Theta.to('degree').magnitude
 
-            x_label = '2Theta'
-            xaxis_title = f'{x_label} (°)'
-            x = self.Deg2Theta.to('degree').magnitude
+        y_label = 'Intensity'
+        yaxis_title = f'{y_label} (a.u.)'
+        y = self.Intensity.to('dimensionless').magnitude
 
-            y_label = 'Intensity'
-            yaxis_title = f'{x_label} (a.u.)'
-            y = self.Intensity.to('dimensionless').magnitude
+        line_linear = px.line(x=x, y=y)
 
-            line_linear = px.line(x=x, y=y)
+        line_linear.update_layout(
+            title=f'{y_label} over {x_label}',
+            xaxis_title=xaxis_title,
+            yaxis_title=yaxis_title,
+            xaxis=dict(
+                fixedrange=False,
+            ),
+            yaxis=dict(
+                fixedrange=False,
+            ),
+            template='plotly_white',
+        )
 
-            line_linear.update_layout(
-                title=f'{y_label} over {x_label}',
-                xaxis_title=xaxis_title,
-                yaxis_title=yaxis_title,
-                xaxis=dict(
-                    fixedrange=False,
-                ),
-                yaxis=dict(
-                    fixedrange=False,
-                ),
-                template='plotly_white',
-            )
-
-            figures.append(
-                PlotlyFigure(
-                    label=f'{y_label} linear plot',
-                    figure=line_linear.to_plotly_json(),
-                ),
-            )
+        figures.append(
+            PlotlyFigure(
+                label=f'{y_label} linear plot',
+                figure=line_linear.to_plotly_json(),
+            ),
+        )
 
         return figures
     
@@ -303,11 +299,11 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
                 self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
         
         # In case something is odd here -> just return
-        if not self.results:
-            return
+        # if not self.results:
+        #    return
         
         # Otherwise create plot
-        self.figures = self.results[0].generate_plots()
+        self.figures = self.generate_plots()
             
 
 
