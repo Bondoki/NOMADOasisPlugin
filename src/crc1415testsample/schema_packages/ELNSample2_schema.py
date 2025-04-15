@@ -16,6 +16,7 @@
 # limitations under the License.
 #
 
+import plotly.express as px
 from nomad.datamodel.metainfo.plot import PlotSection
 from nomad.datamodel.metainfo.eln import ELNMeasurement
 #from nomad.parsing.tabular import TableData
@@ -52,6 +53,11 @@ from nomad.metainfo.metainfo import (
     Category,
 )
 from nomad.units import ureg
+from nomad.datamodel.metainfo.plot import (
+    PlotlyFigure,
+    PlotSection,
+)
+
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
         EntryArchive,
@@ -224,6 +230,53 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
         description='The count at each 2-theta value, dimensionless',
     )
     
+    def generate_plots(self) -> list[PlotlyFigure]:
+        """
+        Generate the plotly figures for the `XRDMeasurement` section.
+
+        Returns:
+            list[PlotlyFigure]: The plotly figures.
+        """
+        figures = []
+        #if self.wavelength is None:
+        #    return figures
+
+        for key in ['transmittance', 'absorbance']:
+            if getattr(self, key) is None:
+                continue
+
+            x_label = '2Theta'
+            xaxis_title = f'{x_label} (°)'
+            x = self.Deg2Theta.to('degree').magnitude
+
+            y_label = 'Intensity'
+            yaxis_title = f'{x_label} (a.u.)'
+            y = self.Intensity.to('dimensionless').magnitude
+
+            line_linear = px.line(x=x, y=y)
+
+            line_linear.update_layout(
+                title=f'{y_label} over {x_label}',
+                xaxis_title=xaxis_title,
+                yaxis_title=yaxis_title,
+                xaxis=dict(
+                    fixedrange=False,
+                ),
+                yaxis=dict(
+                    fixedrange=False,
+                ),
+                template='plotly_white',
+            )
+
+            figures.append(
+                PlotlyFigure(
+                    label=f'{y_label} linear plot',
+                    figure=line_linear.to_plotly_json(),
+                ),
+            )
+
+        return figures
+    
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
         The normalize function of the `XRDMeasurement` section.
@@ -248,7 +301,13 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
                 # Separate the columns into two variables and copy to 
                 self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
                 self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
-            
+        
+        # In case something is odd here -> just return
+        if not self.results:
+            return
+        
+        # Otherwise create plot
+        self.figures = self.results[0].generate_plots()
             
 
 
