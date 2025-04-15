@@ -308,7 +308,14 @@ class CRC1415Sample(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection
             self.pure_substance.normalize(archive, logger)
         elif self.molecular_formula and self.pure_substance is not None:
             # PureSubstanceSection already exists and we need to update
+            self.pure_substance = None
+            self.pure_substance = PureSubstanceSection(name=self.molecular_formula, molecular_formula=self.molecular_formula)
             self.pure_substance.molecular_formula = self.molecular_formula
+            # we need to delete manually the results section as
+            # elements will by populate by System.normalize fct
+            self.elemental_composition = None
+            archive.results.material.elements = []
+            archive.results.material.elemental_composition = []
             self.pure_substance.normalize(archive, logger)
             
         super().normalize(archive, logger)
