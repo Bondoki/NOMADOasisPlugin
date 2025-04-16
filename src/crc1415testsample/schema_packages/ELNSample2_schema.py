@@ -299,7 +299,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
             normalized.
             logger (BoundLogger): A structlog logger.
         """
-        super().normalize(archive, logger)
+        # super().normalize(archive, logger)
         
         try:
             # Check if any file is provided
@@ -450,8 +450,6 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
             normalized.
             logger (BoundLogger): A structlog logger.
         """
-        super().normalize(archive, logger)
-        
         
         try:
             # Check if any file is provided
@@ -460,17 +458,17 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
                 if not self.data_file.endswith('.dpt'):
                     raise DataFileError(f"The file '{self.data_file}' must have a .dpt extension.")
             
-            # Otherwise parse the file
-            with archive.m_context.raw_file(self.data_file) as xyfile:
-                # Load the data from the file
-                dataxyfile = np.loadtxt(xyfile)
-                
-                # Separate the columns into two variables and copy to 
-                self.Wavenumber = ureg.Quantity(dataxyfile[:, 0], '1/cm') # dataxydfile[:, 0]  # First column
-                self.Transmittance = ureg.Quantity(dataxyfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
-                
-                # Otherwise create plot
-                self.figures = self.generate_plots()
+                # Otherwise parse the file
+                with archive.m_context.raw_file(self.data_file) as xyfile:
+                    # Load the data from the file
+                    dataxyfile = np.loadtxt(xyfile)
+                    
+                    # Separate the columns into two variables and copy to 
+                    self.Wavenumber = ureg.Quantity(dataxyfile[:, 0], '1/cm') # dataxydfile[:, 0]  # First column
+                    self.Transmittance = ureg.Quantity(dataxyfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+                    
+                    # Otherwise create plot
+                    self.figures = self.generate_plots()
         
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
