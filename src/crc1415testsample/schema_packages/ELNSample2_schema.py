@@ -170,7 +170,7 @@ class Contributors(ArchiveSection):
 
 
 #class XRDMeasurement(ELNMeasurement, TableData, PlotSection, ArchiveSection):
-class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
+class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
     '''
     Class for handling measurement of XRD.
     '''
@@ -248,7 +248,7 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
     
     def generate_plots(self) -> list[PlotlyFigure]:
         """
-        Generate the plotly figures for the `XRDMeasurement` section.
+        Generate the plotly figures for the `MeasurementXRD` section.
 
         Returns:
             list[PlotlyFigure]: The plotly figures.
@@ -292,13 +292,15 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
-        The normalize function of the `XRDMeasurement` section.
+        The normalize function of the `MeasurementXRD` section.
 
         Args:
             archive (EntryArchive): The archive containing the section that is being
             normalized.
             logger (BoundLogger): A structlog logger.
         """
+        super().normalize(archive, logger)
+        
         try:
             # Check if any file is provided
             if self.data_file:
@@ -314,6 +316,10 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
                     # Separate the columns into two variables and copy to 
                     self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
                     self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+                    
+                    # Otherwise create plot
+                    self.figures = self.generate_plots()
+                    
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
             #logger.error('Invalid file extension for parsing.', exc_info=e)
@@ -321,10 +327,9 @@ class XRDMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
         # if not self.results:
         #    return
         
-        # Otherwise create plot
-        self.figures = self.generate_plots()
+        
 
-class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
+class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
     '''
     Class for handling measurement of IR.
     '''
@@ -365,9 +370,7 @@ class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
     )
     data_file = Quantity(
         type=str,
-        description='''
-        A reference to an uploaded .dpt produced by the IR instrument.
-        ''',
+        description="A reference to an uploaded .dpt produced by the IR instrument.",
         a_tabular_parser={
             "parsing_options": {
                 "sep": "\\t",
@@ -396,7 +399,7 @@ class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
     
     def generate_plots(self) -> list[PlotlyFigure]:
         """
-        Generate the plotly figures for the `XRDMeasurement` section.
+        Generate the plotly figures for the `MeasurementXRD` section.
 
         Returns:
             list[PlotlyFigure]: The plotly figures.
@@ -440,13 +443,16 @@ class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
-        The normalize function of the `IRMeasurement` section.
+        The normalize function of the `MeasurementIR` section.
 
         Args:
             archive (EntryArchive): The archive containing the section that is being
             normalized.
             logger (BoundLogger): A structlog logger.
         """
+        super().normalize(archive, logger)
+        
+        
         try:
             # Check if any file is provided
             if self.data_file:
@@ -462,6 +468,9 @@ class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
                 # Separate the columns into two variables and copy to 
                 self.Wavenumber = ureg.Quantity(dataxyfile[:, 0], '1/cm') # dataxydfile[:, 0]  # First column
                 self.Transmittance = ureg.Quantity(dataxyfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+                
+                # Otherwise create plot
+                self.figures = self.generate_plots()
         
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
@@ -469,8 +478,7 @@ class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
         # if not self.results:
         #    return
         
-        # Otherwise create plot
-        self.figures = self.generate_plots()
+        
 
 
 class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
@@ -531,75 +539,94 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
-        The normalize function of the `IRMeasurement` section.
+        The normalize function of the `MeasurementIR` section.
 
         Args:
             archive (EntryArchive): The archive containing the section that is being
             normalized.
             logger (BoundLogger): A structlog logger.
         """
+        
         try:
+            
             # Check if any file is provided
             if self.data_file:
                 # Check if the file has the correct extension
                 if not self.data_file.endswith('.tif'):
-                    raise DataFileError(f"The file '{self.data_file}' must have a .tif extension.")
+                    if not self.data_file.endswith('.tiff'):
+                        raise DataFileError(f"The file '{self.data_file}' must have a .tif or .tiff extension.")
             
-            # Otherwise parse the file as binary
-            # with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
-            #    archive.m_context.raw_file(self.data_file) as xyfile:
-            with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
-                with Image.open(imagefile) as img:
-                     # Convert the image to RGB (necessary for JPEG)
-                    img = img.convert('RGB')
-                    # Create a BytesIO object to hold the image data
-                    buffered = io.BytesIO()
-                    # Save the image to the BytesIO object in JPEG format
-                    img.save(buffered, format="JPEG")
-                    # Get the byte data
-                    img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
-                    # Create the URI image string
-                    uri = f"data:image/jpeg;base64,{img_str}"
-                    
-                    fig = go.Figure()
-                    # # Add a layout with a background image
-                    fig.update_layout(
-                        images=[
-                            dict(
-                                source=uri,  # Replace with your image URL or local path
-                                x=0,
-                                y=1,
-                                xref="paper",
-                                yref="paper",
-                                sizex=1,
-                                sizey=1,
-                                xanchor="left",
-                                yanchor="top",
-                                opacity=1,
-                                layer="below"  # Place the image below the plot
+                # Otherwise parse the file as binary
+                # with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
+                #    archive.m_context.raw_file(self.data_file) as xyfile:
+                with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
+                    with Image.open(imagefile) as img:
+                        # Get the size of the image
+                        img_width, img_height = img.size
+                        # print(f"Width: {img_width}, Height: {img_height}")
+                        
+                         # Convert the image to RGB (necessary for JPEG)
+                        img = img.convert('RGB')
+                        # Create a BytesIO object to hold the image data
+                        buffered = io.BytesIO()
+                        # Save the image to the BytesIO object in JPEG format
+                        img.save(buffered, format="JPEG")
+                        # Get the byte data
+                        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                        # Create the URI image string
+                        uri = f"data:image/jpeg;base64,{img_str}"
+                        
+                        # see https://plotly.com/python/images/#zoom-on-static-images
+                        fig = go.Figure()
+                        scale_factor = 0.5
+                        fig.add_trace(
+                            go.Scatter(
+                                x=[0, img_width * scale_factor],
+                                y=[0, img_height * scale_factor],
+                                mode="markers",
+                                marker_opacity=0
                             )
-                        ],
-                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                        width=800,
-                        height=600,
-                    )
+                        )
+                        # Configure axes
+                        fig.update_xaxes(
+                            visible=False,
+                            range=[0, img_width * scale_factor]
+                        )
 
-                    # Show the figure
-                    # fig.show()
-                    # with Image.open(imagefile) as img:
-                    #     img.convert('RGB').save('output_file.jpg', 'JPEG')
-                    # # Load the data from the file
-                    # dataxyfile = np.loadtxt(xyfile)
-                    # 
-                    # # Separate the columns into two variables and copy to 
-                    # self.Wavenumber = ureg.Quantity(dataxyfile[:, 0], '1/cm') # dataxydfile[:, 0]  # First column
-                    # self.Transmittance = ureg.Quantity(dataxyfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
-                    
-                    figure_json = fig.to_plotly_json()
-                    # figure_json['config'] = {'staticPlot': True}
-                    self.figures.append(PlotlyFigure(label='Measurement SEM', index=0, figure=figure_json))
-        
+                        fig.update_yaxes(
+                            visible=False,
+                            range=[0, img_height * scale_factor],
+                            # the scaleanchor attribute ensures that the aspect ratio stays constant
+                            scaleanchor="x"
+                        )
+                        
+                        # Add image
+                        fig.add_layout_image(
+                            dict(
+                                x=0,
+                                sizex=img_width * scale_factor,
+                                y=img_height * scale_factor,
+                                sizey=img_height * scale_factor,
+                                xref="x",
+                                yref="y",
+                                opacity=1.0,
+                                layer="below",
+                                sizing="stretch",
+                                source=uri)
+                        )
+                        # Configure other layout
+                        fig.update_layout(
+                            width=img_width * scale_factor,
+                            height=img_height * scale_factor,
+                            margin={"l": 0, "r": 0, "t": 0, "b": 0},
+                        )
+                        
+                        figure_json = fig.to_plotly_json()
+                        figure_json['config'] = {'staticPlot': True, 'displayModeBar': False, 'scrollZoom': True, 'responsive': False, 'displaylogo': False, 'dragmode': False}
+                        #self.figures.append(PlotlyFigure(label='Measurement SEM', index=0, figure=figure_json))
+                        # label=f'{y_label} linear plot',
+                        self.figures = [PlotlyFigure(label=f'Measurement SEM: {self.data_file}', index=0, figure=figure_json)]
+            
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
         # In case something is odd here -> just return
@@ -608,6 +635,7 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
         
         # Otherwise create plot
         #self.figures = self.generate_plots()
+        super().normalize(archive, logger)
 
 
 
@@ -697,13 +725,13 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         section_def=Contributors,
         repeats=True,
     )
-    XRD_Measurement = SubSection(
-        section_def=XRDMeasurement,
+    Measurement_XRD = SubSection(
+        section_def=MeasurementXRD,
         repeats=True,
     )
     
-    IR_Measurement = SubSection(
-        section_def=IRMeasurement,
+    Measurement_IR = SubSection(
+        section_def=MeasurementIR,
         repeats=True,
     )
     
