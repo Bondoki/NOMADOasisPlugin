@@ -500,7 +500,7 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
     data_file = Quantity(
         type=str,
         description='''
-        A reference to an uploaded .dpt produced by the IR instrument.
+        A reference to an uploaded .tif produced by the SEM instrument.
         ''',
         a_tabular_parser={
             "parsing_options": {
@@ -542,11 +542,12 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
             # Check if any file is provided
             if self.data_file:
                 # Check if the file has the correct extension
-                if not self.data_file.endswith('.jpg'):
+                if not self.data_file.endswith('.tif'):
                     raise DataFileError(f"The file '{self.data_file}' must have a .tif extension.")
             
             # Otherwise parse the file as binary
-            #with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
+            # with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
+            #    archive.m_context.raw_file(self.data_file) as xyfile:
             with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
                 with Image.open(imagefile) as img:
                      # Convert the image to RGB (necessary for JPEG)
@@ -598,8 +599,6 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                     figure_json = fig.to_plotly_json()
                     # figure_json['config'] = {'staticPlot': True}
                     self.figures.append(PlotlyFigure(label='Measurement SEM', index=0, figure=figure_json))
-                    
-
         
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
@@ -705,6 +704,11 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
     
     IR_Measurement = SubSection(
         section_def=IRMeasurement,
+        repeats=True,
+    )
+    
+    Measurement_SEM = SubSection(
+        section_def=MeasurementSEM,
         repeats=True,
     )
     
