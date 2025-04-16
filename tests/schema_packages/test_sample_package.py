@@ -9,8 +9,10 @@ def test_schema_package():
     normalize_all(entry_archive)
     print("Run Sample")
 
-    assert entry_archive.data.data_file == 'test.xyd' 
+    #assert entry_archive.data.data_file == 'test.xyd' 
+    #assert entry_archive.data.data_file == 'testSEM.tif' 
     #assert entry_archive.data.data_file == 'test.csv' 
+    assert entry_archive.data.data_file == 'testSEM.jpg' 
     
 def test_IRMeasurement_package():
     test_file = os.path.join('tests', 'data', 'test_IRMeasurement.archive.yaml')

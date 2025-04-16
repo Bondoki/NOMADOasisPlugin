@@ -17,6 +17,13 @@
 #
 
 import plotly.express as px
+import plotly.graph_objects as go
+
+import numpy as np
+from PIL import Image
+import base64
+import io
+
 from nomad.datamodel.metainfo.plot import PlotSection
 from nomad.datamodel.metainfo.eln import ELNMeasurement
 #from nomad.parsing.tabular import TableData
@@ -28,7 +35,10 @@ from nomad.datamodel.metainfo.basesections.v1 import PureSubstanceSection
 from nomad.datamodel.metainfo.eln import ELNInstrument
 from nomad.datamodel.metainfo.eln import Chemical
 from nomad.datamodel.data import EntryData
-import numpy as np
+
+
+
+
 from typing import (
     TYPE_CHECKING,
 )
@@ -462,6 +472,143 @@ class IRMeasurement(ELNMeasurement, PlotSection, ArchiveSection):
         # Otherwise create plot
         self.figures = self.generate_plots()
 
+
+class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
+    '''
+    Class for handling measurement of IR.
+    '''
+    m_def = Section(
+        categories=[CRC1415Category],
+        label='CRC1415-Measurement-SEM',
+        a_eln={
+            "overview": True,
+            "hide": [
+                "name",
+                "lab_id",
+                "method",
+                "samples",
+                "measurement_identifiers"
+            ]
+        },
+        )
+    lab_id = Quantity(
+        type=str,
+        a_display={
+            "visible": False
+        },
+    )
+    data_file = Quantity(
+        type=str,
+        description='''
+        A reference to an uploaded .dpt produced by the IR instrument.
+        ''',
+        a_tabular_parser={
+            "parsing_options": {
+                "sep": "\\t",
+                "comment": "#"
+            }
+        },
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity"
+        },
+    )
+    Wavenumber = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='1/cm',
+        description='The wavenumber range of the spectrogram',
+    )
+    Transmittance = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='dimensionless',
+        description='The transmittance at each wavenumber value, dimensionless',
+    )
+    
+    
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
+        """
+        The normalize function of the `IRMeasurement` section.
+
+        Args:
+            archive (EntryArchive): The archive containing the section that is being
+            normalized.
+            logger (BoundLogger): A structlog logger.
+        """
+        try:
+            # Check if any file is provided
+            if self.data_file:
+                # Check if the file has the correct extension
+                if not self.data_file.endswith('.jpg'):
+                    raise DataFileError(f"The file '{self.data_file}' must have a .tif extension.")
+            
+            # Otherwise parse the file as binary
+            #with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
+            with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
+                with Image.open(imagefile) as img:
+                     # Convert the image to RGB (necessary for JPEG)
+                    img = img.convert('RGB')
+                    # Create a BytesIO object to hold the image data
+                    buffered = io.BytesIO()
+                    # Save the image to the BytesIO object in JPEG format
+                    img.save(buffered, format="JPEG")
+                    # Get the byte data
+                    img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                    # Create the URI image string
+                    uri = f"data:image/jpeg;base64,{img_str}"
+                    
+                    fig = go.Figure()
+                    # # Add a layout with a background image
+                    fig.update_layout(
+                        images=[
+                            dict(
+                                source=uri,  # Replace with your image URL or local path
+                                x=0,
+                                y=1,
+                                xref="paper",
+                                yref="paper",
+                                sizex=1,
+                                sizey=1,
+                                xanchor="left",
+                                yanchor="top",
+                                opacity=1,
+                                layer="below"  # Place the image below the plot
+                            )
+                        ],
+                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                        width=800,
+                        height=600,
+                    )
+
+                    # Show the figure
+                    # fig.show()
+                    # with Image.open(imagefile) as img:
+                    #     img.convert('RGB').save('output_file.jpg', 'JPEG')
+                    # # Load the data from the file
+                    # dataxyfile = np.loadtxt(xyfile)
+                    # 
+                    # # Separate the columns into two variables and copy to 
+                    # self.Wavenumber = ureg.Quantity(dataxyfile[:, 0], '1/cm') # dataxydfile[:, 0]  # First column
+                    # self.Transmittance = ureg.Quantity(dataxyfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+                    
+                    figure_json = fig.to_plotly_json()
+                    # figure_json['config'] = {'staticPlot': True}
+                    self.figures.append(PlotlyFigure(label='Measurement SEM', index=0, figure=figure_json))
+                    
+
+        
+        except Exception as e:
+            logger.error('Invalid file extension for parsing.', exc_info=e)
+        # In case something is odd here -> just return
+        # if not self.results:
+        #    return
+        
+        # Otherwise create plot
+        #self.figures = self.generate_plots()
 
 
 
