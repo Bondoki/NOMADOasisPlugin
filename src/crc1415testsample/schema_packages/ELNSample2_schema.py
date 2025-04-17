@@ -393,7 +393,7 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
     
     def generate_plots(self) -> list[PlotlyFigure]:
         """
-        Generate the plotly figures for the `MeasurementXRD` section.
+        Generate the plotly figures for the `MeasurementIR` section.
 
         Returns:
             list[PlotlyFigure]: The plotly figures.
@@ -499,6 +499,7 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
     )
     data_as_tif_or_tiff_file = Quantity(
         type=str,
+        shape=["*"],
         description='''
         A reference to an uploaded .tif produced by the SEM instrument.
         ''',
@@ -525,8 +526,9 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
             
             # Check if any file is provided
             if self.data_as_tif_or_tiff_file:
+                self.figures = []
                 # Loop over all filenames
-                for data_file in self.data_as_tif_or_tiff_file.split(" "):
+                for data_file in self.data_as_tif_or_tiff_file: #.split(" "):
                     # Check if the file has the correct extension
                     if not data_file.endswith('.tif'):
                         if not data_file.endswith('.tiff'):
@@ -601,7 +603,8 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                             figure_json['config'] = {'staticPlot': True, 'displayModeBar': False, 'scrollZoom': True, 'responsive': False, 'displaylogo': False, 'dragmode': False}
                             #self.figures.append(PlotlyFigure(label='Measurement SEM', index=0, figure=figure_json))
                             # label=f'{y_label} linear plot',
-                            self.figures = [PlotlyFigure(label=f'Measurement SEM: {data_file}', index=0, figure=figure_json)]
+                            self.figures.append(PlotlyFigure(label=f'Measurement SEM: {data_file}', figure=figure_json))
+                            #self.figures = [PlotlyFigure(label=f'Measurement SEM: {data_file}', index=0, figure=figure_json)]
                 
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
@@ -698,7 +701,7 @@ class MeasurementTEM(ELNMeasurement, PlotSection, ArchiveSection):
                         
                         # see https://plotly.com/python/images/#zoom-on-static-images
                         fig = go.Figure()
-                        scale_factor = 0.5
+                        scale_factor = 800.0/img_width # 0.5
                         fig.add_trace(
                             go.Scatter(
                                 x=[0, img_width * scale_factor],
