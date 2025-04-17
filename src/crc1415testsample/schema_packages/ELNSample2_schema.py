@@ -209,17 +209,11 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
             "visible": False
         },
     )
-    data_file = Quantity(
+    data_as_xyd_file = Quantity(
         type=str,
         description='''
         A reference to an uploaded .xyd produced by the XRD instrument.
         ''',
-        a_tabular_parser={
-            "parsing_options": {
-                "sep": "\\t",
-                "comment": "#"
-            }
-        },
         a_browser={
             "adaptor": "RawFileAdaptor"
         },
@@ -303,13 +297,13 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         
         try:
             # Check if any file is provided
-            if self.data_file:
+            if self.data_as_xyd_file:
                 # Check if the file has the correct extension
-                if not self.data_file.endswith('.xyd'):
-                    raise DataFileError(f"The file '{self.data_file}' must have a .xyd extension.")
+                if not self.data_as_xyd_file.endswith('.xyd'):
+                    raise DataFileError(f"The file '{self.data_as_xyd_file}' must have a .xyd extension.")
                     
                 # Otherwise parse the file
-                with archive.m_context.raw_file(self.data_file) as xydfile:
+                with archive.m_context.raw_file(self.data_as_xyd_file) as xydfile:
                     # Load the data from the file
                     dataxydfile = np.loadtxt(xydfile)
                     
@@ -368,7 +362,7 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
             "visible": False
         },
     )
-    data_file = Quantity(
+    data_as_dpt_file = Quantity(
         type=str,
         description="A reference to an uploaded .dpt produced by the IR instrument.",
         a_tabular_parser={
@@ -453,13 +447,13 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
         
         try:
             # Check if any file is provided
-            if self.data_file:
+            if self.data_as_dpt_file:
                 # Check if the file has the correct extension
-                if not self.data_file.endswith('.dpt'):
-                    raise DataFileError(f"The file '{self.data_file}' must have a .dpt extension.")
+                if not self.data_as_dpt_file.endswith('.dpt'):
+                    raise DataFileError(f"The file '{self.data_as_dpt_file}' must have a .dpt extension.")
             
                 # Otherwise parse the file
-                with archive.m_context.raw_file(self.data_file) as xyfile:
+                with archive.m_context.raw_file(self.data_as_dpt_file) as xyfile:
                     # Load the data from the file
                     dataxyfile = np.loadtxt(xyfile)
                     
@@ -481,7 +475,7 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
 
 class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
     '''
-    Class for handling measurement of IR.
+    Class for handling measurement of SEM.
     '''
     m_def = Section(
         categories=[CRC1415Category],
@@ -503,37 +497,19 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
             "visible": False
         },
     )
-    data_file = Quantity(
+    data_as_tif_or_tiff_file = Quantity(
         type=str,
         description='''
         A reference to an uploaded .tif produced by the SEM instrument.
         ''',
-        a_tabular_parser={
-            "parsing_options": {
-                "sep": "\\t",
-                "comment": "#"
-            }
-        },
         a_browser={
             "adaptor": "RawFileAdaptor"
         },
         a_eln={
             "component": "FileEditQuantity"
         },
+        repeats=True,
     )
-    Wavenumber = Quantity(
-        type=np.float64,
-        shape=["*"],
-        unit='1/cm',
-        description='The wavenumber range of the spectrogram',
-    )
-    Transmittance = Quantity(
-        type=np.float64,
-        shape=["*"],
-        unit='dimensionless',
-        description='The transmittance at each wavenumber value, dimensionless',
-    )
-    
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
@@ -548,16 +524,162 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
         try:
             
             # Check if any file is provided
-            if self.data_file:
+            if self.data_as_tif_or_tiff_file:
+                # Loop over all filenames
+                for data_file in self.data_as_tif_or_tiff_file:
+                    # Check if the file has the correct extension
+                    if not data_file.endswith('.tif'):
+                        if not data_file.endswith('.tiff'):
+                            raise DataFileError(f"The file '{data_file}' must have a .tif or .tiff extension.")
+                
+                    # Otherwise parse the file as binary
+                    # with archive.m_context.raw_file(data_file, 'rb') as imagefile:
+                    #    archive.m_context.raw_file(data_file) as xyfile:
+                    with archive.m_context.raw_file(data_file, 'rb') as imagefile:
+                        with Image.open(imagefile) as img:
+                            # Get the size of the image
+                            img_width, img_height = img.size
+                            # print(f"Width: {img_width}, Height: {img_height}")
+                            
+                             # Convert the image to RGB (necessary for JPEG)
+                            img = img.convert('RGB')
+                            # Create a BytesIO object to hold the image data
+                            buffered = io.BytesIO()
+                            # Save the image to the BytesIO object in JPEG format
+                            img.save(buffered, format="JPEG")
+                            # Get the byte data
+                            img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                            # Create the URI image string
+                            uri = f"data:image/jpeg;base64,{img_str}"
+                            
+                            # see https://plotly.com/python/images/#zoom-on-static-images
+                            fig = go.Figure()
+                            scale_factor = 0.5
+                            fig.add_trace(
+                                go.Scatter(
+                                    x=[0, img_width * scale_factor],
+                                    y=[0, img_height * scale_factor],
+                                    mode="markers",
+                                    marker_opacity=0
+                                )
+                            )
+                            # Configure axes
+                            fig.update_xaxes(
+                                visible=False,
+                                range=[0, img_width * scale_factor]
+                            )
+
+                            fig.update_yaxes(
+                                visible=False,
+                                range=[0, img_height * scale_factor],
+                                # the scaleanchor attribute ensures that the aspect ratio stays constant
+                                scaleanchor="x"
+                            )
+                            
+                            # Add image
+                            fig.add_layout_image(
+                                dict(
+                                    x=0,
+                                    sizex=img_width * scale_factor,
+                                    y=img_height * scale_factor,
+                                    sizey=img_height * scale_factor,
+                                    xref="x",
+                                    yref="y",
+                                    opacity=1.0,
+                                    layer="below",
+                                    sizing="stretch",
+                                    source=uri)
+                            )
+                            # Configure other layout
+                            fig.update_layout(
+                                width=img_width * scale_factor,
+                                height=img_height * scale_factor,
+                                margin={"l": 0, "r": 0, "t": 0, "b": 0},
+                            )
+                            
+                            figure_json = fig.to_plotly_json()
+                            figure_json['config'] = {'staticPlot': True, 'displayModeBar': False, 'scrollZoom': True, 'responsive': False, 'displaylogo': False, 'dragmode': False}
+                            #self.figures.append(PlotlyFigure(label='Measurement SEM', index=0, figure=figure_json))
+                            # label=f'{y_label} linear plot',
+                            self.figures = [PlotlyFigure(label=f'Measurement SEM: {data_file}', index=0, figure=figure_json)]
+                
+        except Exception as e:
+            logger.error('Invalid file extension for parsing.', exc_info=e)
+        # In case something is odd here -> just return
+        # if not self.results:
+        #    return
+        
+        # Otherwise create plot
+        #self.figures = self.generate_plots()
+        super().normalize(archive, logger)
+
+
+class MeasurementTEM(ELNMeasurement, PlotSection, ArchiveSection):
+    '''
+    Class for handling measurement of SEM.
+    '''
+    m_def = Section(
+        categories=[CRC1415Category],
+        label='CRC1415-Measurement-TEM',
+        a_eln={
+            "overview": True,
+            "hide": [
+                "name",
+                "lab_id",
+                "method",
+                "samples",
+                "measurement_identifiers"
+            ]
+        },
+        )
+    lab_id = Quantity(
+        type=str,
+        a_display={
+            "visible": False
+        },
+    )
+    data_as_tif_or_tiff_file = Quantity(
+        type=str,
+        description='''
+        A reference to an uploaded .tif produced by the TEM instrument.
+        ''',
+        a_tabular_parser={
+            "parsing_options": {
+                "sep": "\\t",
+                "comment": "#"
+            }
+        },
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity"
+        },
+    )
+    
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
+        """
+        The normalize function of the `MeasurementIR` section.
+
+        Args:
+            archive (EntryArchive): The archive containing the section that is being
+            normalized.
+            logger (BoundLogger): A structlog logger.
+        """
+        
+        try:
+            
+            # Check if any file is provided
+            if self.data_as_tif_or_tiff_file:
                 # Check if the file has the correct extension
-                if not self.data_file.endswith('.tif'):
-                    if not self.data_file.endswith('.tiff'):
-                        raise DataFileError(f"The file '{self.data_file}' must have a .tif or .tiff extension.")
+                if not self.data_as_tif_or_tiff_file.endswith('.tif'):
+                    if not self.data_as_tif_or_tiff_file.endswith('.tiff'):
+                        raise DataFileError(f"The file '{self.data_as_tif_or_tiff_file}' must have a .tif or .tiff extension.")
             
                 # Otherwise parse the file as binary
-                # with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
-                #    archive.m_context.raw_file(self.data_file) as xyfile:
-                with archive.m_context.raw_file(self.data_file, 'rb') as imagefile:
+                # with archive.m_context.raw_file(self.data_as_tif_or_tiff_file, 'rb') as imagefile:
+                #    archive.m_context.raw_file(self.data_as_tif_or_tiff_file) as xyfile:
+                with archive.m_context.raw_file(self.data_as_tif_or_tiff_file, 'rb') as imagefile:
                     with Image.open(imagefile) as img:
                         # Get the size of the image
                         img_width, img_height = img.size
@@ -623,7 +745,7 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                         figure_json['config'] = {'staticPlot': True, 'displayModeBar': False, 'scrollZoom': True, 'responsive': False, 'displaylogo': False, 'dragmode': False}
                         #self.figures.append(PlotlyFigure(label='Measurement SEM', index=0, figure=figure_json))
                         # label=f'{y_label} linear plot',
-                        self.figures = [PlotlyFigure(label=f'Measurement SEM: {self.data_file}', index=0, figure=figure_json)]
+                        self.figures = [PlotlyFigure(label=f'Measurement TEM: {self.data_as_tif_or_tiff_file}', index=0, figure=figure_json)]
             
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
@@ -715,6 +837,15 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         },
         )
     
+    Other_reference_to_measurement = Quantity(
+        type=ELNMeasurement,
+        description='If sample is measure otherwise, then reference it here.',
+        a_eln={
+            "component": "ReferenceEditQuantity"
+        },
+        shape=["*"],
+    )
+    
     IR_Instrument = SubSection(
         section_def=IRInstrument,
         repeats=True,
@@ -736,6 +867,11 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
     Measurement_SEM = SubSection(
         section_def=MeasurementSEM,
         repeats=True,
+    )
+    
+    Measurement_TEM =SubSection(
+       section_def=MeasurementTEM,
+       repeats=True,
     )
     
 
