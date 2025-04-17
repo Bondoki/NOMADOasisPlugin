@@ -10,7 +10,7 @@ def test_schema_package():
     print("Run Sample")
 
     #assert entry_archive.data.data_file == 'test.xyd' 
-    assert entry_archive.data.data_file == 'testSEM.tif' 
+    assert entry_archive.data.data_as_tif_or_tiff_file == 'testSEM.tif testSEM3.tiff' #'testSEM.tif' 
     #assert entry_archive.data.data_file == 'test.csv' 
     #assert entry_archive.data.data_file == 'testSEM.jpg' 
     
@@ -20,7 +20,7 @@ def test_IRMeasurement_package():
     normalize_all(entry_archive)
     print("Run IRMeasurement")
 
-    assert entry_archive.data.data_file == 'IRtest.dpt' 
+    assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
     
     assert len(entry_archive.data.Transmittance) == 3525 
     

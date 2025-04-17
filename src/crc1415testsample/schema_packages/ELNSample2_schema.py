@@ -526,7 +526,7 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
             # Check if any file is provided
             if self.data_as_tif_or_tiff_file:
                 # Loop over all filenames
-                for data_file in self.data_as_tif_or_tiff_file:
+                for data_file in self.data_as_tif_or_tiff_file.split(" "):
                     # Check if the file has the correct extension
                     if not data_file.endswith('.tif'):
                         if not data_file.endswith('.tiff'):

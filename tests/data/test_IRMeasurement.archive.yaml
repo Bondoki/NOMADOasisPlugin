@@ -8,4 +8,4 @@ data:
   #data_file: test.xyd
   #
   m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementIR
-  data_file: IRtest.dpt
+  data_as_dpt_file: IRtest.dpt
