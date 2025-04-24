@@ -25,3 +25,13 @@ def test_IRMeasurement_package():
     assert len(entry_archive.data.Transmittance) == 3525 
     
     
+def test_Overview_package():
+    test_file = os.path.join('tests', 'data', 'test_overview.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run Overview")
+
+    #assert entry_archive.data.data_file == 'test.xyd' 
+    #assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
+    #assert entry_archive.data.data_file == 'test.csv' 
+    #assert entry_archive.data.data_file == 'testSEM.jpg' 
