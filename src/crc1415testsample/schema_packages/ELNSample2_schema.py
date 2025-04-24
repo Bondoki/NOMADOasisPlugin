@@ -23,6 +23,7 @@ import numpy as np
 from PIL import Image
 import base64
 import io
+import pint
 
 from nomad.datamodel.metainfo.plot import PlotSection
 from nomad.datamodel.metainfo.eln import ELNMeasurement
@@ -760,6 +761,200 @@ class MeasurementTEM(ELNMeasurement, PlotSection, ArchiveSection):
         #self.figures = self.generate_plots()
         super().normalize(archive, logger)
 
+class RamanData(ArchiveSection):
+    """General data section for Raman spectroscopy"""
+
+    m_def = Section(
+        label_quantity='name',
+    )
+    
+    name = Quantity(
+        type=str,
+        default='TestName',
+        description='Name of the section or Raman measurement',
+        a_eln={'component': 'StringEditQuantity'},
+    )
+    
+    Laser_Excitation_Wavelength = Quantity(
+        type=np.float64,
+        unit='nanometer',
+        description='The wavelength of the laser for Raman spectroscopy.',
+    )
+    
+    data_as_tvf_or_txt_file = Quantity(
+        type=str,
+        description="A reference to an uploaded TriVista .tvf or .txt file produced by the Raman instrument.",
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity"
+        },
+    )
+        
+    Raman_shift = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='1/centimeter',
+        description='The wavenumber range of the spectrogram.',
+    )
+    Intensity = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='dimensionless',
+        description='The intensity or counts at each Raman wavenumber value, dimensionless',
+    )
+
+class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
+    '''
+    Class for handling measurement of Raman spectroscopy.
+    '''
+    m_def = Section(
+        categories=[CRC1415Category],
+        label='CRC1415-Measurement-Raman',
+        a_eln={
+            "overview": True,
+            "hide": [
+                "name",
+                "lab_id",
+                "method",
+                "samples",
+                "measurement_identifiers"
+            ]
+        },
+        )
+            
+    lab_id = Quantity(
+        type=str,
+        a_display={
+            "visible": False
+        },
+    )
+    
+    Raman_data_entries = SubSection(section_def=RamanData, repeats=True)
+    
+    
+    def generate_plots(self) -> list[PlotlyFigure]:
+        """
+        Generate the plotly figures for the `MeasurementRaman` section.
+
+        Returns:
+            list[PlotlyFigure]: The plotly figures.
+        """
+        figures = []
+        fig = go.Figure()
+        
+        for r_d_entries in self.Raman_data_entries:
+            # Add line plots
+            x = r_d_entries.Raman_shift.to('1/centimeter').magnitude
+            y = r_d_entries.Intensity.to('dimensionless').magnitude
+            fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name=r_d_entries.data_as_tvf_or_txt_file))
+
+        # exemply use the first entry for the units
+        x_label = 'Raman shift'
+        xaxis_title = f'{x_label} ({self.Raman_data_entries[0].Raman_shift.units:~})'#(1/cm)' the ':~' gives the short form
+        
+        y_label = 'Intensity'
+        yaxis_title = f'{y_label} (a.u.)'
+        
+        fig.update_layout(
+            title=f'{y_label} over {x_label}',
+            xaxis_title=xaxis_title,
+            yaxis_title=yaxis_title,
+            xaxis=dict(
+                fixedrange=False,
+            ),
+            yaxis=dict(
+                fixedrange=False,
+            ),
+            legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+            template='plotly_white',
+        )
+
+        figures.append(
+            PlotlyFigure(
+                label=f'{y_label}-{x_label} linear plot',
+                #index=0,
+                figure=fig.to_plotly_json(),
+            ),
+        )
+
+        return figures
+    
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
+        """
+        The normalize function of the `MeasurementRaman` section.
+
+        Args:
+            archive (EntryArchive): The archive containing the section that is being
+            normalized.
+            logger (BoundLogger): A structlog logger.
+        """
+        # super().normalize(archive, logger)
+        try:
+            #Check if any file is provided in any subsection
+            for r_d_entries in self.Raman_data_entries:
+                if r_d_entries.data_as_tvf_or_txt_file:
+                    # Check if the file has the correct extension: TriVista tvf or plain 2-column txt
+                    if not r_d_entries.data_as_tvf_or_txt_file.endswith('.tvf') and not r_d_entries.data_as_tvf_or_txt_file.endswith('.txt'):
+                        print("Expect Data File Error")
+                        raise DataFileError(f"The file '{r_d_entries.data_as_tvf_or_txt_file}' must have a .tvf or .txt extension.")
+                    
+                    # Otherwise parse the file with *.txt
+                    if r_d_entries.data_as_tvf_or_txt_file.endswith('.txt'):
+                        with archive.m_context.raw_file(r_d_entries.data_as_tvf_or_txt_file) as xyfile:
+                            # Load the data from the file
+                            import numpy as np
+                            dataxyfile = np.loadtxt(xyfile)
+                            
+                            # Separate the columns into two variables and copy to 
+                            r_d_entries.Raman_shift = ureg.Quantity(dataxyfile[:, 0], '1/centimeter') # dataxydfile[:, 0]  # First column
+                            r_d_entries.Intensity = ureg.Quantity(dataxyfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+                    
+                    # Otherwise parse the file with *.tvf
+                    if r_d_entries.data_as_tvf_or_txt_file.endswith('.tvf'):
+                        with archive.m_context.raw_file(r_d_entries.data_as_tvf_or_txt_file) as xyfile:
+                            #Load the data from the file
+                            contentxyfile = xyfile.read()
+                            
+                            #use additional packages
+                            import xmltodict, json
+                            dataxyfile = xmltodict.parse(contentxyfile)
+                            
+                            unitWave = dataxyfile['XmlMain']['Documents']['Document']['xDim']['Calibration']['@Unit'].lower()
+                            calibrationLaserWave = float(dataxyfile['XmlMain']['Documents']['Document']['xDim']['Calibration']['@LaserWave'])
+                            r_d_entries.Laser_Excitation_Wavelength = ureg.Quantity(calibrationLaserWave, unitWave)
+                            
+                            #Read the actual Raman wavelength data
+                            RamanWavelength=dataxyfile['XmlMain']['Documents']['Document']['xDim']['Calibration']['@ValueArray']
+                            # first number (=int) gives the number of data entries
+                            RamanWavelengthData = [int(x) if x.isdigit() else float(x) for x in RamanWavelength.split('|')]
+                            
+                            ### Conversion from Wavelength[nm] to Wavenumber[1/cm]
+                            # $\Delta \omega [cm^{-1}] = ( \frac{1}{\lambda_{laser}} - \frac{1}{\lambda_{}}) \cdot 10⁷$
+                            
+                            import numpy as np
+                            RamanWavenumber = (1.0/calibrationLaserWave-1.0/np.asarray(RamanWavelengthData[1:], dtype=np.float64)) # in 1/nm
+                            
+                            # Read-in of Intensity Counts
+                            IntensityString = RamanWavelength=dataxyfile['XmlMain']['Documents']['Document']['Data']['Frame']['#text']
+                            Intensity = np.asarray([float(x) for x in IntensityString.split(';')], dtype=np.float64)
+                            
+                            # Archive the data
+                            r_d_entries.Raman_shift = ureg.Quantity(RamanWavenumber, f'1/{unitWave}') # dataxydfile[:, 0]  # First column
+                            r_d_entries.Intensity = ureg.Quantity(Intensity, 'dimensionless') #dataxydfile[:, 1]  # Second column
+                            
+            
+        except Exception as e:
+            logger.error('Invalid file extension for parsing.', exc_info=e)
+        
+        if self.Raman_data_entries:
+            #Otherwise create plot
+            self.figures = self.generate_plots()
+        
+        super().normalize(archive, logger)
+
+
 
 
 class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
@@ -857,6 +1052,7 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         section_def=Contributors,
         repeats=True,
     )
+    
     Measurement_XRD = SubSection(
         section_def=MeasurementXRD,
         repeats=True,
@@ -874,6 +1070,11 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
     
     Measurement_TEM =SubSection(
        section_def=MeasurementTEM,
+       repeats=True,
+    )
+    
+    Measurement_Raman =SubSection(
+       section_def=MeasurementRaman,
        repeats=True,
     )
     

@@ -35,3 +35,26 @@ def test_Overview_package():
     #assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
     #assert entry_archive.data.data_file == 'test.csv' 
     #assert entry_archive.data.data_file == 'testSEM.jpg' 
+
+from crc1415testsample.schema_packages.ELNSample2_schema import RamanData
+
+def test_RamanMeasurement_package():
+    test_file = os.path.join('tests', 'data', 'test_RamanMeasurement.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    #normalize_all(entry_archive)
+    print("Run RamanMeasurement")
+    
+    # #print(entry_archive.data.Raman_data_entries)
+    # rd = RamanData()
+    # rd.name = "John Doe"
+    # rd.data_as_tvf_or_txt_file = 'test.txt'
+    # #print(rd)
+    # entry_archive.data.Raman_data_entries.append(rd)
+    
+    normalize_all(entry_archive)
+    
+    print("Length Raman-Entries:", len(entry_archive.data.Raman_data_entries))
+    #print(entry_archive.data.Raman_data_entries.RamanData.name)
+    #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
+    
+    #assert len(entry_archive.data.Transmittance) == 3525 
