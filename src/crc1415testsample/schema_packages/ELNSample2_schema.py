@@ -24,6 +24,7 @@ from PIL import Image
 import base64
 import io
 import pint
+import struct # for binary files
 
 from nomad.datamodel.metainfo.plot import PlotSection
 from nomad.datamodel.metainfo.eln import ELNMeasurement
@@ -210,7 +211,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
             "visible": False
         },
     )
-    data_as_xyd_file = Quantity(
+    data_as_raw_or_xyd_file = Quantity(
         type=str,
         description='''
         A reference to an uploaded .xyd produced by the XRD instrument.
@@ -285,6 +286,31 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
 
         return figures
     
+    def unpack_repeated_bytes(self, byte_data, data_type, count):
+        """
+        Unpack a series of bytes into a tuple of the same data type.
+
+        :param byte_data: The bytes to unpack.
+        :param data_type: The format character for the data type (e.g., 'b' for signed char).
+        :param count: The number of items to unpack.
+        :return: A tuple of unpacked values.
+        """
+        # Create the format string based on the data type and count
+        format_string = f'{count}{data_type}'
+        
+        # Unpack the byte data using the constructed format string
+        return struct.unpack(format_string, byte_data)  
+    
+    def get_non_empty_chunks_separated_by_null(self, data_slice):
+        """
+        Get all non-empty chunks of data separated by NULL bytes.
+
+        :param data_slice: The slice of data to split.
+        :return: A list of bytes objects, each representing a non-empty chunk of data.
+        """
+        # Split the data by NULL bytes and filter out empty chunks
+        return [chunk for chunk in data_slice.split(b'\x00') if chunk]
+    
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
         The normalize function of the `MeasurementXRD` section.
@@ -298,22 +324,159 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         
         try:
             # Check if any file is provided
-            if self.data_as_xyd_file:
+            if self.data_as_raw_or_xyd_file:
                 # Check if the file has the correct extension
-                if not self.data_as_xyd_file.endswith('.xyd'):
-                    raise DataFileError(f"The file '{self.data_as_xyd_file}' must have a .xyd extension.")
+                if not self.data_as_raw_or_xyd_file.endswith('.xyd') and not self.data_as_raw_or_xyd_file.endswith('.raw'):
+                    raise DataFileError(f"The file '{self.data_as_raw_or_xyd_file}' must have a .raw or .xyd extension.")
                     
-                # Otherwise parse the file
-                with archive.m_context.raw_file(self.data_as_xyd_file) as xydfile:
-                    # Load the data from the file
-                    dataxydfile = np.loadtxt(xydfile)
-                    
-                    # Separate the columns into two variables and copy to 
-                    self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
-                    self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
-                    
-                    # Otherwise create plot
-                    self.figures = self.generate_plots()
+                if self.data_as_raw_or_xyd_file.endswith('.xyd'):
+                    # Otherwise parse the file
+                    with archive.m_context.raw_file(self.data_as_raw_or_xyd_file) as xydfile:
+                        # Load the data from the file
+                        dataxydfile = np.loadtxt(xydfile)
+                        
+                        # Separate the columns into two variables and copy to 
+                        self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
+                        self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+                        
+                        # Otherwise create plot
+                        self.figures = self.generate_plots()
+                        
+                if self.data_as_raw_or_xyd_file.endswith('.raw'):
+                    # Otherwise parse the file
+                    with archive.m_context.raw_file(self.data_as_raw_or_xyd_file,'rb') as rawfile:
+                        # Load the data from the file
+                        contentrawfile = rawfile.read()
+                        
+                        ###
+                        # File Type Version
+                        ###
+                        count = len(contentrawfile[0x00:0x0F + 1])//1 # Number of bytes to unpack
+                        #print(count)
+                        unpacked_data = self.unpack_repeated_bytes(contentrawfile[0x00:0x0F + 1], 'b', count)
+                            
+                        # Convert unpacked data to a string
+                        string_output = ''.join(chr(b) for b in unpacked_data)
+                            
+                        # Print the unpacked data as a string
+                        #print(string_output)
+                        
+                        ###
+                        # Date
+                        ###
+
+                        datasplice = contentrawfile[0x0010:0x001F + 1]
+                        count = len(datasplice)//1 # Number of bytes to unpack
+                        #print(count)
+                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'b', count)
+                            
+                        # Convert unpacked data to a string
+                        string_output = ''.join(chr(b) for b in unpacked_data)
+                        # Print the unpacked data as a string
+                        print(string_output)
+                        
+                        ###
+                        # File Name And Comments?
+                        ###
+                        datasplice = contentrawfile[0x0020:0x012F + 1]
+                        
+                        # Get all chunks separated by NULL bytes in the data slice
+                        chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
+                            
+                        # Print the result chunks
+                        for i, chunk in enumerate(chunks):
+                            #print(f'Chunk {i}: {chunk}')
+                            count = len(chunk)//1 # Number of bytes to unpack (1 for char)
+                            unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
+                            string_output = ''.join(chr(b) for b in unpacked_data)
+                            # Print the unpacked data as a string
+                            print(string_output)
+                            
+                        ###
+                        # Start and End Time
+                        ###
+                        datasplice = contentrawfile[4*0x10000+0x0600:4*0x10000+0x0620]
+                        #print(datasplice)
+                        # Get all chunks separated by NULL bytes in the data slice
+                        chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
+                            
+                        # Print the result chunks
+                        for i, chunk in enumerate(chunks):
+                            print(f'Chunk {i}: {chunk}')
+                            count = len(chunk)//1 # Number of bytes to unpack (1 for char)
+                            unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
+                            string_output = ''.join(chr(b) for b in unpacked_data)
+                            # Print the unpacked data as a string
+                            print(string_output)
+                        
+                        ###
+                        # Number of Data Entries
+                        ###
+                        datasplice = contentrawfile[4*0x10000+0x0622:4*0x10000+0x0624]
+                        print(datasplice)
+                        #'i': Integer (4 bytes)
+                        #'f': Float (4 bytes)
+                        #'d': Double (8 bytes)
+                        #'h': Short (2 bytes)
+                        count = len(datasplice)//2 # Number of bytes to unpack (1 for char)
+                        #print(count)
+                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'h', count)
+                        countDataEntries=int(unpacked_data[0])
+                        print(unpacked_data)
+                        print(countDataEntries)
+                        
+                        ###
+                        # x-range
+                        ###
+                        datasplice = contentrawfile[4*0x10000+0x062C:4*0x10000+0x0638]
+                        print(datasplice)
+                        #'i': Integer (4 bytes)
+                        #'f': Float (4 bytes)
+                        #'d': Double (8 bytes)
+                        #'h': Short (2 bytes)
+                        count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+                        #print(count)
+                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
+                        print(unpacked_data)
+
+                        x_start = unpacked_data[0]
+                        x_end = unpacked_data[2]
+
+                        x_range = np.linspace(x_start, x_end, countDataEntries, True)
+                        print(type(x_range))
+                        print(x_range)
+                        print(len(x_range))
+                        
+                        ###
+                        # Data
+                        ###
+
+                        datasplice = contentrawfile[0x40800:0x42BC0]
+                        #'i': Integer (4 bytes)
+                        #'f': Float (4 bytes)
+                        #'d': Double (8 bytes)
+                        count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+                        #print(count)
+                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'i', count)
+
+                        #print(unpacked_data)
+                        #type(unpacked_data)
+                        y_data = np.array(unpacked_data, dtype=np.int64)
+                        print(y_data)
+                        print(len(y_data))
+
+                        # Save to file
+                        #np.savetxt('filenameRAW2TXT.txt', np.transpose((x_range,y_data)), fmt=['%.6f', '%d'], header='2Theta, Intensity', comments='# Converted RAW to TXT\n')
+
+                        
+#                         dataxydfile = np.loadtxt(xydfile)
+#                         
+#                         # Separate the columns into two variables and copy to 
+#                         self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
+#                         self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+#                         
+#                         # Otherwise create plot
+#                         self.figures = self.generate_plots()
                     
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
