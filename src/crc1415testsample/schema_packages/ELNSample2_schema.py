@@ -393,18 +393,20 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         # Get all chunks separated by NULL bytes in the data slice
                         chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
                         
-                        self.description = ''
-                        
-                        # Print the result chunks
-                        for i, chunk in enumerate(chunks):
-                            #print(f'Chunk {i}: {chunk}')
-                            count = len(chunk)//1 # Number of bytes to unpack (1 for char)
-                            unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
-                            string_output_description = ''.join(chr(b) for b in unpacked_data)
-                            # Print the unpacked data as a string
-                            self.description += string_output_description + '\n'
-                            #print(string_output)
+                        # Only add description if nothing is there
+                        if not self.description:
+                            self.description = ''
                             
+                            # Print the result chunks
+                            for i, chunk in enumerate(chunks):
+                                #print(f'Chunk {i}: {chunk}')
+                                count = len(chunk)//1 # Number of bytes to unpack (1 for char)
+                                unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
+                                string_output_description = ''.join(chr(b) for b in unpacked_data)
+                                # Print the unpacked data as a string
+                                self.description += '<p>'+string_output_description + '</p>\n'
+                                #print(string_output)
+                                
                         ###
                         # Start and End Time
                         ###
