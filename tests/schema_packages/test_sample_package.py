@@ -60,10 +60,10 @@ def test_RamanMeasurement_package():
     #assert len(entry_archive.data.Transmittance) == 3525 
 
 def test_XRDMeasurement_package():
-    test_file = os.path.join('tests', 'data', 'test_XRDMeasurement.archive.yaml')
+    test_file = os.path.join('tests', 'data', 'test_XRDMeasurementXYD.archive.yaml')
     entry_archive = parse(test_file)[0]
     normalize_all(entry_archive)
-    print("Run XRDMeasurement")
+    print("Run XRDMeasurement XYD file")
 
     #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
     
@@ -73,7 +73,7 @@ def test_XRDMeasurementRAW_package():
     test_file = os.path.join('tests', 'data', 'test_XRDMeasurementRAW.archive.yaml')
     entry_archive = parse(test_file)[0]
     normalize_all(entry_archive)
-    print("Run XRDMeasurement")
+    print("Run XRDMeasurement RAW file")
 
     #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
     

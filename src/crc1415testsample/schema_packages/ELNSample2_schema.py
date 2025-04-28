@@ -211,10 +211,17 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
             "visible": False
         },
     )
+    
+    datetime_end = Quantity(
+        type=Datetime,
+        description='The date and time when this activity has ended.',
+        a_eln=dict(component='DateTimeEditQuantity', label='ending Time'),
+    )
+    
     data_as_raw_or_xyd_file = Quantity(
         type=str,
         description='''
-        A reference to an uploaded .xyd produced by the XRD instrument.
+        A reference to an uploaded .raw or .xyd produced by the XRD instrument.
         ''',
         a_browser={
             "adaptor": "RawFileAdaptor"
@@ -351,18 +358,18 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         ###
                         # File Type Version
                         ###
-                        count = len(contentrawfile[0x00:0x0F + 1])//1 # Number of bytes to unpack
+                        count = len(contentrawfile[0x00:0x0D + 1])//1 # Number of bytes to unpack
                         #print(count)
-                        unpacked_data = self.unpack_repeated_bytes(contentrawfile[0x00:0x0F + 1], 'b', count)
+                        unpacked_data = self.unpack_repeated_bytes(contentrawfile[0x00:0x0D + 1], 'b', count)
                             
                         # Convert unpacked data to a string
-                        string_output = ''.join(chr(b) for b in unpacked_data)
-                            
-                        # Print the unpacked data as a string
-                        #print(string_output)
+                        string_output_file_type = ''.join(chr(b) for b in unpacked_data)
+                        
+                        if string_output_file_type != 'RAW_1.06Powdat':
+                            logger.warn(f'This reader may not work for raw file with header: "{string_output_file_type}"')
                         
                         ###
-                        # Date
+                        # Date of Experiment
                         ###
 
                         datasplice = contentrawfile[0x0010:0x001F + 1]
@@ -371,9 +378,12 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         unpacked_data = self.unpack_repeated_bytes(datasplice, 'b', count)
                             
                         # Convert unpacked data to a string
-                        string_output = ''.join(chr(b) for b in unpacked_data)
-                        # Print the unpacked data as a string
-                        print(string_output)
+                        string_output_day = ''.join(chr(b) for b in unpacked_data)
+                        
+                        # Convert the unpacked data as a datetime object
+                        from dateutil import parser as dataparser
+                        dt = dataparser.parse(string_output_day)
+                        self.datetime = dt 
                         
                         ###
                         # File Name And Comments?
@@ -382,15 +392,18 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         
                         # Get all chunks separated by NULL bytes in the data slice
                         chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
-                            
+                        
+                        self.description = ''
+                        
                         # Print the result chunks
                         for i, chunk in enumerate(chunks):
                             #print(f'Chunk {i}: {chunk}')
                             count = len(chunk)//1 # Number of bytes to unpack (1 for char)
                             unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
-                            string_output = ''.join(chr(b) for b in unpacked_data)
+                            string_output_description = ''.join(chr(b) for b in unpacked_data)
                             # Print the unpacked data as a string
-                            print(string_output)
+                            self.description += string_output_description + '\n'
+                            #print(string_output)
                             
                         ###
                         # Start and End Time
@@ -401,35 +414,45 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
                             
                         # Print the result chunks
-                        for i, chunk in enumerate(chunks):
-                            print(f'Chunk {i}: {chunk}')
-                            count = len(chunk)//1 # Number of bytes to unpack (1 for char)
-                            unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
-                            string_output = ''.join(chr(b) for b in unpacked_data)
-                            # Print the unpacked data as a string
-                            print(string_output)
+                        # for i, chunk in enumerate(chunks):
+                        #     print(f'Chunk {i}: {chunk}')
+                        #     count = len(chunk)//1 # Number of bytes to unpack (1 for char)
+                        #     unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
+                        #     string_output_time = ''.join(chr(b) for b in unpacked_data)
+                        #     # Print the unpacked data as a string
+                        #     print(string_output_time)
+                        #
+                        # print(len(chunks), chunks[1])
+                        
+                        
+                        if len(chunks) > 1:
+                            count = len(chunks[1])//1 # Number of bytes to unpack (1 for char)
+                            unpacked_data = self.unpack_repeated_bytes(chunks[1], 'b', count)
+                            string_output_time = ''.join(chr(b) for b in unpacked_data)
+                            
+                            from dateutil import parser as dataparser
+                            dt = dataparser.parse(string_output_time)
+                            self.datetime_end = dt 
                         
                         ###
                         # Number of Data Entries
                         ###
                         datasplice = contentrawfile[4*0x10000+0x0622:4*0x10000+0x0624]
-                        print(datasplice)
-                        #'i': Integer (4 bytes)
-                        #'f': Float (4 bytes)
-                        #'d': Double (8 bytes)
-                        #'h': Short (2 bytes)
+                        # 'i': Integer (4 bytes)
+                        # 'f': Float (4 bytes)
+                        # 'd': Double (8 bytes)
+                        # 'h': Short (2 bytes)
                         count = len(datasplice)//2 # Number of bytes to unpack (1 for char)
                         #print(count)
                         unpacked_data = self.unpack_repeated_bytes(datasplice, 'h', count)
                         countDataEntries=int(unpacked_data[0])
-                        print(unpacked_data)
-                        print(countDataEntries)
+                        # print(countDataEntries)
                         
                         ###
                         # x-range
                         ###
                         datasplice = contentrawfile[4*0x10000+0x062C:4*0x10000+0x0638]
-                        print(datasplice)
+                        
                         #'i': Integer (4 bytes)
                         #'f': Float (4 bytes)
                         #'d': Double (8 bytes)
@@ -437,15 +460,17 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
                         #print(count)
                         unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
-                        print(unpacked_data)
-
+                        #print(unpacked_data)
+                        
                         x_start = unpacked_data[0]
                         x_end = unpacked_data[2]
 
                         x_range = np.linspace(x_start, x_end, countDataEntries, True)
-                        print(type(x_range))
-                        print(x_range)
-                        print(len(x_range))
+                        #print(type(x_range))
+                        #print(x_range)
+                        #print(len(x_range))
+                        
+                        self.Deg2Theta = ureg.Quantity(x_range, 'degree') # dataxydfile[:, 0]  # First column
                         
                         ###
                         # Data
@@ -462,24 +487,20 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         #print(unpacked_data)
                         #type(unpacked_data)
                         y_data = np.array(unpacked_data, dtype=np.int64)
-                        print(y_data)
-                        print(len(y_data))
-
-                        # Save to file
-                        #np.savetxt('filenameRAW2TXT.txt', np.transpose((x_range,y_data)), fmt=['%.6f', '%d'], header='2Theta, Intensity', comments='# Converted RAW to TXT\n')
-
+                        #print(y_data)
+                        #print(len(y_data))
                         
-#                         dataxydfile = np.loadtxt(xydfile)
-#                         
-#                         # Separate the columns into two variables and copy to 
-#                         self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
-#                         self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
-#                         
-#                         # Otherwise create plot
-#                         self.figures = self.generate_plots()
+                        self.Intensity = ureg.Quantity(y_data, 'dimensionless') #dataxydfile[:, 1]  # Second column
+                        
+                        # Sanity check
+                        if len(x_range) != len(y_data):
+                            raise DataFileError(f"The data in file '{self.data_as_dpt_file}' could not parsed. '{countDataEntries}' expected, but {len(y_data)} found!")
+                        
+                        # Create plot
+                        self.figures = self.generate_plots()
                     
         except Exception as e:
-            logger.error('Invalid file extension for parsing.', exc_info=e)
+            logger.error('Invalid file parsing error.', exc_info=e)
             #logger.error('Invalid file extension for parsing.', exc_info=e)
         # In case something is odd here -> just return
         # if not self.results:
