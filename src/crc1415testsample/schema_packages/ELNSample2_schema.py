@@ -1231,6 +1231,14 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     string_output_xml = ''.join(chr(b) for b in unpacked_data)
                     #print(string_output_xml)
                     
+                    import xmltodict, json
+                    dataxmlfile = xmltodict.parse(string_output_xml)
+                    string_experiment_time = dataxmlfile['Info']['Groups']['Group'][0]['Items']['Item']['Value']
+                    
+                    from datetime import datetime
+                    dateExpermimentParsed = datetime.strptime(string_experiment_time,'%d.%m.%Y %H:%M')
+                    self.datetime = dateExpermimentParsed
+                    
                     ###
                     # List of Intensity counts for every frame in file
                     ###

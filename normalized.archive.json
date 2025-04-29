@@ -2,7 +2,7 @@
   "data": {
     "m_def": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",
     "name": "test RamanMeasurementTVB",
-    "datetime": "2025-04-29T15:56:57.175262+00:00",
+    "datetime": "2025-03-11T11:32:00+00:00",
     "data_as_tvb_file": "test_Raman_10Frames.tvb",
     "figures": [
       {
@@ -54613,9 +54613,9 @@
     "entry_type": "MeasurementRaman",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_RamanMeasurementTVB.archive.yaml",
     "text_search_contents": [
-      "Intensity-Raman shift linear plot",
       "test RamanMeasurementTVB",
-      "test_Raman_10Frames.tvb"
+      "test_Raman_10Frames.tvb",
+      "Intensity-Raman shift linear plot"
     ],
     "n_quantities": 59,
     "quantities": [
@@ -54827,16 +54827,16 @@
         "float_value": 561.07
       },
       {
+        "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.Activity.datetime",
+        "path_archive": "data.datetime",
+        "datetime_value": "2025-03-11T11:32:00+00:00"
+      },
+      {
         "id": "data.name#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",
         "definition": "nomad.datamodel.metainfo.basesections.v1.BaseSection.name",
         "path_archive": "data.name",
         "str_value": "test RamanMeasurementTVB"
-      },
-      {
-        "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",
-        "definition": "nomad.datamodel.metainfo.basesections.v1.Activity.datetime",
-        "path_archive": "data.datetime",
-        "datetime_value": "2025-04-29T15:56:57.175262+00:00"
       }
     ]
   },
