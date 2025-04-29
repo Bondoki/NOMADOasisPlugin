@@ -54664,12 +54664,12 @@
     "section_defs": [
       {
         "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",
-        "definition_id": "2db6eb2f706c13c42f1b2f611de1358123b5d6be",
+        "definition_id": "2240288cddca3ac7dda702215bab04a59ed95557",
         "used_directly": true
       },
       {
         "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.RamanData",
-        "definition_id": "cca93a24b90a2c3c47c3eff31007381c885b780c",
+        "definition_id": "992d74c9a196c85fa17a02c394fe6de17bd4f27d",
         "used_directly": true
       },
       {

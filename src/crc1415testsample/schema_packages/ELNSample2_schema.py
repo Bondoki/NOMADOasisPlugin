@@ -956,7 +956,7 @@ class RamanData(ArchiveSection):
     
     name = Quantity(
         type=str,
-        default='TestName',
+        #default='TestName',
         description='Name of the section or Raman measurement',
         a_eln={'component': 'StringEditQuantity'},
     )
