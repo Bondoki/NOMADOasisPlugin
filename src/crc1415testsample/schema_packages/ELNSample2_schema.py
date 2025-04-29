@@ -1017,6 +1017,17 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         },
     )
     
+    data_as_tvb_file = Quantity(
+        type=str,
+        description="A reference to an uploaded TriVista binary .tvb produced by the Raman instrument.",
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity"
+        },
+    )
+    
     Raman_data_entries = SubSection(section_def=RamanData, repeats=True)
     
     
@@ -1067,6 +1078,46 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
 
         return figures
     
+    def unpack_repeated_bytes(self, byte_data, data_type, count, littleEndianEncoding=True):
+        """
+        Unpack a series of bytes into a tuple of the same data type.
+        'i': Integer (4 bytes)
+        'I': Unsigned Int (4 bytes)
+        'l': Long (4 bytes)
+        'L': Long (8 bytes)
+        'f': Float (4 bytes)
+        'd': Double (8 bytes)
+        'h': Short (2 bytes)
+        'b': Signed char (1 byte)
+        'B': Unsigned char (1 byte)
+        'q': Long long (8 bytes)
+        'Q': Unsigned long long (8 bytes)
+
+        :param byte_data: The bytes to unpack.
+        :param data_type: The format character for the data type (e.g., 'b' for signed char).
+        :param count: The number of items to unpack.
+        :param littleEndianEncoding: Flag to determine if the data is in little-endian format.
+        :return: A tuple of unpacked values.
+        """
+        # Determine the endianness based on the flag
+        endianness = '<' if littleEndianEncoding else '>'
+        
+        # Create the format string based on the data type, count, and endianness
+        format_string = f'{endianness}{count}{data_type}'
+        
+        # Unpack the byte data using the constructed format string
+        return struct.unpack(format_string, byte_data)
+    
+    def get_non_empty_chunks_separated_by_null(self, data_slice):
+        """
+        Get all non-empty chunks of data separated by NULL bytes.
+
+        :param data_slice: The slice of data to split.
+        :return: A list of bytes objects, each representing a non-empty chunk of data.
+        """
+        # Split the data by NULL bytes and filter out empty chunks
+        return [chunk for chunk in data_slice.split(b'\x00') if chunk]
+    
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
         The normalize function of the `MeasurementRaman` section.
@@ -1078,12 +1129,156 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         """
         # super().normalize(archive, logger)
         try:
-            #Check if any file is provided in any subsection
+            #Check if there's any TriVista binary .tvb file provided in main section
+            if self.data_as_tvb_file:
+                if not self.data_as_tvb_file.endswith('.tvb'):
+                    raise DataFileError(f"The file '{self.data_as_tvb_file}' must have a .tvb extension.")
+                
+                # Otherwise parse the file
+                with archive.m_context.raw_file(self.data_as_tvb_file,'rb') as tvbfile:
+                    # Load the data from the file
+                    contentTVBfile = tvbfile.read()
+                    
+                    ###
+                    # File Type Version
+                    ###
+                    datasplice = contentTVBfile[0x0000:0x003] # this should be 'tvb'
+                    # 'b': Signed char (1 byte)
+                    count = len(datasplice)//1 # Number of bytes to unpack (1 for char)
+                    #print(count)
+                    unpacked_data = self.unpack_repeated_bytes(datasplice, 'b', count)
+                    string_output_file_type = ''.join(chr(b) for b in unpacked_data)
+                    #print(string_output_file_type)
+                    
+                    if string_output_file_type != 'tvb':
+                        logger.error(f'This reader may not work for tvb file with header: "{string_output_file_type}"')
+                    
+                    ###
+                    # File Info - Frames and Dataset Length
+                    ###
+                    datasplice = contentTVBfile[0x0004:0x0016] 
+                    # 'h': short (2 byte)
+                    count = len(datasplice)//2 # Number of bytes to unpack (1 for char)
+                    #print(count)
+                    unpacked_data = self.unpack_repeated_bytes(datasplice, 'h', count)
+                    #print(unpacked_data)
+                    
+                    numDatasetLength = int(unpacked_data[1])
+                    numFrames = int(unpacked_data[5])
+                    #print(numDatasetLength, numFrames)
+                    
+                    ###
+                    # LaserExcitationWavelength
+                    ###
+                    datasplice = contentTVBfile[0x0025:0x002D]
+                    # 'd': double (8 byte)
+                    count = len(datasplice)//8 # Number of bytes to unpack (1 for char)
+                    #print(count)
+                    unpacked_data = self.unpack_repeated_bytes(datasplice, 'd', count)
+                    #print(unpacked_data)
+                    
+                    LaserExcitationWavelength = float(unpacked_data[0])
+                    #print(LaserExcitationWavelength)
+                    
+                    ###
+                    # Number of Raman Wavelength entries = NRWE
+                    ###
+                    datasplice = contentTVBfile[0x002D:0x0031] 
+                    # 'I': unsigned integer (4 byte)
+                    count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+                    #print(count)
+                    unpacked_data = self.unpack_repeated_bytes(datasplice, 'I', count)
+                    #print(unpacked_data)
+                    
+                    NRWE = int(unpacked_data[0])
+                    # print(NRWE)
+                    
+                    ###
+                    # List of Raman Wavelength [in nm] convert to Raman Shift = Raman Wavenumber [1/nm]
+                    ###
+                    datasplice = contentTVBfile[0x0031:0x0031+4*NRWE] 
+                    # 'f': float (4 byte)
+                    count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+                    #print(count)
+                    unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
+                    #print(unpacked_data)
+                    
+                    import numpy as np
+                    RamanWavenumber = (1.0/LaserExcitationWavelength-1.0/np.asarray(unpacked_data, dtype=np.float64)) # in 1/nm
+                    #print(RamanWavenumber)
+                    
+                    ###
+                    # Character Length of XML section = CLXML
+                    ###
+                    datasplice = contentTVBfile[0x1534:0x1538] 
+                    # 'I': unsigned integer (4 byte)
+                    count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+                    #print(count)
+                    unpacked_data = self.unpack_repeated_bytes(datasplice, 'I', count)
+                    #print(unpacked_data)
+                    
+                    CLXML = int(unpacked_data[0])
+                    #print(CLXML)
+                    
+                    ###
+                    # XML part
+                    ###
+                    datasplice = contentTVBfile[0x1538:0x1538+1*CLXML]
+                    # 'b': Signed char (1 byte)
+                    count = len(datasplice)//1 # Number of bytes to unpack (1 for char)
+                    #print(count)
+                    unpacked_data = self.unpack_repeated_bytes(datasplice, 'b', count)
+                    string_output_xml = ''.join(chr(b) for b in unpacked_data)
+                    #print(string_output_xml)
+                    
+                    ###
+                    # List of Intensity counts for every frame in file
+                    ###
+                    offsetHeader = 0x1538+1*CLXML + 3*4 + 8 + 101
+                    
+                    # Create subsection if not existing
+                    if not self.Raman_data_entries:
+                        self.Raman_data_entries = []
+                        # Ensure the list is long enough
+                        while len(self.Raman_data_entries) < numFrames:
+                            self.Raman_data_entries.append(RamanData())  # Append a placeholder value
+                    
+                    # Create new if not sufficient long enough - overwrites the default
+                    if len(self.Raman_data_entries) < numFrames:
+                        self.Raman_data_entries = []
+                        while len(self.Raman_data_entries) < numFrames:
+                            self.Raman_data_entries.append(RamanData())  # Append a placeholder value
+                    
+                    #print(len(self.Raman_data_entries))
+                    
+                    # Do this for every frame in file
+                    for frame in range(0,numFrames,1):
+                        #print(frame)
+                        datasplice = contentTVBfile[offsetHeader:offsetHeader+4*NRWE] 
+                        # 'f': float (4 byte)
+                        count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+                        #print(count)
+                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
+                        #print(unpacked_data)
+                        
+                        import numpy as np
+                        IntensityCount = np.asarray(unpacked_data, dtype=np.float64)
+                        #print(IntensityCount)
+                        
+                        # Separate the columns into two variables and copy to 
+                        self.Raman_data_entries[frame].Raman_shift = ureg.Quantity(RamanWavenumber, '1/nanometer')
+                        self.Raman_data_entries[frame].Intensity = ureg.Quantity(IntensityCount, 'dimensionless')
+                        self.Raman_data_entries[frame].Laser_Excitation_Wavelength = ureg.Quantity(LaserExcitationWavelength, 'nanometer')
+                        
+                        offsetHeader += 4*NRWE + 3*4 + 8 + 101 # specific after every frame 
+                    
+                    
+            #Check if any file is provided in any subsection for .tvb or .txt files
             for r_d_entries in self.Raman_data_entries:
                 if r_d_entries.data_as_tvf_or_txt_file:
                     # Check if the file has the correct extension: TriVista tvf or plain 2-column txt
                     if not r_d_entries.data_as_tvf_or_txt_file.endswith('.tvf') and not r_d_entries.data_as_tvf_or_txt_file.endswith('.txt'):
-                        print("Expect Data File Error")
+                        #print("Expect Data File Error")
                         raise DataFileError(f"The file '{r_d_entries.data_as_tvf_or_txt_file}' must have a .tvf or .txt extension.")
                     
                     # Otherwise parse the file with *.txt
@@ -1123,7 +1318,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                             RamanWavenumber = (1.0/calibrationLaserWave-1.0/np.asarray(RamanWavelengthData[1:], dtype=np.float64)) # in 1/nm
                             
                             # Read-in of Intensity Counts
-                            IntensityString = RamanWavelength=dataxyfile['XmlMain']['Documents']['Document']['Data']['Frame']['#text']
+                            IntensityString = dataxyfile['XmlMain']['Documents']['Document']['Data']['Frame']['#text']
                             Intensity = np.asarray([float(x) for x in IntensityString.split(';')], dtype=np.float64)
                             
                             # Archive the data

@@ -1,0 +1,12 @@
+data:
+  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical
+  #
+  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample
+  # molecular_formula: 'VK0.5'
+  #
+  #m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementXRD
+  #data_file: test.xyd
+  #
+  m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman
+  data_as_tvb_file: test_Raman_10Frames.tvb
+  
