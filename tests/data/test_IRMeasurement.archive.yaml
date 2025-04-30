@@ -1,11 +1,3 @@
 data:
-  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical
-  #
-  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample
-  # molecular_formula: 'VK0.5'
-  #
-  #m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementXRD
-  #data_file: test.xyd
-  #
   m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementIR
   data_as_dpt_file: IRtest.dpt

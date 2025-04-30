@@ -69,6 +69,16 @@ def test_RamanMeasurementTVB_package():
     
     assert entry_archive.data.data_as_tvb_file == 'test_Raman_10Frames.tvb'
     
+def test_RamanMeasurementTVB2_package():
+    test_file = os.path.join('tests', 'data', 'test_RamanMeasurementTVB2.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    #normalize_all(entry_archive)
+    print("Run RamanMeasurement TVB")
+    
+    normalize_all(entry_archive)
+    
+    assert entry_archive.data.data_as_tvb_file == 'test_Raman_1Frame.tvb'
+    
 
 def test_XRDMeasurement_package():
     test_file = os.path.join('tests', 'data', 'test_XRDMeasurementXYD.archive.yaml')
