@@ -1,0 +1,65 @@
+﻿                        Quantachrome� ASiQwin�- Automated Gas Sorption Data
+                                     Acquisition and Reduction
+                               � 1994-2012, Quantachrome Instruments
+                                            version 3.0
+
+Analysis                                          Report
+Operator:      operator       Date:4/11/2023      Operator: useradsorb          Date:2025/03/14
+Sample ID:     RE-306_act_DUT-     Filename:      RE-306_act_DUT-84_Prop.QPS
+Sample Desc:   RE-306_act_DUT-84_PropComment:      
+Sample weight: 0.0268 g
+Analysis Time: 527.6 min           End of run:    4/11/2023 18:04:50  Instrument:    QuadraSorb Station 4
+Void Vol.:     He Mode.Cell: 9mm large bulbRun modeStandard           Instrument version:5.04
+Thermal delay: 120 sec             He evac time:  0 min
+Outgas Time:   24.0 hrs            OutgasTemp:    120.0 C
+Analysis gas:  Nitrogen            Bath Temp:     77.3 K
+Press. Tolerance:0.050/0.050 (ads/des)Equil time: variable/300 sec (ads/des)Equil timeout:600/600 sec (ads/des)
+                                     Data Reduction Parameters
+Adsorbate      Nitrogen                 Temperature    77.350K
+ 
+               Molec. Wt.: 28.013       Cross Section: 16.200  Ų     Liquid Density: 0.808  g/cc
+
+                     Relative                                        Volume @ STP
+                     Pressure                                               
+                                                                         cc/g
+
+                        1.19889e-02                                     122.3506
+                        1.72585e-02                                     124.4019
+                        4.81037e-02                                     130.1502
+                        8.99883e-02                                     133.7026
+                        1.30441e-01                                     136.0292
+                        1.71065e-01                                     138.2497
+                        2.15451e-01                                     140.1585
+                        2.54597e-01                                     141.7897
+                        2.96902e-01                                     142.9325
+                        3.36038e-01                                     144.2967
+                        3.76621e-01                                     145.8857
+                        4.19849e-01                                     147.4527
+                        4.60224e-01                                     149.4576
+                        4.99172e-01                                     151.1491
+                        5.40239e-01                                     153.3210
+                        5.79503e-01                                     155.0930
+                        6.18520e-01                                     157.1780
+                        6.60820e-01                                     158.6382
+                        6.99045e-01                                     160.2471
+                        7.36257e-01                                     162.3567
+                        7.76122e-01                                     165.0234
+                        8.27309e-01                                     168.9982
+                        8.61561e-01                                     171.0303
+                        8.98833e-01                                     174.2863
+                        9.38471e-01                                     180.4528
+                        9.82732e-01                                     199.7299
+                        9.04927e-01                                     186.1629
+                        8.30768e-01                                     179.3017
+                        7.68725e-01                                     175.2248
+                        7.03232e-01                                     171.8781
+                        6.29436e-01                                     168.5868
+                        5.67347e-01                                     165.9047
+                        4.96044e-01                                     160.7452
+                        4.25030e-01                                     154.2433
+                        3.53739e-01                                     151.2347
+                        2.86656e-01                                     148.2132
+                        2.17327e-01                                     144.7585
+                        1.48394e-01                                     140.5583
+                        7.82475e-02                                     135.1192
+                        7.92729e-03                                     120.4438

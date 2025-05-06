@@ -26,6 +26,12 @@ import io
 import pint
 import struct # for binary files
 
+import os    
+
+import re
+import numpy as np
+import json
+
 from nomad.datamodel.metainfo.plot import PlotSection
 from nomad.datamodel.metainfo.eln import ELNMeasurement
 #from nomad.parsing.tabular import TableData
@@ -1343,6 +1349,353 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         super().normalize(archive, logger)
 
 
+class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
+    '''
+    Class for handling measurement of IR.
+    '''
+    m_def = Section(
+        categories=[CRC1415Category],
+        label='CRC1415-Measurement-Adsorption',
+        a_eln={
+            "overview": True,
+            "hide": [
+                "name",
+                "lab_id",
+                "method",
+                "samples",
+                "measurement_identifiers"
+            ]
+        },
+    )
+    lab_id = Quantity(
+        type=str,
+        a_display={
+            "visible": False
+        },
+    )
+    data_as_txt_file = Quantity(
+        type=str,
+        description="A reference to an uploaded Quantachrome .txt produced by the adsorption instrument.",
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity"
+        },
+    )
+    
+    datetime_end = Quantity(
+        type=Datetime,
+        description='The date and time when this activity has ended.',
+        a_eln=dict(component='DateTimeEditQuantity', label='Ending Time'),
+    )
+    
+    Analysis_Time= Quantity(
+        type=np.float64,
+        unit='minute',
+        description='The time for performing the analysis.',
+        a_eln=dict(component='NumberEditQuantity', label='Analysis Time', defaultDisplayUnit= 'minute'),
+    )
+    
+    Sample_Weight = Quantity(
+        type=np.float64,
+        unit='gram',
+        description='The weight of the sample.',
+    )
+    
+    Outgas_Time= Quantity(
+        type=np.float64,
+        unit='hours',
+        description='The time during the outgas process.',
+        a_eln=dict(component='NumberEditQuantity', label='Outgas Time', defaultDisplayUnit= 'hours'),
+    )
+    
+    Outgas_Temperature = Quantity(
+        type=np.float64,
+        unit='celsius',
+        description='The temperature during the outgas process.',
+        a_eln=dict(component='NumberEditQuantity', label='Outgas Temperature', defaultDisplayUnit= 'celsius'),
+    )
+    
+    Analysis_Gas  = Quantity(
+        type=str,
+        #unit='celsius',
+        description='The gas used for the analysis.',
+        a_eln=dict(component='StringEditQuantity', label='Analysis Gas'),
+    )
+    
+    Bath_Temperature = Quantity(
+        type=np.float64,
+        unit='kelvin',
+        description='The temperature of the bath.',
+        a_eln=dict(component='NumberEditQuantity', label='Bath Temperature', defaultDisplayUnit= 'kelvin'),
+    )
+    
+    RelativePressure = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='dimensionless',
+        description='The relative pressure range of the spectrogram, dimensionless.',
+    )
+    AdsorpedVolume = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='millimole/gram',
+        description='The measured adsorped volume at relative pressure value, normalized by ideal gas molar volume 22.4 cm**3/mol.',
+    )
+    
+    def generate_plots(self) -> list[PlotlyFigure]:
+        """
+        Generate the plotly figures for the `MeasurementIR` section.
+
+        Returns:
+            list[PlotlyFigure]: The plotly figures.
+        """
+        # figures = []
+        # #if self.wavelength is None:
+        # #    return figures
+        # 
+        # x_label = 'Wavenumber'
+        # xaxis_title = f'{x_label} (cm-1)'
+        # x = self.Wavenumber.to('1/cm').magnitude
+        # 
+        # y_label = 'Transmittance'
+        # yaxis_title = f'{y_label} (a.u.)'
+        # y = self.Transmittance.to('dimensionless').magnitude
+        # 
+        # line_linear = px.line(x=x, y=y)
+        # 
+        # line_linear.update_layout(
+        #     title=f'{y_label} over {x_label}',
+        #     xaxis_title=xaxis_title,
+        #     yaxis_title=yaxis_title,
+        #     xaxis=dict(
+        #         fixedrange=False,
+        #     ),
+        #     yaxis=dict(
+        #         fixedrange=False,
+        #     ),
+        #     template='plotly_white',
+        # )
+        # 
+        # figures.append(
+        #     PlotlyFigure(
+        #         label=f'{y_label} linear plot',
+        #         index=0,
+        #         figure=line_linear.to_plotly_json(),
+        #     ),
+        # )
+
+        return figures
+    
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
+        """
+        The normalize function of the `MeasurementIR` section.
+
+        Args:
+            archive (EntryArchive): The archive containing the section that is being
+            normalized.
+            logger (BoundLogger): A structlog logger.
+        """
+        
+        try:
+            # Check if any file is provided
+            if self.data_as_txt_file:
+                # Check if the file has the correct extension
+                if not self.data_as_txt_file.endswith('.txt'):
+                    raise DataFileError(f"The file '{self.data_as_txt_file}' must have a Quantachrome .txt extension.")
+            
+                # Get the encoding
+                # from chardet import detect # for Quantachrome ASiQwin text as the file has the 'Windows-1252' encoding
+                # # but this can usally ignored as the only character is the Angstrom 
+                
+                # with archive.m_context.raw_file(self.data_as_txt_file, 'rb') as txtfile:
+                #     rawdata = txtfile.read()
+                #     get_encoding_type = detect(rawdata)['encoding']
+                #     print(get_encoding_type)
+                
+                with archive.m_context.raw_file(self.data_as_txt_file, 'r', errors='ignore') as txtfile:
+                    text = txtfile.read()
+
+                # Merge all whitespaces to one
+                cleaned_text = re.sub(r'\s+', ' ', text)
+
+                # Split the text to find the section starting with "Analysis Report"
+                report_start = cleaned_text.find("Analysis Report")
+                if report_start == -1:
+                    raise DataFileError(f"The file '{self.data_as_txt_file}' could not be parsed. Error in parsing Analysis Report section.")
+                
+                # Extract the relevant part of the text
+                report_text = cleaned_text[report_start:]
+                
+                # Define a dictionary to hold the extracted fields
+                report_data = {}
+                
+                # Use regular expressions to extract the fields
+                #report_data['Operator'] = re.search(r'Operator:\s*(.*?)\s*Date:', report_text).group(1).strip()
+                #report_data['Date'] = re.search(r'Date:\s*(.*?)\s*Sample ID:', report_text).group(1).strip()
+                #report_data['Sample ID'] = re.search(r'Sample ID:\s*(.*?)\s*Filename:', report_text).group(1).strip()
+                #report_data['Filename'] = re.search(r'Filename:\s*(.*?)\s*Sample Desc:', report_text).group(1).strip()
+                #report_data['Sample Desc'] = re.search(r'Sample Desc:\s*(.*?)\s*Sample weight:', report_text).group(1).strip()
+                report_data['Sample weight'] = re.search(r'Sample weight:\s*(.*?)\s*Analysis Time:', report_text).group(1).strip()
+                report_data['Analysis Time'] = re.search(r'Analysis Time:\s*(.*?)\s*End of run:', report_text).group(1).strip()
+                report_data['End of run'] = re.search(r'End of run:\s*(.*?)\s*Instrument:', report_text).group(1).strip()
+                #report_data['Instrument'] = re.search(r'Instrument:\s*(.*?)\s*Void Vol.:', report_text).group(1).strip()
+                #report_data['Void Vol.'] = re.search(r'Void Vol.:\s*(.*?)\s*He Mode.Cell:', report_text).group(1).strip()
+                #report_data['He Mode.Cell'] = re.search(r'He Mode.Cell:\s*(.*?)\s*Run mode', report_text).group(1).strip()
+                #report_data['Run mode'] = re.search(r'Run mode(.*?)(Instrument version:)', report_text).group(1).strip()
+                #report_data['Instrument version'] = re.search(r'Instrument version:\s*(.*?)\s*Thermal delay:', report_text).group(1).strip()
+                #report_data['Thermal delay'] = re.search(r'Thermal delay:\s*(.*?)\s*He evac time:', report_text).group(1).strip()
+                #report_data['He evac time'] = re.search(r'He evac time:\s*(.*?)\s*Outgas Time:', report_text).group(1).strip()
+                report_data['Outgas Time'] = re.search(r'Outgas Time:\s*(.*?)\s*OutgasTemp:', report_text).group(1).strip()
+                report_data['OutgasTemp'] = re.search(r'OutgasTemp:\s*(.*?)\s*Analysis gas:', report_text).group(1).strip()
+                report_data['Analysis gas'] = re.search(r'Analysis gas:\s*(.*?)\s*Bath Temp:', report_text).group(1).strip()
+                report_data['Bath Temp'] = re.search(r'Bath Temp:\s*(.*?)\s*Press. Tolerance:', report_text).group(1).strip()
+                #report_data['Press. Tolerance'] = re.search(r'Press. Tolerance:\s*(.*?)\s*Equil time:', report_text).group(1).strip()
+                #report_data['Equil time'] = re.search(r'Equil time:\s*(.*?)\s*Equil timeout:', report_text).group(1).strip()
+                #report_data['Equil timeout'] = re.search(r'Equil timeout:\s*(.*?)\s*Data Reduction Parameters', report_text).group(1).strip()
+                
+                # Extract the metadata
+                self.Sample_Weight = ureg.Quantity(float(report_data['Sample weight'].split()[0]), report_data['Sample weight'].split()[1])
+                
+                # Convert the unpacked data as a datetime object
+                from dateutil import parser as dataparser
+                from datetime import datetime, timedelta
+                analysistime = ureg.Quantity(float(report_data['Analysis Time'].split()[0]), 'minutes' if report_data['Analysis Time'].split()[1] == 'min' else 'dimensionless')
+                self.Analysis_Time = analysistime
+                #print(type(analysistime.to(ureg.minute).magnitude))
+                #print(float(analysistime.to(ureg.minute).magnitude))
+                self.datetime_end = dataparser.parse(report_data['End of run'])
+                self.datetime = dataparser.parse(report_data['End of run']) - timedelta(minutes=float(analysistime.to(ureg.minute).magnitude))
+                
+                self.Outgas_Time = ureg.Quantity(float(report_data['Outgas Time'].split()[0]), 'hours' if report_data['Outgas Time'].split()[1] == 'hrs' else 'dimensionless')
+                self.Outgas_Temperature = ureg.Quantity(float(report_data['OutgasTemp'].split()[0]), 'celsius' if report_data['OutgasTemp'].split()[1] == 'C' else 'dimensionless')
+                
+                self.Analysis_Gas = report_data['Analysis gas']
+                self.Bath_Temperature = ureg.Quantity(float(report_data['Bath Temp'].split()[0]), 'kelvin' if report_data['Bath Temp'].split()[1] == 'K' else 'dimensionless')
+                
+                # Splits the file into parts separated by empty lines.
+                # The actual data is in the last part.
+                parts = text.split('\n\n')
+                
+                # The first part is everything before the first empty line
+                #before_section = parts[0].strip()
+                #print(before_section)
+                # The data part is everything after the last empty line
+                # We need to check if there is a data part
+                data_section = parts[len(parts)-1].strip() if len(parts) > 1 else None 
+                
+                if not data_section:
+                    raise DataFileError(f"The file '{self.data_as_txt_file}' could not be parsed. Error in parsing data section.")
+                # Convert table data to numpy array
+                relativPressure_array = []
+                adsorpedVolume_array = []
+
+                # Split the section into lines
+                lines = data_section.splitlines()
+                
+                # Iterate through each line and extract values
+                for line in lines:
+                    # Use regex to capture the relative pressure and volume values
+                    match = re.match(r'\s*(\S+)\s+(\S+)', line)
+                    
+                    if match:
+                        try:
+                            relativPressure_array.append(float(match.group(1)))
+                            adsorpedVolume_array.append(float(match.group(2)))
+                        except ValueError:
+                            pass
+                
+                relativePressure = np.array(relativPressure_array)
+                adsorpedVolume = np.array(adsorpedVolume_array)
+                
+                # Archive the data
+                self.RelativePressure = ureg.Quantity(relativePressure, 'dimensionless')
+                self.AdsorpedVolume = ureg.Quantity(adsorpedVolume/22.4, 'millimole/g') # normalized by ideal gas molar volume
+                
+                # Find the index of the maximum value
+                max_index_relativePressure = np.argmax(relativePressure)
+
+                # Split the array into two parts for plotting
+                adsorption_relativePressure = relativePressure[:max_index_relativePressure + 1]  # Include the maximum value
+                desorption_relativePressure = relativePressure[max_index_relativePressure + 1:]   # Exclude the maximum value
+                
+                adsorption_adsorpedVolume = adsorpedVolume[:max_index_relativePressure + 1]/22.4  # Include the maximum value
+                desorption_adsorpedVolume = adsorpedVolume[max_index_relativePressure + 1:]/22.4   # Exclude the maximum value
+                
+                # create plot
+                figures = []
+                
+                # Create a figure
+                fig = go.Figure()
+                
+                x_label = 'Relative Pressure'
+                xaxis_title = 'p/p0 [dimensionless]'
+                x_ads = adsorption_relativePressure
+                x_des = desorption_relativePressure
+                
+                y_label = 'Adsorped Volume'
+                yaxis_title = f'Adsorped Volume [mmol/g] ({self.Analysis_Gas}, {self.Bath_Temperature})'
+                
+                y_ads = adsorption_adsorpedVolume
+                y_des = desorption_adsorpedVolume
+                
+                #line_ads = px.line(x=x_ads, y=y_ads, markers=True, marker_symbol='circle')
+                #line_des = px.line(x=x_des, y=y_des, markers=True, marker_symbol='square-open')
+                
+                # Add the first line with markers
+                fig.add_trace(go.Scatter(
+                    x=x_ads,
+                    y=y_ads,
+                    mode='lines+markers',  # 'lines+markers' to show both lines and markers
+                    name='adsorption',         # Name of the first line
+                    line=dict(color='blue'),  # Line color
+                    marker=dict(size=10, symbol='circle')      # Marker size
+                ))
+
+                # Add the second line with markers
+                fig.add_trace(go.Scatter(
+                    x=x_des,
+                    y=y_des,
+                    mode='lines+markers',  # 'lines+markers' to show both lines and markers
+                    name='desorption',         # Name of the second line
+                    line=dict(color='red'),   # Line color
+                    marker=dict(size=10, symbol='square-open')      # Marker size
+                ))
+
+                
+                fig.update_layout(
+                    title=f'{y_label} over {x_label}',
+                    xaxis_title=xaxis_title,
+                    yaxis_title=yaxis_title,
+                    xaxis=dict(
+                        fixedrange=False,
+                    ),
+                    yaxis=dict(
+                        fixedrange=False,
+                    ),
+                    template='plotly_white',
+                )
+                
+                figures.append(
+                    PlotlyFigure(
+                        label=f'{y_label}-{x_label}',
+                        #index=0,
+                        figure=fig.to_plotly_json(),
+                    ),
+                )
+                
+                self.figures = figures
+                
+                
+        
+        except Exception as e:
+            logger.error('Invalid file extension for parsing.', exc_info=e)
+        # In case something is odd here -> just return
+        # if not self.results:
+        #    return
+        
+        
 
 
 class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
@@ -1463,6 +1816,11 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
     
     Measurement_Raman =SubSection(
        section_def=MeasurementRaman,
+       repeats=True,
+    )
+    
+    Measurement_Adsorption=SubSection(
+       section_def=MeasurementAdsorption,
        repeats=True,
     )
     

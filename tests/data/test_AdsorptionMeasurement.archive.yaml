@@ -1,0 +1,4 @@
+data:
+  m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementAdsorption
+  data_as_txt_file: test_QuantachromeAdsorption.txt
+  #data_as_txt_file: test_QuantachromeAdsorption-UTF8.txt

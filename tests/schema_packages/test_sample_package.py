@@ -100,3 +100,11 @@ def test_XRDMeasurementRAW_package():
     
     #assert len(entry_archive.data.Transmittance) == 3525 
     
+def test_AdsorptionMeasurement_package():
+    test_file = os.path.join('tests', 'data', 'test_AdsorptionMeasurement.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    print("Run Adsorption")
+    
+    normalize_all(entry_archive)
+    
+    #assert entry_archive.data.data_as_txt_file == 'test_QuantachromeAdsorption.txt'
