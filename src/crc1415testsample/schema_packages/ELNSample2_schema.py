@@ -1525,6 +1525,19 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 if report_start == -1:
                     raise DataFileError(f"The file '{self.data_as_txt_file}' could not be parsed. Error in parsing Analysis Report section.")
                 
+                # Check for version
+                header_text = cleaned_text[:report_start]
+
+                match = re.search(r'version\s+([\d.]+)', header_text, re.IGNORECASE)
+
+                # Check if the match was successful and extract the version
+                if match:
+                    if match.group(1) != '3.01' and match.group(1) != '3.0':
+                        raise DataFileError(f"The file '{self.data_as_txt_file}' could not be parsed. Parser only for v3.0 instead {match.group(1) } found.")
+                else:
+                    raise DataFileError(f"The file '{self.data_as_txt_file}' could not be parsed. No version information found.")
+                
+                
                 # Extract the relevant part of the text
                 report_text = cleaned_text[report_start:]
                 
@@ -1537,9 +1550,41 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 #report_data['Sample ID'] = re.search(r'Sample ID:\s*(.*?)\s*Filename:', report_text).group(1).strip()
                 #report_data['Filename'] = re.search(r'Filename:\s*(.*?)\s*Sample Desc:', report_text).group(1).strip()
                 #report_data['Sample Desc'] = re.search(r'Sample Desc:\s*(.*?)\s*Sample weight:', report_text).group(1).strip()
-                report_data['Sample weight'] = re.search(r'Sample weight:\s*(.*?)\s*Analysis Time:', report_text).group(1).strip()
-                report_data['Analysis Time'] = re.search(r'Analysis Time:\s*(.*?)\s*End of run:', report_text).group(1).strip()
-                report_data['End of run'] = re.search(r'End of run:\s*(.*?)\s*Instrument:', report_text).group(1).strip()
+                #report_data['Sample weight'] = re.search(r'Sample weight:\s*(.*?)\s*Analysis Time:', report_text).group(1).strip()
+                report_data['Sample weight'] = re.search(r'Sample weight:\s*([\d.]+)\s*(\w+)', report_text, re.IGNORECASE).group(1).strip()
+                report_data['Sample weight unit'] = re.search(r'Sample weight:\s*([\d.]+)\s*(\w+)', report_text, re.IGNORECASE).group(2).strip()
+    
+                
+                #report_data['Analysis Time'] = re.search(r'Analysis Time:\s*(.*?)\s*End of run:', report_text).group(1).strip()
+                
+                # Regex pattern to match both formats either
+                # MMM.M min or HH:MM hr:min
+                pattern_analysis_time = r'Analysis Time:\s*([\d.]+)\s*min|Analysis Time:\s*(\d+):(\d+)\s*hr:min'
+
+                match_analysis_time = re.search(pattern_analysis_time, report_text, re.IGNORECASE)
+
+                if match_analysis_time:
+                    if match_analysis_time.group(1):  # format matched MMM.M min
+                        report_data['Analysis Time'] = float(match_analysis_time.group(1))
+                        report_data['Analysis Time unit'] = 'minutes'
+                    elif match_analysis_time.group(2) and match_analysis_time.group(3):  # format matched HH:MM hr:min
+                        report_data['Analysis Time'] = float(match_analysis_time.group(2))*60.0 + float(match_analysis_time.group(3)) # convert in minutes
+                        report_data['Analysis Time unit'] = 'minutes'
+                        #print(f"{match_analysis_time.group(2)} hr {match_analysis_time.group(3)} min")
+                
+                #report_data['End of run'] = re.search(r'End of run:\s*(.*?)\s*Instrument:', report_text).group(1).strip()
+                
+                # Regex pattern to match the date and time DD/MM/YYYY HH:MM:SS
+                pattern_end_run = r'End of run:\s*(\d{1,2}/\d{1,2}/\d{4}\s+\d{2}:\d{2}:\d{2})'
+                
+                # Use regex to find the date and time
+                match_end_run = re.search(pattern_end_run, report_text)
+                
+                # Check if the match was successful and extract the date and time
+                if match_end_run:
+                    #print("Parsed:", match_end_run.group(0))
+                    report_data['End of run'] = match_end_run.group(1)
+                
                 #report_data['Instrument'] = re.search(r'Instrument:\s*(.*?)\s*Void Vol.:', report_text).group(1).strip()
                 #report_data['Void Vol.'] = re.search(r'Void Vol.:\s*(.*?)\s*He Mode.Cell:', report_text).group(1).strip()
                 #report_data['He Mode.Cell'] = re.search(r'He Mode.Cell:\s*(.*?)\s*Run mode', report_text).group(1).strip()
@@ -1547,32 +1592,49 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 #report_data['Instrument version'] = re.search(r'Instrument version:\s*(.*?)\s*Thermal delay:', report_text).group(1).strip()
                 #report_data['Thermal delay'] = re.search(r'Thermal delay:\s*(.*?)\s*He evac time:', report_text).group(1).strip()
                 #report_data['He evac time'] = re.search(r'He evac time:\s*(.*?)\s*Outgas Time:', report_text).group(1).strip()
-                report_data['Outgas Time'] = re.search(r'Outgas Time:\s*(.*?)\s*OutgasTemp:', report_text).group(1).strip()
-                report_data['OutgasTemp'] = re.search(r'OutgasTemp:\s*(.*?)\s*Analysis gas:', report_text).group(1).strip()
-                report_data['Analysis gas'] = re.search(r'Analysis gas:\s*(.*?)\s*Bath Temp:', report_text).group(1).strip()
-                report_data['Bath Temp'] = re.search(r'Bath Temp:\s*(.*?)\s*Press. Tolerance:', report_text).group(1).strip()
+                #print('outgas0')
+                #report_data['Outgas Time'] = re.search(r'Outgas Time:\s*(.*?)\s*OutgasTemp:', report_text).group(1).strip()
+                report_data['Outgas Time'] = re.search(r'Outgas Time:\s*([\d.]+)\s*(\w+)', report_text, re.IGNORECASE).group(1)
+                report_data['Outgas Time unit'] = re.search(r'Outgas Time:\s*([\d.]+)\s*(\w+)', report_text, re.IGNORECASE).group(2)
+                
+                #report_data['OutgasTemp'] = re.search(r'OutgasTemp:\s*(.*?)\s*Analysis gas:', report_text).group(1).strip()
+                report_data['OutgasTemp'] = re.search(r'Outgas\s*Temp\.?:\s*([\d.]+)\s*(\w+)', report_text, re.IGNORECASE).group(1)
+                report_data['OutgasTemp unit'] = re.search(r'Outgas\s*Temp\.?:\s*([\d.]+)\s*(\w+)', report_text, re.IGNORECASE).group(2)
+                
+                #report_data['Analysis gas'] = re.search(r'Analysis gas:\s*(.*?)\s*Bath Temp:', report_text).group(1).strip()
+                report_data['Analysis gas'] = re.search(r'Analysis gas:\s*(.*?)\s*(\w+)', report_text, re.IGNORECASE).group(0).split()[2]
+                
+                #report_data['Bath Temp'] = re.search(r'Bath Temp:\s*(.*?)\s*Press. Tolerance:', report_text).group(1).strip()
+                
+                report_data['Bath Temp'] = re.search(r'Bath\s*Temp\.?:\s*([\d.]+)\s*(\w+)', report_text, re.IGNORECASE).group(1)
+                report_data['Bath Temp unit'] = re.search(r'Bath\s*Temp\.?:\s*([\d.]+)\s*(\w+)', report_text, re.IGNORECASE).group(2)
                 #report_data['Press. Tolerance'] = re.search(r'Press. Tolerance:\s*(.*?)\s*Equil time:', report_text).group(1).strip()
                 #report_data['Equil time'] = re.search(r'Equil time:\s*(.*?)\s*Equil timeout:', report_text).group(1).strip()
                 #report_data['Equil timeout'] = re.search(r'Equil timeout:\s*(.*?)\s*Data Reduction Parameters', report_text).group(1).strip()
                 
                 # Extract the metadata
-                self.Sample_Weight = ureg.Quantity(float(report_data['Sample weight'].split()[0]), report_data['Sample weight'].split()[1])
+                self.Sample_Weight = ureg.Quantity(float(report_data['Sample weight']), report_data['Sample weight unit'])
                 
                 # Convert the unpacked data as a datetime object
                 from dateutil import parser as dataparser
                 from datetime import datetime, timedelta
-                analysistime = ureg.Quantity(float(report_data['Analysis Time'].split()[0]), 'minutes' if report_data['Analysis Time'].split()[1] == 'min' else 'dimensionless')
-                self.Analysis_Time = analysistime
+                
+                self.Analysis_Time = ureg.Quantity(float(report_data['Analysis Time']), report_data['Analysis Time unit'])
                 #print(type(analysistime.to(ureg.minute).magnitude))
                 #print(float(analysistime.to(ureg.minute).magnitude))
-                self.datetime_end = dataparser.parse(report_data['End of run'])
-                self.datetime = dataparser.parse(report_data['End of run']) - timedelta(minutes=float(analysistime.to(ureg.minute).magnitude))
                 
-                self.Outgas_Time = ureg.Quantity(float(report_data['Outgas Time'].split()[0]), 'hour' if report_data['Outgas Time'].split()[1] == 'hrs' else 'dimensionless')
-                self.Outgas_Temperature = ureg.Quantity(float(report_data['OutgasTemp'].split()[0]), 'celsius' if report_data['OutgasTemp'].split()[1] == 'C' else 'dimensionless')
+                if 'End of run' in report_data.keys():
+                    self.datetime_end = dataparser.parse(report_data['End of run'])
+                    self.datetime = dataparser.parse(report_data['End of run']) - timedelta(minutes=float(self.Analysis_Time.to(ureg.minute).magnitude))
+                
+                self.Outgas_Time = ureg.Quantity(float(report_data['Outgas Time']), 'hour' if report_data['Outgas Time unit'] == 'hrs' else 'dimensionless')
+                
+                self.Outgas_Temperature = ureg.Quantity(float(report_data['OutgasTemp']), 'celsius' if report_data['OutgasTemp unit'] == 'C' else 'dimensionless')
                 
                 self.Analysis_Gas = report_data['Analysis gas']
-                self.Bath_Temperature = ureg.Quantity(float(report_data['Bath Temp'].split()[0]), 'kelvin' if report_data['Bath Temp'].split()[1] == 'K' else 'dimensionless')
+                
+                self.Bath_Temperature = ureg.Quantity(float(report_data['Bath Temp']), 'kelvin' if report_data['Bath Temp unit'] == 'K' else 'dimensionless')
+                
                 
                 # Splits the file into parts separated by empty lines.
                 # The actual data is in the last part.
