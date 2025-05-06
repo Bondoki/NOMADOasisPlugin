@@ -1405,9 +1405,9 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
     
     Outgas_Time= Quantity(
         type=np.float64,
-        unit='hours',
+        unit='hour',
         description='The time during the outgas process.',
-        a_eln=dict(component='NumberEditQuantity', label='Outgas Time', defaultDisplayUnit= 'hours'),
+        a_eln=dict(component='NumberEditQuantity', label='Outgas Time', defaultDisplayUnit= 'hour'),
     )
     
     Outgas_Temperature = Quantity(
@@ -1568,7 +1568,7 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 self.datetime_end = dataparser.parse(report_data['End of run'])
                 self.datetime = dataparser.parse(report_data['End of run']) - timedelta(minutes=float(analysistime.to(ureg.minute).magnitude))
                 
-                self.Outgas_Time = ureg.Quantity(float(report_data['Outgas Time'].split()[0]), 'hours' if report_data['Outgas Time'].split()[1] == 'hrs' else 'dimensionless')
+                self.Outgas_Time = ureg.Quantity(float(report_data['Outgas Time'].split()[0]), 'hour' if report_data['Outgas Time'].split()[1] == 'hrs' else 'dimensionless')
                 self.Outgas_Temperature = ureg.Quantity(float(report_data['OutgasTemp'].split()[0]), 'celsius' if report_data['OutgasTemp'].split()[1] == 'C' else 'dimensionless')
                 
                 self.Analysis_Gas = report_data['Analysis gas']
@@ -1635,8 +1635,7 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 x_des = desorption_relativePressure
                 
                 y_label = 'Adsorped Volume'
-                yaxis_title = f'Adsorped Volume [mmol/g] ({self.Analysis_Gas}, {self.Bath_Temperature})'
-                
+                yaxis_title = f'Adsorped Volume [mmol/g] ({self.Analysis_Gas}, {self.Bath_Temperature.to('kelvin').magnitude} {self.Bath_Temperature.units:~})'
                 y_ads = adsorption_adsorpedVolume
                 y_des = desorption_adsorpedVolume
                 

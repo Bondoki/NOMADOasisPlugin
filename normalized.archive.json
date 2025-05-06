@@ -1037,7 +1037,7 @@
             },
             "yaxis": {
               "title": {
-                "text": "Adsorped Volume [mmol/g] (Nitrogen, 77.3 kelvin)"
+                "text": "Adsorped Volume [mmol/g] (Nitrogen, 77.3 K)"
               },
               "fixedrange": false
             },
@@ -1053,8 +1053,8 @@
     "entry_name": "test_AdsorptionMeasurement.archive.yaml",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_AdsorptionMeasurement.archive.yaml",
     "text_search_contents": [
-      "Adsorped Volume-Relative Pressure",
       "Nitrogen",
+      "Adsorped Volume-Relative Pressure",
       "test_QuantachromeAdsorption.txt"
     ],
     "n_quantities": 20,
