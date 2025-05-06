@@ -1574,8 +1574,8 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 
                 #report_data['End of run'] = re.search(r'End of run:\s*(.*?)\s*Instrument:', report_text).group(1).strip()
                 
-                # Regex pattern to match the date and time DD/MM/YYYY HH:MM:SS
-                pattern_end_run = r'End of run:\s*(\d{1,2}/\d{1,2}/\d{4}\s+\d{2}:\d{2}:\d{2})'
+                # Regex pattern to match the date and time MM/DD/YYYY HH:MM:SS
+                pattern_end_run = r'End of run:\s*(\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2}:\d{2})'
                 
                 # Use regex to find the date and time
                 match_end_run = re.search(pattern_end_run, report_text)
