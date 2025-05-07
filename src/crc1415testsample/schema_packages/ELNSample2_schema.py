@@ -262,8 +262,6 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
             list[PlotlyFigure]: The plotly figures.
         """
         figures = []
-        #if self.wavelength is None:
-        #    return figures
 
         x_label = '2Theta'
         xaxis_title = f'{x_label} (°)'
@@ -272,13 +270,57 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         y_label = 'Normalized Intensity'
         yaxis_title = f'{y_label} (a.u.)'
         y = self.Intensity.to('dimensionless').magnitude
+        
+        # line_linear = px.line(x=x, y=y/np.max(y))
+        # 
+        # line_linear.update_layout(
+        #     title=f'{y_label} over {x_label}',
+        #     xaxis_title=xaxis_title,
+        #     yaxis_title=yaxis_title,
+        #     xaxis=dict(
+        #         fixedrange=False,
+        #     ),
+        #     yaxis=dict(
+        #         fixedrange=False,
+        #     ),
+        #     template='plotly_white',
+        # )
+        # 
+        # figures.append(
+        #     PlotlyFigure(
+        #         label=f'{y_label}-{x_label} linear plot',
+        #         index=0,
+        #         figure=line_linear.to_plotly_json(),
+        #     ),
+        # )
+        
+        config = {'displayModeBar': True}
+        
+        # Create the figure (for the moment: a blank graph)
+        fig = go.Figure()
 
-        line_linear = px.line(x=x, y=y/np.max(y))
+        # Add the scatter trace
+        fig.add_trace(go.Scatter( 
+            x=x, # Variable in the x-axis
+            y=y/np.max(y), # Variable in the y-axis
+            mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
+            name='Experiment',
+            hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
+            # Properties associated with points 
+            # marker=dict(
+            #     size=12, # Size
+            #     color='#cb1dd1', # Color
+            #     opacity=0.8, # Point transparency 
+            #     line=dict(width=1, color='black') # Properties of the edges
+            # ),
+        ))
 
-        line_linear.update_layout(
+        # Customize the layout
+        fig.update_layout(
             title=f'{y_label} over {x_label}',
             xaxis_title=xaxis_title,
             yaxis_title=yaxis_title,
+            showlegend=True,
             xaxis=dict(
                 fixedrange=False,
             ),
@@ -286,15 +328,14 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                 fixedrange=False,
             ),
             template='plotly_white',
+            hovermode="x unified", # provides a dashed line and finds the closest point
+            
         )
-
-        figures.append(
-            PlotlyFigure(
-                label=f'{y_label}-{x_label} linear plot',
-                index=0,
-                figure=line_linear.to_plotly_json(),
-            ),
-        )
+        
+        figure_json = fig.to_plotly_json()
+        figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+        
+        figures.append(PlotlyFigure(label=f'{y_label}-{x_label} linear plot', figure=figure_json))
 
         return figures
     
