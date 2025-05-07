@@ -116,7 +116,15 @@ def test_XRDMeasurementRAW_package():
     #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
     
     #assert len(entry_archive.data.Transmittance) == 3525 
-    
+
+def test_MeasurementXRD_XYE_package():
+    test_file = os.path.join('tests', 'data', 'test_MeasurementXRD_XYE.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run MeasurementXRD XYE file")
+
+
+
 def test_AdsorptionMeasurement_package():
     test_file = os.path.join('tests', 'data', 'test_AdsorptionMeasurement.archive.yaml')
     entry_archive = parse(test_file)[0]
