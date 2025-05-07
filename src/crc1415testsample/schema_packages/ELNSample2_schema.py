@@ -269,11 +269,11 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         xaxis_title = f'{x_label} (°)'
         x = self.Deg2Theta.to('degree').magnitude
 
-        y_label = 'Intensity'
+        y_label = 'Normalized Intensity'
         yaxis_title = f'{y_label} (a.u.)'
         y = self.Intensity.to('dimensionless').magnitude
 
-        line_linear = px.line(x=x, y=y)
+        line_linear = px.line(x=x, y=y/np.max(y))
 
         line_linear.update_layout(
             title=f'{y_label} over {x_label}',
@@ -290,7 +290,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
 
         figures.append(
             PlotlyFigure(
-                label=f'{y_label} linear plot',
+                label=f'{y_label}-{x_label} linear plot',
                 index=0,
                 figure=line_linear.to_plotly_json(),
             ),
