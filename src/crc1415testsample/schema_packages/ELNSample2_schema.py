@@ -1126,6 +1126,23 @@ class RamanData(ArchiveSection):
 
     m_def = Section(
         label_quantity='name',
+        a_eln={
+            # "overview": False,
+            # "hide": [
+            #     "name",
+            #     "lab_id",
+            #     "method",
+            #     "samples",
+            #     "measurement_identifiers"
+            # ],
+            "properties": {
+                "order": [
+                    "name",
+                    "data_as_tvf_or_txt_file",
+                    "Laser_Excitation_Wavelength"
+                ]
+            }
+        },
     )
     
     name = Quantity(
@@ -1180,7 +1197,16 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                 "method",
                 "samples",
                 "measurement_identifiers"
-            ]
+            ],
+            "properties": {
+                "order": [
+                    "tags",
+                    "datetime",
+                    "location",
+                    "data_as_tvb_file",
+                    "description"
+                ]
+            }
         },
         )
             
@@ -1213,13 +1239,29 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
             list[PlotlyFigure]: The plotly figures.
         """
         figures = []
+        # Create the figure
         fig = go.Figure()
         
-        for r_d_entries in self.Raman_data_entries:
+        #for r_d_entries in self.Raman_data_entries:
+        for idx, r_d_entries in enumerate(self.Raman_data_entries):
+            #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
             # Add line plots
             x = r_d_entries.Raman_shift.to('1/centimeter').magnitude
             y = r_d_entries.Intensity.to('dimensionless').magnitude
-            fig.add_trace(go.Scatter(x=x, y=y, mode='lines', name=r_d_entries.data_as_tvf_or_txt_file))
+            
+            
+            # Get the Viridis color scale
+            viridis_colors = px.colors.sequential.Viridis
+            
+            fig.add_trace(go.Scatter(
+                x=x,
+                y=y,
+                mode='lines',
+                name=f'frame: {idx}',
+                #line=dict(color=go.colors.sample_colorscale('Viridis', i / (len(self.Raman_data_entries) - 1))),
+                line=dict(color=viridis_colors[int(idx / (len(self.Raman_data_entries) - 1) * (len(viridis_colors) - 1))]),
+                hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+            ))
 
         # exemply use the first entry for the units
         x_label = 'Raman shift'
@@ -1238,17 +1280,31 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
             yaxis=dict(
                 fixedrange=False,
             ),
-            legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+            #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
             template='plotly_white',
+            showlegend=True,
+            hovermode="x unified",
         )
 
+        # figures.append(
+        #     PlotlyFigure(
+        #         label=f'{y_label}-{x_label} linear plot',
+        #         #index=0,
+        #         figure=fig.to_plotly_json(),
+        #     ),
+        # )
+        
+        figure_json = fig.to_plotly_json()
+        figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+        
         figures.append(
             PlotlyFigure(
                 label=f'{y_label}-{x_label} linear plot',
-                #index=0,
-                figure=fig.to_plotly_json(),
-            ),
+                figure=figure_json
+            )
         )
+        
+        self.figures = figures
 
         return figures
     
