@@ -1533,7 +1533,17 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 "method",
                 "samples",
                 "measurement_identifiers"
-            ]
+            ],
+            "properties": {
+                "order": [
+                    "tags",
+                    "datetime",
+                    "datetime_end",
+                    "location",
+                    "data_as_txt_file",
+                    "description"
+                ]
+            }
         },
     )
     lab_id = Quantity(
@@ -1849,15 +1859,16 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
 
                 # Split the array into two parts for plotting
                 adsorption_relativePressure = relativePressure[:max_index_relativePressure + 1]  # Include the maximum value
-                desorption_relativePressure = relativePressure[max_index_relativePressure + 1:]   # Exclude the maximum value
+                desorption_relativePressure = relativePressure[max_index_relativePressure:]   # Exclude the maximum value
                 
                 adsorption_adsorpedVolume = adsorpedVolume[:max_index_relativePressure + 1]/22.4  # Include the maximum value
-                desorption_adsorpedVolume = adsorpedVolume[max_index_relativePressure + 1:]/22.4   # Exclude the maximum value
+                desorption_adsorpedVolume = adsorpedVolume[max_index_relativePressure:]/22.4   # Exclude the maximum value
                 
                 # create plot
                 figures = []
                 
                 # Create a figure
+                config = {'displayModeBar': True}
                 fig = go.Figure()
                 
                 x_label = 'Relative Pressure'
@@ -1880,6 +1891,7 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                     mode='lines+markers',  # 'lines+markers' to show both lines and markers
                     name='adsorption',         # Name of the first line
                     line=dict(color='blue'),  # Line color
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
                     marker=dict(size=10, symbol='circle')      # Marker size
                 ))
 
@@ -1890,6 +1902,7 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                     mode='lines+markers',  # 'lines+markers' to show both lines and markers
                     name='desorption',         # Name of the second line
                     line=dict(color='red'),   # Line color
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
                     marker=dict(size=10, symbol='square-open')      # Marker size
                 ))
 
@@ -1905,15 +1918,22 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                         fixedrange=False,
                     ),
                     template='plotly_white',
+                    showlegend=True,
+                    hovermode="x unified", # provides a dashed line and finds the closest point
                 )
                 
-                figures.append(
-                    PlotlyFigure(
-                        label=f'{y_label}-{x_label}',
-                        #index=0,
-                        figure=fig.to_plotly_json(),
-                    ),
-                )
+                # figures.append(
+                #     PlotlyFigure(
+                #         label=f'{y_label}-{x_label}',
+                #         #index=0,
+                #         figure=fig.to_plotly_json(),
+                #     ),
+                # )
+                
+                figure_json = fig.to_plotly_json()
+                figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+                
+                figures.append(PlotlyFigure(label=f'{y_label}-{x_label} linear plot', figure=figure_json))
                 
                 self.figures = figures
                 
