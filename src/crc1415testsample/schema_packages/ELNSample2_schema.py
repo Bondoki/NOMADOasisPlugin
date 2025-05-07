@@ -192,7 +192,18 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                 "method",
                 "samples",
                 "measurement_identifiers"
-            ]
+            ],
+            "properties": {
+                "order": [
+                    "tags",
+                    "datetime",
+                    "datetime_end",
+                    "location",
+                    "data_as_raw_or_xyd_file",
+                    "data_as_xye_file",
+                    "description"
+                ]
+            }
         },
         # a_plotly_graph_object=[
         #     {
