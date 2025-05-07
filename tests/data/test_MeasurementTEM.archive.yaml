@@ -1,0 +1,3 @@
+data:
+  m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementTEM
+  data_as_tif_or_tiff_file: ['testTEM01.tif', 'testTEM02.tiff']

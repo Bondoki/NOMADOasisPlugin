@@ -13,6 +13,23 @@ def test_schema_package():
     assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
     #assert entry_archive.data.data_file == 'test.csv' 
     #assert entry_archive.data.data_file == 'testSEM.jpg' 
+
+def test_MeasurementSEM_package():
+    test_file = os.path.join('tests', 'data', 'test_MeasurementSEM.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run Measurement SEM")
+
+    assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
+
+
+def test_MeasurementTEM_package():
+    test_file = os.path.join('tests', 'data', 'test_MeasurementTEM.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run Measurement TEM")
+
+    assert entry_archive.data.data_as_tif_or_tiff_file == ['testTEM01.tif', 'testTEM02.tiff'] 
     
 def test_IRMeasurement_package():
     test_file = os.path.join('tests', 'data', 'test_IRMeasurement.archive.yaml')
