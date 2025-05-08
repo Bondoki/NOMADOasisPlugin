@@ -2245,7 +2245,7 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
                     fig = go.Figure()
                     
                     x_label = 'Temperature'
-                    xaxis_title = f'Temperature [\u2103]{self.TGA_Temperature.units:~}'
+                    xaxis_title = 'Temperature [\u2103]'
                     
                     y_label = 'Sample Mass'
                     yaxis_title = 'Sample Mass [%]' #f'Adsorbed Volume [mmol/g] ({self.Analysis_Gas}, {self.Bath_Temperature.to('kelvin').magnitude} {self.Bath_Temperature.units:~})'
@@ -2258,7 +2258,7 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
                         name='TGA',         # Name of the first line
                         line=dict(color='blue'),  # Line color
                         hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
-                        marker=dict(size=10, symbol='circle')      # Marker size
+                        marker=dict(size=2, symbol='circle')      # Marker size
                     ))
                     
                     
@@ -2395,14 +2395,20 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         repeats=True,
     )
     
-    Measurement_XRD = SubSection(
-        section_def=MeasurementXRD,
-        repeats=True,
+    
+    Measurement_Adsorption=SubSection(
+       section_def=MeasurementAdsorption,
+       repeats=True,
     )
     
     Measurement_IR = SubSection(
         section_def=MeasurementIR,
         repeats=True,
+    )
+    
+    Measurement_Raman =SubSection(
+       section_def=MeasurementRaman,
+       repeats=True,
     )
     
     Measurement_SEM = SubSection(
@@ -2415,14 +2421,14 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
        repeats=True,
     )
     
-    Measurement_Raman =SubSection(
-       section_def=MeasurementRaman,
+    Measurement_TGA =SubSection(
+       section_def=MeasurementTGA,
        repeats=True,
     )
     
-    Measurement_Adsorption=SubSection(
-       section_def=MeasurementAdsorption,
-       repeats=True,
+    Measurement_XRD = SubSection(
+        section_def=MeasurementXRD,
+        repeats=True,
     )
     
 

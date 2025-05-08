@@ -1142,7 +1142,7 @@
                 "color": "blue"
               },
               "marker": {
-                "size": 10,
+                "size": 2,
                 "symbol": "circle"
               },
               "mode": "lines+markers",
@@ -3093,7 +3093,7 @@
             },
             "xaxis": {
               "title": {
-                "text": "Temperature [\u2103]\u00b0C"
+                "text": "Temperature [\u2103]"
               },
               "fixedrange": false
             },
@@ -3125,8 +3125,8 @@
     "entry_name": "test_MeasurementTGA.archive.yaml",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_MeasurementTGA.archive.yaml",
     "text_search_contents": [
-      "Sample Mass-Temperature linear plot",
-      "test_TGA_File.txt"
+      "test_TGA_File.txt",
+      "Sample Mass-Temperature linear plot"
     ],
     "n_quantities": 17,
     "quantities": [
