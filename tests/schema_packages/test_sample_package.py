@@ -75,6 +75,16 @@ def test_RamanMeasurement_package():
     #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
     
     #assert len(entry_archive.data.Transmittance) == 3525 
+    
+def test_MeasurementRaman_1TVF_package():
+    test_file = os.path.join('tests', 'data', 'test_MeasurementRaman_1TVF.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    
+    print("Run RamanMeasurement 1TVF")
+    
+    normalize_all(entry_archive)
+    
+    print("Length Raman-Entries:", len(entry_archive.data.Raman_data_entries))
 
 def test_RamanMeasurementTVB_package():
     test_file = os.path.join('tests', 'data', 'test_RamanMeasurementTVB.archive.yaml')

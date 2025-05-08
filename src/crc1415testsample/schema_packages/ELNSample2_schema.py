@@ -1253,13 +1253,14 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
             # Get the Viridis color scale
             viridis_colors = px.colors.sequential.Viridis
             
+            color_index_line = int(idx / (len(self.Raman_data_entries)-1) * (len(viridis_colors) - 1)) if len(self.Raman_data_entries) > 1 else 0
+            
             fig.add_trace(go.Scatter(
                 x=x,
                 y=y,
                 mode='lines',
                 name=f'frame: {idx}',
-                #line=dict(color=go.colors.sample_colorscale('Viridis', i / (len(self.Raman_data_entries) - 1))),
-                line=dict(color=viridis_colors[int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
             ))
 
