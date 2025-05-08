@@ -22,6 +22,13 @@ def test_MeasurementSEM_package():
 
     assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
 
+def test_MeasurementSEM_Auxiliary_package():
+    test_file = os.path.join('tests', 'data', 'test_MeasurementSEM_Auxiliary.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run Measurement SEM Auxiliary")
+
+    assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
 
 def test_MeasurementTEM_package():
     test_file = os.path.join('tests', 'data', 'test_MeasurementTEM.archive.yaml')

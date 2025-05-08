@@ -841,7 +841,17 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                 "method",
                 "samples",
                 "measurement_identifiers"
-            ]
+            ],
+            "properties": {
+                "order": [
+                    "name",
+                    "data_as_tif_or_tiff_file",
+                    "auxiliary_data_file",
+                    "SEM_Accelerating_Voltage",
+                    "SEM_Magnification",
+                    "description"
+                ]
+            }
         },
         )
     lab_id = Quantity(
@@ -863,6 +873,34 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
             "component": "FileEditQuantity"
         },
         repeats=True,
+    )
+    
+    auxiliary_data_file = Quantity(
+        type=str,
+        description='''
+        A reference to an uploaded .tif produced by the SEM instrument.
+        ''',
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity",
+            "label": "Auxiliary metadata file as .txt"
+        },
+    )
+    
+    SEM_Accelerating_Voltage = Quantity(
+        type=np.float64,
+        unit='volt',
+        description='The voltage applied in the SEM experiment, volt.',
+        a_eln=dict(component='NumberEditQuantity', label='SEM: Accelerating Voltage', defaultDisplayUnit= 'volt'),
+    )
+    
+    SEM_Magnification = Quantity(
+        type=np.float64,
+        unit='dimensionless',
+        description='The magnification used in the SEM experiment, dimensionless.',
+        a_eln=dict(component='NumberEditQuantity', label='SEM: Magnification', defaultDisplayUnit= 'dimensionless'),
     )
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
@@ -959,6 +997,27 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                             self.figures.append(PlotlyFigure(label=f'Measurement SEM: {data_file}', figure=figure_json))
                             #self.figures = [PlotlyFigure(label=f'Measurement SEM: {data_file}', index=0, figure=figure_json)]
                 
+            if self.auxiliary_data_file:
+                if not self.auxiliary_data_file.endswith('.txt'):
+                    raise DataFileError(f"The file '{self.auxiliary_data_file}' must have a .txt extension.")
+                
+                # Otherwise parse the file as binary
+                with archive.m_context.raw_file(self.auxiliary_data_file, 'r') as txtfile:
+                    
+                    text = txtfile.read()
+                    
+                    AV = re.search(r'(AcceleratingVoltage)=([\d.]+)\s+(\w+)', text, re.IGNORECASE)
+                    
+                    if AV:
+                        self.SEM_Accelerating_Voltage = ureg.Quantity(float(AV.group(2)), AV.group(3).lower()) # decimal number, volt
+                    
+                    MG = re.search(r'(Magnification)=([\d.]+)', text, re.IGNORECASE)
+                    
+                    if MG:
+                        self.SEM_Magnification = ureg.Quantity(float(MG.group(2)), 'dimensionless') # decimal number
+                
+                
+            
         except Exception as e:
             logger.error('Invalid file extension for parsing.', exc_info=e)
         # In case something is odd here -> just return
