@@ -177,4 +177,12 @@ def test_MeasurementCV_TXT2_package():
     normalize_all(entry_archive)
     
     #print("Length CV-Entries:", len(entry_archive.data.CV_data_entries))
+
+def test_MeasurementCV_IDS_package():
+    test_file = os.path.join('tests', 'data', 'test_MeasurementCV_IDS.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    #normalize_all(entry_archive)
+    print("Run Measurement CV IDS")
     
+    normalize_all(entry_archive)
+

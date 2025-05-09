@@ -2591,6 +2591,43 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
 
         return figures
     
+    def read_section(self, contentIDSlines, start_line, num_lines):
+        # filecontent = file_path.readlines()
+        # section_lines = []
+        # #with open(file_path, 'r', errors='ignore') as file:
+        # for current_line_number, line in enumerate(filecontent, start=1):
+        #     #Check if we are at the starting line
+        #     if current_line_number >= start_line:
+        #         #Strip whitespace from the line
+        #         stripped_line = line.strip()
+        #         #Check if the line is empty
+        #         if stripped_line == "":
+        #             break  # Stop if an empty line is encountered
+        #         section_lines.append(stripped_line)  # Add the line to the list
+        #         #Stop if we have read the specified number of lines
+        #         if len(section_lines) >= num_lines:
+        #             break
+        # return section_lines
+        section_lines = []
+        #with open(file_path, 'r', errors='ignore') as file:
+        #contentIDSlines = file_path.readlines()
+        for current_line_number, line in enumerate(contentIDSlines, start=1):
+            # Check if we are at the starting line
+            if current_line_number >= start_line:
+                #print(line)
+                # Strip whitespace from the line
+                stripped_line = line.strip()
+                # Check if the line is empty
+                if stripped_line == "":
+                    break  # Stop if an empty line is encountered
+                section_lines.append(stripped_line)  # Add the line to the list
+                # Stop if we have read the specified number of lines
+                if len(section_lines) >= num_lines:
+                    break
+
+        return section_lines
+    
+    
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
         The normalize function of the `MeasurementRaman` section.
@@ -2607,48 +2644,58 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                 if not self.data_as_ids_file.endswith('.ids'):
                     raise DataFileError(f"The file '{self.data_as_ids_file}' must have a .ids extension.")
                 
+                positions_primary_data = [] # list of data entries position
+                
                 # Otherwise parse the file - ignore the iso8859-15 encoding
-                with archive.m_context.raw_file(self.data_as_ids_file,'r', errors='ignore') as idsfile:
+                with archive.m_context.raw_file(self.data_as_ids_file,'r', encoding='iso8859-15') as idsfile:
                     # Load the data from the file
-                    contentIDSfile = tvbfile.read()
+                    contentIDSlines = idsfile.readlines()  # Read all lines into a listidsfile.read()
                     
-#                     
-#                     # Create subsection if not existing
-#                     if not self.Raman_data_entries:
-#                         self.Raman_data_entries = []
-#                         # Ensure the list is long enough
-#                         while len(self.Raman_data_entries) < numFrames:
-#                             self.Raman_data_entries.append(RamanData())  # Append a placeholder value
-#                     
-#                     # Create new if not sufficient long enough - overwrites the default
-#                     if len(self.Raman_data_entries) < numFrames:
-#                         self.Raman_data_entries = []
-#                         while len(self.Raman_data_entries) < numFrames:
-#                             self.Raman_data_entries.append(RamanData())  # Append a placeholder value
-#                     
-#                     #print(len(self.Raman_data_entries))
-#                     
-#                     # Do this for every frame in file
-#                     for frame in range(0,numFrames,1):
-#                         #print(frame)
-#                         datasplice = contentTVBfile[offsetHeader:offsetHeader+4*NRWE] 
-#                         # 'f': float (4 byte)
-#                         count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
-#                         #print(count)
-#                         unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
-#                         #print(unpacked_data)
-#                         
-#                         import numpy as np
-#                         IntensityCount = np.asarray(unpacked_data, dtype=np.float64)
-#                         #print(IntensityCount)
-#                         
-#                         # Separate the columns into two variables and copy to 
-#                         self.Raman_data_entries[frame].Raman_shift = ureg.Quantity(RamanWavenumber, '1/nanometer')
-#                         self.Raman_data_entries[frame].Intensity = ureg.Quantity(IntensityCount, 'dimensionless')
-#                         self.Raman_data_entries[frame].Laser_Excitation_Wavelength = ureg.Quantity(LaserExcitationWavelength, 'nanometer')
-#                         
-#                         offsetHeader += 4*NRWE + 3*4 + 8 + 101 # specific after every frame 
+                    # Read the file line by line and search for 'primary_data'
+                    for line_number, line in enumerate(contentIDSlines):
+                        #start_index = 0
+                        #while True:
+                            # Find the next occurrence of the search string
+                        found_data = line.find('primary_data')
+                            #if found == -1:
+                            #    break  # No more occurrences in this line
+                            # Store the position as a tuple (line_number, character_position)
+                        if found_data >= 0:
+                            positions_primary_data.append((line_number, int(contentIDSlines[line_number+1].strip('\x00')), int(contentIDSlines[line_number+2].strip()) ))  
+                            #start_index += 1  # Move to the next character to continue searching
+                        
+                #print(positions_primary_data) # the first list is useless
                     
+                with archive.m_context.raw_file(self.data_as_ids_file,'r', encoding='iso8859-15') as idsfile:
+                    # Load the data from the file
+                    contentIDSlines = idsfile.readlines()  # Read all lines into a listidsfile.read()
+                    
+                    numFrames = len(positions_primary_data)-1 # the first entry is useless
+                    # Create subsection if not existing
+                    if not self.CV_data_entries:
+                        self.CV_data_entries = []
+                        # Ensure the list is long enough
+                        while len(self.CV_data_entries) < numFrames:
+                            self.CV_data_entries.append(CVData())  # Append a placeholder value
+                    
+                    # Create new if not sufficient long enough - overwrites the default
+                    if len(self.CV_data_entries) < numFrames:
+                        self.CV_data_entries = []
+                        while len(self.CV_data_entries) < numFrames:
+                            self.CV_data_entries.append(CVData())  # Append a placeholder value
+
+                    # Do this for every frame in file
+                    for frame in range(1,numFrames+1,1): # omit the first entry and add the last
+                        section_lines = self.read_section(contentIDSlines, positions_primary_data[frame][0]+4, positions_primary_data[frame][2])
+                        
+                        import numpy as np
+                        dataxyfile = np.loadtxt(section_lines) # convert the section into data
+                        
+                        # Separate the columns into two variables and copy to 
+                        self.CV_data_entries[frame-1].CV_Potential = ureg.Quantity(dataxyfile[:, 0], 'volt')
+                        self.CV_data_entries[frame-1].CV_Current = ureg.Quantity(dataxyfile[:, 1], 'ampere')
+                        
+                        
                     
             #Check if any file is provided in any subsection for .txt files
             for r_d_entries in self.CV_data_entries:

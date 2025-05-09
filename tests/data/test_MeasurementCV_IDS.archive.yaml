@@ -1,0 +1,3 @@
+data:
+  m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV
+  data_as_ids_file: 'test_file_CV_IDS.ids'
