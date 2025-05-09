@@ -734,7 +734,7 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
     IR_Solvent  = Quantity(
         type=str,
         description='The solvent used for solving the sample in the IR experiment.',
-        a_eln=dict(component='StringEditQuantity', label='Solvent', suggestions=['Acetone', 'THF', 'CCl4', 'CHCl3', 'CS2']),
+        a_eln=dict(component='EnumEditQuantity', label='IR Solvent', suggestions=['Acetone', 'THF', 'CCl4', 'CHCl3', 'CS2']),
     )
     
     Wavenumber = Quantity(
@@ -765,7 +765,7 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
         #    return figures
 
         x_label = 'Wavenumber'
-        xaxis_title = f'{x_label} [{self.Wavenumber.units:~}])'
+        xaxis_title = f'{x_label} [{self.Wavenumber.units:~}]'
         #x = self.Wavenumber.to('1/cm').magnitude
         x = self.Wavenumber.to(self.Wavenumber.units).magnitude
         

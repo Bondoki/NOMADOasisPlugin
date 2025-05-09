@@ -14950,7 +14950,7 @@
             },
             "xaxis": {
               "title": {
-                "text": "Wavenumber [1 / cm])"
+                "text": "Wavenumber [1 / cm]"
               },
               "fixedrange": false
             },
