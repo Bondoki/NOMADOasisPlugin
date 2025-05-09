@@ -691,23 +691,19 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
                 "method",
                 "samples",
                 "measurement_identifiers"
-            ]
+            ],
+            "properties": {
+                "order": [
+                    "tags",
+                    "datetime",
+                    "location",
+                    "data_as_dpt_file",
+                    "IR_Substance_Type",
+                    "IR_Solvent",
+                    "description"
+                ]
+            }
         },
-        # a_plotly_graph_object=[
-        #     {
-        #         "data": [
-        #             {
-        #                 "x": "#Deg2Theta",
-        #                 "y": "#Counts"
-        #             }
-        #         ],
-        #         "layout": {
-        #             "title": {
-        #                 "text": "Counts over Degree 2Theta"
-        #             }
-        #         }
-        #     }
-        # ],
         )
     lab_id = Quantity(
         type=str,
@@ -718,12 +714,6 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
     data_as_dpt_file = Quantity(
         type=str,
         description="A reference to an uploaded .dpt produced by the IR instrument.",
-        a_tabular_parser={
-            "parsing_options": {
-                "sep": "\\t",
-                "comment": "#"
-            }
-        },
         a_browser={
             "adaptor": "RawFileAdaptor"
         },
@@ -731,11 +721,30 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
             "component": "FileEditQuantity"
         },
     )
+    
+    IR_Substance_Type = Quantity(
+        type=MEnum(['in solution', 'powder', 'KBr pellet', 'other']),
+        description='The preparation condition of the sample in the IR experiment.',
+        a_eln={
+            "component": "RadioEnumEditQuantity",
+            "label": "IR substance type"
+        },
+    )
+    
+    IR_Solvent  = Quantity(
+        type=str,
+        description='The solvent used for solving the sample in the IR experiment.',
+        a_eln=dict(component='StringEditQuantity', label='Solvent', suggestions=['Acetone', 'THF', 'CCl4', 'CHCl3', 'CS2']),
+    )
+    
     Wavenumber = Quantity(
         type=np.float64,
         shape=["*"],
         unit='1/cm',
         description='The wavenumber range of the spectrogram',
+        a_eln={
+            "defaultDisplayUnit": "1/cm",
+        },
     )
     Transmittance = Quantity(
         type=np.float64,
@@ -756,16 +765,28 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
         #    return figures
 
         x_label = 'Wavenumber'
-        xaxis_title = f'{x_label} (cm-1)'
-        x = self.Wavenumber.to('1/cm').magnitude
-
+        xaxis_title = f'{x_label} [{self.Wavenumber.units:~}])'
+        #x = self.Wavenumber.to('1/cm').magnitude
+        x = self.Wavenumber.to(self.Wavenumber.units).magnitude
+        
         y_label = 'Transmittance'
         yaxis_title = f'{y_label} (a.u.)'
         y = self.Transmittance.to('dimensionless').magnitude
-
-        line_linear = px.line(x=x, y=y)
-
-        line_linear.update_layout(
+        
+        fig = go.Figure()
+        
+        # Add the first line with markers
+        fig.add_trace(go.Scatter(
+            x=x,
+            y=y,
+            mode='lines',  # 'lines+markers' to show both lines and markers
+            name='IR',         # Name of the first line
+            line=dict(color='blue'),  # Line color
+            hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
+            marker=dict(size=10, symbol='circle')      # Marker size
+        ))
+        
+        fig.update_layout(
             title=f'{y_label} over {x_label}',
             xaxis_title=xaxis_title,
             yaxis_title=yaxis_title,
@@ -776,16 +797,18 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
                 fixedrange=False,
             ),
             template='plotly_white',
+            showlegend=True,
+            hovermode="x unified",
         )
-
-        figures.append(
-            PlotlyFigure(
-                label=f'{y_label} linear plot',
-                index=0,
-                figure=line_linear.to_plotly_json(),
-            ),
-        )
-
+        
+        figure_json = fig.to_plotly_json()
+        
+        figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+        
+        figures.append(PlotlyFigure(label=f'{y_label}-{x_label} linear plot', figure=figure_json))
+        
+        self.figures = figures
+        
         return figures
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
