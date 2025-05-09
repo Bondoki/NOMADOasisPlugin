@@ -1,0 +1,7 @@
+data:
+  m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV
+  CV_data_entries:
+    - name: 'TestTXT01'
+      data_as_txt_file: 'test_file_CV_TXT01.txt'
+
+

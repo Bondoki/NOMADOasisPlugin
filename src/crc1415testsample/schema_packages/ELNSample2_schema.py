@@ -2399,6 +2399,287 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
         
         super().normalize(archive, logger)
 
+
+class CVData(ArchiveSection):
+    """General data section for cyclic voltammetry"""
+
+    m_def = Section(
+        label_quantity='name',
+        a_eln={
+            # "overview": False,
+            # "hide": [
+            #     "name",
+            #     "lab_id",
+            #     "method",
+            #     "samples",
+            #     "measurement_identifiers"
+            # ],
+            "properties": {
+                "order": [
+                    "name",
+                    "data_as_txt_file",
+                    "Laser_Excitation_Wavelength"
+                ]
+            }
+        },
+    )
+    
+    name = Quantity(
+        type=str,
+        #default='TestName',
+        description='Name of the section or CV measurement',
+        a_eln={'component': 'StringEditQuantity'},
+    )
+    
+    # Laser_Excitation_Wavelength = Quantity(
+    #     type=np.float64,
+    #     unit='nanometer',
+    #     description='The wavelength of the laser for Raman spectroscopy.',
+    # )
+    
+    data_as_txt_file = Quantity(
+        type=str,
+        description="A reference to an uploaded .txt file produced by the cyclic voltammetry instrument.",
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity"
+        },
+    )
+        
+    CV_Potential = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='millivolt',
+        description='The applied potential during the cyclic voltammetry experiment, millivolt.',
+        a_eln=dict(label='CV Potential', defaultDisplayUnit= 'millivolt'),
+    )
+    
+    CV_Current = Quantity(
+        type=np.float64,
+        shape=["*"],
+        unit='microampere',
+        description='The measured current during the cyclic voltammetry experiment, microampere',
+        a_eln=dict(label='CV Current', defaultDisplayUnit= 'microampere'),
+    )
+
+class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
+    '''
+    Class for handling measurement of cyclic voltammetry experiment.
+    '''
+    m_def = Section(
+        categories=[CRC1415Category],
+        label='CRC1415-Measurement-CV',
+        a_eln={
+            "overview": True,
+            "hide": [
+                "name",
+                "lab_id",
+                "method",
+                "samples",
+                "measurement_identifiers"
+            ],
+            "properties": {
+                "order": [
+                    "tags",
+                    "datetime",
+                    "location",
+                    "data_as_ids_file",
+                    "description"
+                ]
+            }
+        },
+        )
+            
+    lab_id = Quantity(
+        type=str,
+        a_display={
+            "visible": False
+        },
+    )
+    
+    data_as_ids_file = Quantity(
+        type=str,
+        description="A reference to an uploaded cyclic voltammetry .ids file produced by the CV instrument.",
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity"
+        },
+    )
+    
+    CV_data_entries = SubSection(section_def=CVData, repeats=True)
+    
+    
+    def generate_plots(self) -> list[PlotlyFigure]:
+        """
+        Generate the plotly figures for the `MeasurementRaman` section.
+
+        Returns:
+            list[PlotlyFigure]: The plotly figures.
+        """
+        figures = []
+        # Create the figure
+        fig = go.Figure()
+        
+        #for r_d_entries in self.Raman_data_entries:
+        for idx, r_d_entries in enumerate(self.CV_data_entries):
+            #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
+            # Add line plots
+            x = r_d_entries.CV_Potential.to('millivolt').magnitude
+            y = r_d_entries.CV_Current.to('microampere').magnitude
+            
+            
+            # Get the Viridis color scale
+            viridis_colors = px.colors.sequential.Viridis
+            
+            color_index_line = int(idx / (len(self.CV_data_entries)-1) * (len(viridis_colors) - 1)) if len(self.CV_data_entries) > 1 else 0
+            
+            fig.add_trace(go.Scatter(
+                x=x,
+                y=y,
+                mode='lines',
+                name=f'frame: {idx}',
+                line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+            ))
+
+        # exemply use the first entry for the units
+        x_label = 'Potential'
+        xaxis_title = f'{x_label} ({self.CV_data_entries[0].CV_Potential.units:~})'#(1/cm)' the ':~' gives the short form
+        
+        y_label = 'Current'
+        yaxis_title = f'{y_label} ({self.CV_data_entries[0].CV_Current.units:~})'
+        
+        fig.update_layout(
+            title=f'{y_label} over {x_label}',
+            xaxis_title=xaxis_title,
+            yaxis_title=yaxis_title,
+            xaxis=dict(
+                fixedrange=False,
+            ),
+            yaxis=dict(
+                fixedrange=False,
+            ),
+            #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+            template='plotly_white',
+            showlegend=True,
+            hovermode="x unified",
+        )
+
+        # figures.append(
+        #     PlotlyFigure(
+        #         label=f'{y_label}-{x_label} linear plot',
+        #         #index=0,
+        #         figure=fig.to_plotly_json(),
+        #     ),
+        # )
+        
+        figure_json = fig.to_plotly_json()
+        figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+        
+        figures.append(
+            PlotlyFigure(
+                label=f'{y_label}-{x_label} linear plot',
+                figure=figure_json
+            )
+        )
+        
+        self.figures = figures
+
+        return figures
+    
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
+        """
+        The normalize function of the `MeasurementRaman` section.
+
+        Args:
+            archive (EntryArchive): The archive containing the section that is being
+            normalized.
+            logger (BoundLogger): A structlog logger.
+        """
+        # super().normalize(archive, logger)
+        try:
+            #Check if there's any CV .ids file provided in main section
+            if self.data_as_ids_file:
+                if not self.data_as_ids_file.endswith('.ids'):
+                    raise DataFileError(f"The file '{self.data_as_ids_file}' must have a .ids extension.")
+                
+                # Otherwise parse the file - ignore the iso8859-15 encoding
+                with archive.m_context.raw_file(self.data_as_ids_file,'r', errors='ignore') as idsfile:
+                    # Load the data from the file
+                    contentIDSfile = tvbfile.read()
+                    
+#                     
+#                     # Create subsection if not existing
+#                     if not self.Raman_data_entries:
+#                         self.Raman_data_entries = []
+#                         # Ensure the list is long enough
+#                         while len(self.Raman_data_entries) < numFrames:
+#                             self.Raman_data_entries.append(RamanData())  # Append a placeholder value
+#                     
+#                     # Create new if not sufficient long enough - overwrites the default
+#                     if len(self.Raman_data_entries) < numFrames:
+#                         self.Raman_data_entries = []
+#                         while len(self.Raman_data_entries) < numFrames:
+#                             self.Raman_data_entries.append(RamanData())  # Append a placeholder value
+#                     
+#                     #print(len(self.Raman_data_entries))
+#                     
+#                     # Do this for every frame in file
+#                     for frame in range(0,numFrames,1):
+#                         #print(frame)
+#                         datasplice = contentTVBfile[offsetHeader:offsetHeader+4*NRWE] 
+#                         # 'f': float (4 byte)
+#                         count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+#                         #print(count)
+#                         unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
+#                         #print(unpacked_data)
+#                         
+#                         import numpy as np
+#                         IntensityCount = np.asarray(unpacked_data, dtype=np.float64)
+#                         #print(IntensityCount)
+#                         
+#                         # Separate the columns into two variables and copy to 
+#                         self.Raman_data_entries[frame].Raman_shift = ureg.Quantity(RamanWavenumber, '1/nanometer')
+#                         self.Raman_data_entries[frame].Intensity = ureg.Quantity(IntensityCount, 'dimensionless')
+#                         self.Raman_data_entries[frame].Laser_Excitation_Wavelength = ureg.Quantity(LaserExcitationWavelength, 'nanometer')
+#                         
+#                         offsetHeader += 4*NRWE + 3*4 + 8 + 101 # specific after every frame 
+                    
+                    
+            #Check if any file is provided in any subsection for .txt files
+            for r_d_entries in self.CV_data_entries:
+                if r_d_entries.data_as_txt_file:
+                    # Check if the file has the correct extension: txt or plain 2-column txt
+                    # if not r_d_entries.data_as_tvf_or_txt_file.endswith('.tvf') and not r_d_entries.data_as_tvf_or_txt_file.endswith('.txt'):
+                    #     raise DataFileError(f"The file '{r_d_entries.data_as_tvf_or_txt_file}' must have a .tvf or .txt extension.")
+                    
+                    # Otherwise parse the file with *.txt - ignore the iso8859-15 encoding
+                    #if r_d_entries.data_as_txt_file.endswith('.txt'):
+                    with archive.m_context.raw_file(r_d_entries.data_as_txt_file,'r', errors='ignore') as xyfile:
+                            # Load the data from the file
+                            import numpy as np
+                            dataxyfile = np.loadtxt(xyfile, skiprows=1)
+                            
+                            # Separate the columns into two variables and copy to 
+                            r_d_entries.CV_Potential = ureg.Quantity(dataxyfile[:, 1], 'volt') # dataxydfile[:, 0]  # First column
+                            r_d_entries.CV_Current = ureg.Quantity(dataxyfile[:, 2], 'ampere') #dataxydfile[:, 1]  # Second column
+                    
+                    
+            
+        except Exception as e:
+            logger.error('Invalid file extension for parsing.', exc_info=e)
+        
+        if self.CV_data_entries:
+            #Otherwise create plot
+            self.figures = self.generate_plots()
+        
+        super().normalize(archive, logger)
+
+
 class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
     '''
     Class autogenerated from yaml schema for ELNSubstance.
