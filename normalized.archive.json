@@ -2,7 +2,8 @@
   "data": {
     "m_def": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
     "name": "test MeasurementCV IDS",
-    "datetime": "2025-05-09T17:20:42.376098+00:00",
+    "datetime": "2022-10-14T14:39:33+00:00",
+    "datetime_end": "2022-10-14T14:43:54+00:00",
     "data_as_ids_file": "test_file_CV_IDS.ids",
     "figures": [
       {
@@ -14,7 +15,11 @@
               "line": {
                 "color": "#440154"
               },
-              "mode": "lines",
+              "marker": {
+                "size": 2,
+                "symbol": "circle"
+              },
+              "mode": "lines+markers",
               "name": "frame: 0",
               "x": [
                 0.0,
@@ -667,7 +672,11 @@
               "line": {
                 "color": "#31688e"
               },
-              "mode": "lines",
+              "marker": {
+                "size": 2,
+                "symbol": "circle"
+              },
+              "mode": "lines+markers",
               "name": "frame: 1",
               "x": [
                 0.0,
@@ -1320,7 +1329,11 @@
               "line": {
                 "color": "#35b779"
               },
-              "mode": "lines",
+              "marker": {
+                "size": 2,
+                "symbol": "circle"
+              },
+              "mode": "lines+markers",
               "name": "frame: 2",
               "x": [
                 0.0,
@@ -1973,7 +1986,11 @@
               "line": {
                 "color": "#fde725"
               },
-              "mode": "lines",
+              "marker": {
+                "size": 2,
+                "symbol": "circle"
+              },
+              "mode": "lines+markers",
               "name": "frame: 3",
               "x": [
                 0.0,
@@ -3452,7 +3469,7 @@
               "fixedrange": false
             },
             "title": {
-              "text": "Current over Potential"
+              "text": "Current over Potential - Cyclic Voltammetry"
             },
             "showlegend": true,
             "hovermode": "x unified"
@@ -6063,11 +6080,11 @@
     "entry_type": "MeasurementCV",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_MeasurementCV_IDS.archive.yaml",
     "text_search_contents": [
-      "test MeasurementCV IDS",
+      "Current-Potential linear plot",
       "test_file_CV_IDS.ids",
-      "Current-Potential linear plot"
+      "test MeasurementCV IDS"
     ],
-    "n_quantities": 31,
+    "n_quantities": 32,
     "quantities": [
       "",
       "data",
@@ -6076,6 +6093,7 @@
       "data.CV_data_entries.CV_Potential",
       "data.data_as_ids_file",
       "data.datetime",
+      "data.datetime_end",
       "data.figures",
       "data.figures.figure",
       "data.figures.label",
@@ -6118,7 +6136,7 @@
       },
       {
         "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
-        "definition_id": "3d835fe241e5179b3ff3443f802cf2d569186ad2",
+        "definition_id": "14190ea81f6a427555d57daacc6ddd1c3b2a9966",
         "used_directly": true
       },
       {
@@ -6216,16 +6234,22 @@
         "str_value": "Current-Potential linear plot"
       },
       {
+        "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "nomad.datamodel.metainfo.basesections.v1.Activity.datetime",
+        "path_archive": "data.datetime",
+        "datetime_value": "2022-10-14T14:39:33+00:00"
+      },
+      {
+        "id": "data.datetime_end#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV.datetime_end",
+        "path_archive": "data.datetime_end",
+        "datetime_value": "2022-10-14T14:43:54+00:00"
+      },
+      {
         "id": "data.name#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
         "definition": "nomad.datamodel.metainfo.basesections.v1.BaseSection.name",
         "path_archive": "data.name",
         "str_value": "test MeasurementCV IDS"
-      },
-      {
-        "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
-        "definition": "nomad.datamodel.metainfo.basesections.v1.Activity.datetime",
-        "path_archive": "data.datetime",
-        "datetime_value": "2025-05-09T17:20:42.376098+00:00"
       }
     ]
   },

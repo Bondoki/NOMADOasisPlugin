@@ -2484,6 +2484,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                 "order": [
                     "tags",
                     "datetime",
+                    "datetime_end",
                     "location",
                     "data_as_ids_file",
                     "description"
@@ -2498,6 +2499,13 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
             "visible": False
         },
     )
+    
+    datetime_end = Quantity(
+        type=Datetime,
+        description='The date and time when this activity has ended.',
+        a_eln=dict(component='DateTimeEditQuantity', label='Ending Time'),
+    )
+    
     
     data_as_ids_file = Quantity(
         type=str,
@@ -2628,6 +2636,54 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
             if self.data_as_ids_file:
                 if not self.data_as_ids_file.endswith('.ids'):
                     raise DataFileError(f"The file '{self.data_as_ids_file}' must have a .ids extension.")
+                
+                
+                # Otherwise parse the file - ignore the iso8859-15 encoding
+                with archive.m_context.raw_file(self.data_as_ids_file,'r', encoding='iso8859-15') as idsfile:
+                    positions_startdate = [] # list of data entries position
+                    # Load the data from the file
+                    contentIDSlines = idsfile.readlines()  # Read all lines into a listidsfile.read()
+                    
+                    # Read the file line by line and search for 'primary_data'
+                    for line_number, line in enumerate(contentIDSlines):
+                        #start_index = 0
+                        #while True:
+                            # Find the next occurrence of the search string
+                        found_data = line.find('starttime=')
+                            #if found == -1:
+                            #    break  # No more occurrences in this line
+                            # Store the position as a tuple (line_number, character_position)
+                        if found_data >= 0:
+                            # first occurrence: start time and date of frame
+                            # next line: end time and date of frame
+                            positions_startdate.append((line_number, contentIDSlines[line_number], contentIDSlines[line_number+1]))  
+                            #start_index += 1  # Move to the next character to continue searching
+                            
+                    #print(positions_startdate)
+                    
+                    # Convert Europe/Berlin to UTC
+                    import pytz
+                    from dateutil import parser as dataparser 
+                    # dates:    DD.MM.YYYY HH:MM:SS in Berlin/Europe time zone
+                    starttime = positions_startdate[1][1].strip().split("=")[1] # starttime=14.10.2022 16:42:50 -> 14.10.2022 16:42:50
+                    exp_time_start = dataparser.parse(starttime, dayfirst=True)
+                    
+                    local_tz = pytz.timezone('Europe/Berlin')
+                    target_tz = pytz.timezone('UTC')
+                    
+                    exp_time_start = local_tz.localize(exp_time_start) # set to Berlin time
+                    exp_time_start = target_tz.normalize(exp_time_start) #transfer to UTC
+                    
+                    self.datetime = exp_time_start
+                    
+                    endtime = positions_startdate[len(positions_startdate)-1][2].strip().split("=")[1]
+                    exp_time_end = dataparser.parse(endtime, dayfirst=True)
+                    
+                    exp_time_end = local_tz.localize(exp_time_end) # set to Berlin time
+                    exp_time_end = target_tz.normalize(exp_time_end) #transfer to UTC
+                    
+                    self.datetime_end = exp_time_end
+                
                 
                 positions_primary_data = [] # list of data entries position
                 
