@@ -501,7 +501,16 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         # Convert the unpacked data as a datetime object
                         from dateutil import parser as dataparser
                         dt = dataparser.parse(string_output_day)
-                        self.datetime = dt 
+                        
+                        import pytz
+                        
+                        local_tz = pytz.timezone('Europe/Berlin')
+                        target_tz = pytz.timezone('UTC')
+                        
+                        dt = local_tz.localize(dt) # set to Berlin time
+                        dt = target_tz.normalize(dt) #transfer to UTC
+                        
+                        self.datetime = dt
                         
                         ###
                         # File Name And Comments?
@@ -570,7 +579,16 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                             
                             from dateutil import parser as dataparser
                             dt = dataparser.parse(string_output_time)
-                            self.datetime_end = dt 
+                            
+                            import pytz
+                        
+                            local_tz = pytz.timezone('Europe/Berlin')
+                            target_tz = pytz.timezone('UTC')
+                            
+                            dt = local_tz.localize(dt) # set to Berlin time
+                            dt = target_tz.normalize(dt) #transfer to UTC
+                            
+                            self.datetime_end = dt
                         
                         ###
                         # Number of Data Entries
@@ -1042,6 +1060,30 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                     
                     if MG:
                         self.SEM_Magnification = ureg.Quantity(float(MG.group(2)), 'dimensionless') # decimal number
+                        
+                    DATE = re.search(r'Date=([\d.]+)/([\d.]+)/([\d.]+)', text, re.IGNORECASE) # MM/DD/YYYY
+                    TIME = re.search(r'Time=([\d.]+):([\d.]+):([\d.]+)', text, re.IGNORECASE) # HH:MM:SS
+                    
+                    if DATE and TIME:
+                        import pytz
+                        import datetime
+                        # Should follow:    DD-MM-YYYY HH:MM:SS in Berlin/Europe time zone
+                        exp_time = datetime.datetime(int(DATE.group(3)),
+                                                     int(DATE.group(1)),
+                                                     int(DATE.group(2)),
+                                                     int(TIME.group(1)),
+                                                     int(TIME.group(2)),
+                                                     int(TIME.group(3)))
+                        
+                        local_tz = pytz.timezone('Europe/Berlin')
+                        target_tz = pytz.timezone('UTC')
+                        
+                        exp_time = local_tz.localize(exp_time) # set to Berlin time
+                        exp_time = target_tz.normalize(exp_time) #transfer to UTC
+                        
+                        self.datetime = exp_time
+                
+                
                 
                 
             
@@ -1080,8 +1122,8 @@ class MeasurementTEM(ELNMeasurement, PlotSection, ArchiveSection):
                     "name",
                     "data_as_tif_or_tiff_file",
                     "auxiliary_data_file",
-                    "SEM_Accelerating_Voltage",
-                    "SEM_Magnification",
+                    #"TEM_Accelerating_Voltage",
+                    #"TEM_Magnification",
                     "description"
                 ]
             }
@@ -1959,8 +2001,19 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 #print(float(analysistime.to(ureg.minute).magnitude))
                 
                 if 'End of run' in report_data.keys():
-                    self.datetime_end = dataparser.parse(report_data['End of run'])
-                    self.datetime = dataparser.parse(report_data['End of run']) - timedelta(minutes=float(self.Analysis_Time.to(ureg.minute).magnitude))
+                    import pytz
+                    # End of run:    MM/DD/YYYY 5:11:04 in Berlin/Europe time zone
+                    exp_time = dataparser.parse(report_data['End of run'], dayfirst=False)
+                    
+                    local_tz = pytz.timezone('Europe/Berlin')
+                    target_tz = pytz.timezone('UTC')
+                    
+                    exp_time = local_tz.localize(exp_time) # set to Berlin time
+                    exp_time = target_tz.normalize(exp_time) #transfer to UTC
+                    
+                    self.datetime_end = exp_time
+                    
+                    self.datetime = exp_time - timedelta(minutes=float(self.Analysis_Time.to(ureg.minute).magnitude))
                 
                 self.Outgas_Time = ureg.Quantity(float(report_data['Outgas Time']), 'hour' if report_data['Outgas Time unit'] == 'hrs' else 'dimensionless')
                 
@@ -2261,11 +2314,16 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
                     if time_exp:
                         # Convert the unpacked data as a datetime object
                         from datetime import datetime
-                        self.datetime = datetime.strptime(time_exp.group(1), "%d.%m.%Y %H:%M")
-                        #from dateutil import parser as dataparser
-                        #from datetime import datetime, timedelta
-                        #self.datetime = dataparser.parse(time_exp.group(1))
+                        import pytz
+                        exp_time = datetime.strptime(time_exp.group(1), "%d.%m.%Y %H:%M")
                         
+                        local_tz = pytz.timezone('Europe/Berlin')
+                        target_tz = pytz.timezone('UTC')
+                        
+                        exp_time = local_tz.localize(exp_time) # set to Berlin time
+                        exp_time = target_tz.normalize(exp_time) #transfer to UTC
+                        
+                        self.datetime = exp_time
                         
                 
                 with archive.m_context.raw_file(self.data_as_txt_file, 'r', encoding='iso8859-15') as txtfile:
