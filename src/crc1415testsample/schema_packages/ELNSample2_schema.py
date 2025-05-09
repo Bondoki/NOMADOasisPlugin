@@ -2515,7 +2515,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
     
     def generate_plots(self) -> list[PlotlyFigure]:
         """
-        Generate the plotly figures for the `MeasurementRaman` section.
+        Generate the plotly figures for the `MeasurementCV` section.
 
         Returns:
             list[PlotlyFigure]: The plotly figures.
@@ -2540,10 +2540,11 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
             fig.add_trace(go.Scatter(
                 x=x,
                 y=y,
-                mode='lines',
+                mode='lines+markers',  # 'lines+markers' to show both lines and markers
                 name=f'frame: {idx}',
                 line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                marker=dict(size=2, symbol='circle')      # Marker size
             ))
 
         # exemply use the first entry for the units
@@ -2554,7 +2555,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
         yaxis_title = f'{y_label} ({self.CV_data_entries[0].CV_Current.units:~})'
         
         fig.update_layout(
-            title=f'{y_label} over {x_label}',
+            title=f'{y_label} over {x_label} - Cyclic Voltammetry',
             xaxis_title=xaxis_title,
             yaxis_title=yaxis_title,
             xaxis=dict(
@@ -2592,22 +2593,6 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
         return figures
     
     def read_section(self, contentIDSlines, start_line, num_lines):
-        # filecontent = file_path.readlines()
-        # section_lines = []
-        # #with open(file_path, 'r', errors='ignore') as file:
-        # for current_line_number, line in enumerate(filecontent, start=1):
-        #     #Check if we are at the starting line
-        #     if current_line_number >= start_line:
-        #         #Strip whitespace from the line
-        #         stripped_line = line.strip()
-        #         #Check if the line is empty
-        #         if stripped_line == "":
-        #             break  # Stop if an empty line is encountered
-        #         section_lines.append(stripped_line)  # Add the line to the list
-        #         #Stop if we have read the specified number of lines
-        #         if len(section_lines) >= num_lines:
-        #             break
-        # return section_lines
         section_lines = []
         #with open(file_path, 'r', errors='ignore') as file:
         #contentIDSlines = file_path.readlines()
@@ -2823,6 +2808,10 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         repeats=True,
     )
     
+    Measurement_CV=SubSection(
+       section_def=MeasurementCV,
+       repeats=True,
+    )
     
     Measurement_Adsorption=SubSection(
        section_def=MeasurementAdsorption,
