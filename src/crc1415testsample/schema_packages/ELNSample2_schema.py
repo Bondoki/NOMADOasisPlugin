@@ -674,6 +674,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         # if not self.results:
         #    return
         
+        super().normalize(archive, logger)
         
 
 class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
@@ -846,7 +847,7 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
         # if not self.results:
         #    return
         
-        
+        super().normalize(archive, logger)
 
 
 class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
@@ -867,6 +868,9 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
             ],
             "properties": {
                 "order": [
+                    "tags",
+                    "datetime",
+                    "location",
                     "name",
                     "data_as_tif_or_tiff_file",
                     "auxiliary_data_file",
@@ -1067,7 +1071,20 @@ class MeasurementTEM(ELNMeasurement, PlotSection, ArchiveSection):
                 "method",
                 "samples",
                 "measurement_identifiers"
-            ]
+            ],
+            "properties": {
+                "order": [
+                    "tags",
+                    "datetime",
+                    "location",
+                    "name",
+                    "data_as_tif_or_tiff_file",
+                    "auxiliary_data_file",
+                    "SEM_Accelerating_Voltage",
+                    "SEM_Magnification",
+                    "description"
+                ]
+            }
         },
         )
     lab_id = Quantity(
@@ -2084,7 +2101,7 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
         # if not self.results:
         #    return
         
-        
+        super().normalize(archive, logger)
 
 class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
     '''
@@ -2321,6 +2338,8 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
         # In case something is odd here -> just return
         # if not self.results:
         #    return
+        
+        super().normalize(archive, logger)
 
 class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
     '''
