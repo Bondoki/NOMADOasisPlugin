@@ -2085,7 +2085,8 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 x_ads = adsorption_relativePressure
                 x_des = desorption_relativePressure
                 
-                y_label = '\u25CF Adsorbed Volume and \u25A1 Desorbed Volume'
+                #y_label = '\u25CF Adsorbed Volume and \u25A1 Desorbed Volume'
+                y_label = 'Adsorbed Volume'
                 yaxis_title = f'Adsorbed Volume [mmol/g] ({self.Analysis_Gas}, {self.Bath_Temperature.to('kelvin').magnitude} {self.Bath_Temperature.units:~})'
                 y_ads = adsorption_adsorpedVolume
                 y_des = desorption_adsorpedVolume
@@ -2356,7 +2357,7 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
                         name='TGA',         # Name of the first line
                         line=dict(color='blue'),  # Line color
                         hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
-                        marker=dict(size=2, symbol='circle')      # Marker size
+                        marker=dict(size=5, symbol='circle')      # Marker size
                     ))
                     
                     
@@ -2552,7 +2553,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                 name=f'frame: {idx}',
                 line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
-                marker=dict(size=2, symbol='circle')      # Marker size
+                marker=dict(size=5, symbol='circle')      # Marker size
             ))
 
         # exemply use the first entry for the units
@@ -2575,9 +2576,13 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
             #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
             template='plotly_white',
             showlegend=True,
-            hovermode="x unified",
+            hovermode="closest", #"x unified",
+            hoverdistance=10,
         )
-
+        
+        fig.update_xaxes(showspikes=True,)  # <-- add this line
+        fig.update_yaxes(showspikes=True)  # <-- add this line
+        
         # figures.append(
         #     PlotlyFigure(
         #         label=f'{y_label}-{x_label} linear plot',
