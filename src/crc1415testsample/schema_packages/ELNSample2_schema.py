@@ -2452,17 +2452,17 @@ class CVData(ArchiveSection):
     CV_Potential = Quantity(
         type=np.float64,
         shape=["*"],
-        unit='millivolt',
-        description='The applied potential during the cyclic voltammetry experiment, millivolt.',
-        a_eln=dict(label='CV Potential', defaultDisplayUnit= 'millivolt'),
+        unit='volt',
+        description='The applied potential during the cyclic voltammetry experiment, volt.',
+        a_eln=dict(label='CV Potential', defaultDisplayUnit= 'volt'),
     )
     
     CV_Current = Quantity(
         type=np.float64,
         shape=["*"],
-        unit='microampere',
-        description='The measured current during the cyclic voltammetry experiment, microampere',
-        a_eln=dict(label='CV Current', defaultDisplayUnit= 'microampere'),
+        unit='milliampere',
+        description='The measured current during the cyclic voltammetry experiment, milliampere',
+        a_eln=dict(label='CV Current', defaultDisplayUnit= 'milliampere'),
     )
 
 class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
@@ -2550,7 +2550,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                 x=x,
                 y=y,
                 mode='lines+markers',  # 'lines+markers' to show both lines and markers
-                name=f'frame: {idx}',
+                name=f'cycle: {idx}',
                 line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
                 hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
                 marker=dict(size=5, symbol='circle')      # Marker size
