@@ -2538,8 +2538,8 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
         for idx, r_d_entries in enumerate(self.CV_data_entries):
             #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
             # Add line plots
-            x = r_d_entries.CV_Potential.to('millivolt').magnitude
-            y = r_d_entries.CV_Current.to('microampere').magnitude
+            x = r_d_entries.CV_Potential.to(r_d_entries.CV_Potential.units).magnitude
+            y = r_d_entries.CV_Current.to(r_d_entries.CV_Current.units).magnitude
             
             
             # Get the Viridis color scale
