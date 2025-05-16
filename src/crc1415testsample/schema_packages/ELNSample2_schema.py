@@ -2841,6 +2841,9 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
             "properties": {
                 "order": [
                     "tags",
+                    "Project_Tags_Synthesis",
+                    "Project_Tags_Characterization",
+                    "Project_Tags_Theory",
                     "name",
                     "short_name",
                     "institute",
@@ -2871,6 +2874,32 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         },
         shape=["*"],
     )
+        
+    Project_Tags_Synthesis = Quantity(
+        type=MEnum(['A01', 'A02', 'A03', 'A04', 'A05', 'A06', 'A08', 'A10', 'A11']),
+        a_eln={
+            "component": "AutocompleteEditQuantity",
+            "label": ", label='A: Materials Synthesis",
+        },
+        shape=["*"],
+    )
+    Project_Tags_Characterization = Quantity(
+        type=MEnum(['B01', 'B04', 'B06', 'B07', 'B08', 'B09', 'B10', 'B11']),
+        a_eln={
+            "component": "AutocompleteEditQuantity",
+            "label": ", label='B: Characterization",
+        },
+        shape=["*"],
+    )
+    Project_Tags_Theory = Quantity(
+        type=MEnum(['C01', 'C03', 'C04', 'C06', 'C07', 'C08', 'C09']),
+        a_eln={
+            "component": "AutocompleteEditQuantity",
+            "label": ", label='C: Theory",
+        },
+        shape=["*"],
+    )
+        
     chemicals = Quantity(
         type=CRC1415Chemical,
         a_eln={
