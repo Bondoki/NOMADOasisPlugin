@@ -1287,7 +1287,6 @@ class RamanData(ArchiveSection):
                 "order": [
                     "name",
                     "data_as_tvf_or_txt_file",
-                    "Laser_Excitation_Wavelength"
                 ]
             }
         },
@@ -1300,11 +1299,6 @@ class RamanData(ArchiveSection):
         a_eln={'component': 'StringEditQuantity'},
     )
     
-    Laser_Excitation_Wavelength = Quantity(
-        type=np.float64,
-        unit='nanometer',
-        description='The wavelength of the laser for Raman spectroscopy.',
-    )
     
     data_as_tvf_or_txt_file = Quantity(
         type=str,
@@ -1352,6 +1346,10 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     "datetime",
                     "location",
                     "data_as_tvb_file",
+                    "Laser_Excitation_Wavelength",
+                    "Laser_Power",
+                    "Ramification_Objective",
+                    "Groove_Density",
                     "description"
                 ]
             }
@@ -1363,6 +1361,34 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         a_display={
             "visible": False
         },
+    )
+    
+    Laser_Excitation_Wavelength = Quantity(
+        type=np.float64,
+        unit='nanometer',
+        description='The wavelength of the laser for Raman spectroscopy, nanometer.',
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Laser Excitation Wavelength', defaultDisplayUnit= 'nanometer'),
+    )
+    
+    Laser_Power = Quantity(
+        type=np.float64,
+        unit='milliwatt',
+        description='The power of the laser for Raman spectroscopy, mW.',
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Laser Power', defaultDisplayUnit= 'milliwatt'),
+    )
+    
+    Ramification_Objective = Quantity(
+        type=np.float64,
+        unit='dimensionless',
+        description='The ramification of the objective for the laser in Raman spectroscopy, dimensionless.',
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Objective', defaultDisplayUnit= 'dimensionless'),
+    )
+    
+    Groove_Density = Quantity(
+        type=np.float64,
+        unit='1/millimeter',
+        description='The number of grooves per area of a grating in Raman spectroscopy, grooves/millimeter.',
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Groove_Density', defaultDisplayUnit= '1/millimeter'),
     )
     
     data_as_tvb_file = Quantity(
@@ -1557,6 +1583,9 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     #print(unpacked_data)
                     
                     LaserExcitationWavelength = float(unpacked_data[0])
+                    
+                    self.Laser_Excitation_Wavelength = ureg.Quantity(LaserExcitationWavelength, 'nanometer')
+                        
                     #print(LaserExcitationWavelength)
                     
                     ###
@@ -1600,7 +1629,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     #print(CLXML)
                     
                     ###
-                    # XML part
+                    # XML part -> Date, LaserPower, Ramification Objective, Groove Density
                     ###
                     datasplice = contentTVBfile[0x1538:0x1538+1*CLXML]
                     # 'b': Signed char (1 byte)
@@ -1613,6 +1642,41 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     import xmltodict, json
                     dataxmlfile = xmltodict.parse(string_output_xml)
                     string_experiment_time = dataxmlfile['Info']['Groups']['Group'][0]['Items']['Item']['Value']
+                    
+                    
+                    if dataxmlfile['Info']['Groups']['Group'][1]['Items']['Item'][2]['Name'] == 'Laser-Power':
+                        laser_power_str = dataxmlfile['Info']['Groups']['Group'][1]['Items']['Item'][2]['Value'] # 1,178mW
+                        
+                        # Use regex to separate the number (note the comma) and the unit
+                        match = re.match(r'([\d,]+)([a-zA-Z]+)', laser_power_str)
+                        if match:
+                            number_str, unit_str = match.groups()
+                            # Remove commas and convert to float
+                            number = float(number_str.replace(',', ''))
+                            #print(number, unit_str)
+                            self.Laser_Power = ureg.Quantity(number, unit_str)
+                            
+                    if dataxmlfile['Info']['Groups']['Group'][1]['Items']['Item'][3]['Name'] == 'Used Objective':
+                        objective_str = dataxmlfile['Info']['Groups']['Group'][1]['Items']['Item'][3]['Value'] # 20x
+                    
+                        match = re.match(r'([\d,]+)([a-zA-Z]+)', objective_str)
+                        if match:
+                            number_str, unit_str = match.groups()
+                            # Remove commas and convert to float
+                            number = float(number_str.replace(',', ''))
+                            #print(number, unit_str)
+                            self.Ramification_Objective = ureg.Quantity(number, 'dimensionless')
+                    
+                    if dataxmlfile['Info']['Groups']['Group'][3]['Groups']['Group']['Items']['Item'][6]['Name'] == 'Groove_Density':
+                        groove_density_str = dataxmlfile['Info']['Groups']['Group'][3]['Groups']['Group']['Items']['Item'][6]['Value'] # 300 g/mm
+                    
+                        match = re.match(r'([\d\s]+)([a-zA-Z/]+)', groove_density_str)
+                        if match:
+                            number_str, unit_str = match.groups()
+                            # Remove commas and convert to float
+                            number = float(number_str.replace(',', ''))
+                            #print(number, unit_str)
+                            self.Groove_Density = ureg.Quantity(number, '1/millimeter')
                     
                     from datetime import datetime
                     dateExpermimentParsed = datetime.strptime(string_experiment_time,'%d.%m.%Y %H:%M')
@@ -1655,7 +1719,6 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                         # Separate the columns into two variables and copy to 
                         self.Raman_data_entries[frame].Raman_shift = ureg.Quantity(RamanWavenumber, '1/nanometer')
                         self.Raman_data_entries[frame].Intensity = ureg.Quantity(IntensityCount, 'dimensionless')
-                        self.Raman_data_entries[frame].Laser_Excitation_Wavelength = ureg.Quantity(LaserExcitationWavelength, 'nanometer')
                         
                         offsetHeader += 4*NRWE + 3*4 + 8 + 101 # specific after every frame 
                     
