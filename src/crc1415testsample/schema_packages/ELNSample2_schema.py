@@ -75,12 +75,12 @@ from nomad.datamodel.metainfo.plot import (
     PlotSection,
 )
 
-from nomad.metainfo.elasticsearch_extension import (
-    Elasticsearch,
-    material_entry_type,
-    entry_type as es_entry_type,
-    create_searchable_quantity,
-)
+# from nomad.metainfo.elasticsearch_extension import (
+#     Elasticsearch,
+#     material_entry_type,
+#     entry_type as es_entry_type,
+#     create_searchable_quantity,
+# )
 
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
@@ -2889,7 +2889,7 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
             "label": "A: Materials Synthesis",
         },
         shape=["*"],
-        a_elasticsearch=Elasticsearch(material_entry_type),
+        #a_elasticsearch=Elasticsearch(material_entry_type),
         # see nomad/nomad/datamodel/results.py
     )
     Project_Tags_Characterization = Quantity(
