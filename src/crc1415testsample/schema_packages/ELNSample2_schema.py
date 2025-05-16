@@ -2889,8 +2889,8 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
             "label": "A: Materials Synthesis",
         },
         shape=["*"],
-        a_elasticsearch=[Elasticsearch(mapping='text', es_query='match_bool_prefix')],
-        # see nomad/nomad/datamodel/datamodel.py
+        a_elasticsearch=Elasticsearch(material_entry_type),
+        # see nomad/nomad/datamodel/results.py
     )
     Project_Tags_Characterization = Quantity(
         type=MEnum(['B01', 'B04', 'B06', 'B07', 'B08', 'B09', 'B10', 'B11']),
