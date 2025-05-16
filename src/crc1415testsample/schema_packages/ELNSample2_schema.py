@@ -1776,8 +1776,9 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
     
     Sample_Weight = Quantity(
         type=np.float64,
-        unit='gram',
-        description='The weight of the sample.',
+        unit='milligram',
+        description='The weight of the sample, milligram',
+        a_eln=dict(component='NumberEditQuantity', label='Sample Weight', defaultDisplayUnit= 'milligram'),
     )
     
     Outgas_Time= Quantity(
