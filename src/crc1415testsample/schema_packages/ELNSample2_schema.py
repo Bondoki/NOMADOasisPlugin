@@ -75,6 +75,13 @@ from nomad.datamodel.metainfo.plot import (
     PlotSection,
 )
 
+from nomad.metainfo.elasticsearch_extension import (
+    Elasticsearch,
+    material_entry_type,
+    entry_type as es_entry_type,
+    create_searchable_quantity,
+)
+
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
         EntryArchive,
@@ -2879,15 +2886,17 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         type=MEnum(['A01', 'A02', 'A03', 'A04', 'A05', 'A06', 'A08', 'A10', 'A11']),
         a_eln={
             "component": "AutocompleteEditQuantity",
-            "label": ", label='A: Materials Synthesis",
+            "label": "A: Materials Synthesis",
         },
         shape=["*"],
+        a_elasticsearch=[Elasticsearch(mapping='text', es_query='match_bool_prefix')],
+        # see nomad/nomad/datamodel/datamodel.py
     )
     Project_Tags_Characterization = Quantity(
         type=MEnum(['B01', 'B04', 'B06', 'B07', 'B08', 'B09', 'B10', 'B11']),
         a_eln={
             "component": "AutocompleteEditQuantity",
-            "label": ", label='B: Characterization",
+            "label": "B: Characterization",
         },
         shape=["*"],
     )
@@ -2895,7 +2904,7 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         type=MEnum(['C01', 'C03', 'C04', 'C06', 'C07', 'C08', 'C09']),
         a_eln={
             "component": "AutocompleteEditQuantity",
-            "label": ", label='C: Theory",
+            "label": "C: Theory",
         },
         shape=["*"],
     )
