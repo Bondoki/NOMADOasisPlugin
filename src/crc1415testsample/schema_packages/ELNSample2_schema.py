@@ -950,7 +950,7 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
-        The normalize function of the `MeasurementIR` section.
+        The normalize function of the `MeasurementSEM` section.
 
         Args:
             archive (EntryArchive): The archive containing the section that is being
@@ -1158,7 +1158,7 @@ class MeasurementTEM(ELNMeasurement, PlotSection, ArchiveSection):
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
-        The normalize function of the `MeasurementIR` section.
+        The normalize function of the `MeasurementTEM` section.
 
         Args:
             archive (EntryArchive): The archive containing the section that is being
@@ -1824,7 +1824,7 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
     
     def generate_plots(self) -> list[PlotlyFigure]:
         """
-        Generate the plotly figures for the `MeasurementIR` section.
+        Generate the plotly figures for the `MeasurementAdsorption` section.
 
         Returns:
             list[PlotlyFigure]: The plotly figures.
@@ -2488,6 +2488,8 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                     "datetime",
                     "datetime_end",
                     "location",
+                    "CV_Electrolyte",
+                    "CV_Reference_Electrode_Material",
                     "data_as_ids_file",
                     "description"
                 ]
@@ -2508,6 +2510,19 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln=dict(component='DateTimeEditQuantity', label='Ending Time'),
     )
     
+    CV_Reference_Electrode_Material = Quantity(
+        type=str,
+        #default='TestName',
+        description='The material, which the reference electrode is made of.',
+        a_eln=dict(component='EnumEditQuantity', label='Reference Electrode Material', suggestions=['SCE (saturated calomel electrode)', 'SHE (standard hydrogen electrode (SHE)', 'AgCl/Ag']),
+    )
+    
+    CV_Electrolyte = Quantity(
+        type=str,
+        #default='TestName',
+        description='The electrolytes in cyclic voltammetry facilitate ion transport, enabling electrochemical reaction measurements',
+        a_eln=dict(component='EnumEditQuantity', label='Electrolyte', suggestions=['KCl', 'Na2SO4', 'LiClO4', 'KNO3']),
+    )
     
     data_as_ids_file = Quantity(
         type=str,
