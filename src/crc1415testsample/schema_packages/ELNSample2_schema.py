@@ -2420,7 +2420,7 @@ class CVData(ArchiveSection):
                 "order": [
                     "name",
                     "data_as_txt_file",
-                    "Laser_Excitation_Wavelength"
+                    "CV_Scanrate",
                 ]
             }
         },
@@ -2452,9 +2452,9 @@ class CVData(ArchiveSection):
     
     CV_Scanrate = Quantity(
         type=np.float64,
-        unit='volt/seconds',
-        description='The scanrate used in the CV experiment, volt/seconds.',
-        a_eln=dict(component='NumberEditQuantity', label='CV: Scanrate', defaultDisplayUnit= 'volt/seconds'),
+        unit='volt/second',
+        description='The scanrate used in the CV experiment, volt/second.',
+        a_eln=dict(component='NumberEditQuantity', label='CV: Scanrate', defaultDisplayUnit= 'volt/second'),
     )
     
     CV_Potential = Quantity(
@@ -2717,7 +2717,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                 # Find the 'Title=' in .ids file
                 ###
                 
-                positions_scanrate_data = [] # list of data entries position of keyword 'Scanrate=' in Volt/seconds
+                positions_scanrate_data = [] # list of data entries position of keyword 'Scanrate=' in Volt/second
                 positions_title_data = [] # list of data entries position of keyword 'Title=' for every cycle
                 
                 # Otherwise parse the file - ignore the iso8859-15 encoding
@@ -2794,7 +2794,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                         self.CV_data_entries[frame-1].CV_Current = ureg.Quantity(dataxyfile[:, 1], 'ampere')
                         
                         # Provide the Scanrate (in V/s) used in every run
-                        self.CV_data_entries[frame-1].CV_Scanrate = ureg.Quantity(float(positions_scanrate_data[frame][1]), 'volt/seconds')
+                        self.CV_data_entries[frame-1].CV_Scanrate = ureg.Quantity(float(positions_scanrate_data[frame][1]), 'volt/second')
                         # Provide the Title of every measurement
                         self.CV_data_entries[frame-1].name = positions_title_data[frame][1]
                         

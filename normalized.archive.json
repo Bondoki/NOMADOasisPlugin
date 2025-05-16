@@ -6092,12 +6092,12 @@
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_MeasurementCV_IDS.archive.yaml",
     "text_search_contents": [
       "Au roughening02",
-      "Current-Potential linear plot",
-      "Au roughening03",
-      "test_file_CV_IDS.ids",
-      "test MeasurementCV IDS",
+      "Au roughening04",
       "Au roughening01",
-      "Au roughening04"
+      "Au roughening03",
+      "test MeasurementCV IDS",
+      "Current-Potential linear plot",
+      "test_file_CV_IDS.ids"
     ],
     "n_quantities": 40,
     "quantities": [
