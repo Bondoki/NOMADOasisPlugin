@@ -2430,7 +2430,7 @@ class CVData(ArchiveSection):
         type=str,
         #default='TestName',
         description='Name of the section or CV measurement',
-        a_eln={'component': 'StringEditQuantity'},
+        a_eln={'component': 'StringEditQuantity', 'label': 'CV: Title of the measurement'},
     )
     
     # Laser_Excitation_Wavelength = Quantity(
@@ -2449,7 +2449,14 @@ class CVData(ArchiveSection):
             "component": "FileEditQuantity"
         },
     )
-        
+    
+    CV_Scanrate = Quantity(
+        type=np.float64,
+        unit='volt/seconds',
+        description='The scanrate used in the CV experiment, volt/seconds.',
+        a_eln=dict(component='NumberEditQuantity', label='CV: Scanrate', defaultDisplayUnit= 'volt/seconds'),
+    )
+    
     CV_Potential = Quantity(
         type=np.float64,
         shape=["*"],
@@ -2705,6 +2712,35 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                     
                     self.datetime_end = exp_time_end
                 
+                ###
+                # Find the 'Scanrate=' in .ids file
+                # Find the 'Title=' in .ids file
+                ###
+                
+                positions_scanrate_data = [] # list of data entries position of keyword 'Scanrate=' in Volt/seconds
+                positions_title_data = [] # list of data entries position of keyword 'Title=' for every cycle
+                
+                # Otherwise parse the file - ignore the iso8859-15 encoding
+                with archive.m_context.raw_file(self.data_as_ids_file,'r', encoding='iso8859-15') as idsfile:
+                    # Load the data from the file
+                    contentIDSlines = idsfile.readlines()  # Read all lines into a listidsfile.read()
+                    
+                    # Read the file line by line and search for 'primary_data'
+                    for line_number, line in enumerate(contentIDSlines):
+                        found_data_scanrate = line.find('Scanrate=')
+                        found_data_title = line.find('Title=')
+                        
+                        # Important: the line starts (== 0) with the keyword
+                        if found_data_scanrate == 0:
+                            positions_scanrate_data.append((line_number, line.strip().split('=')[1]) )  
+                        
+                        if found_data_title == 0:
+                            positions_title_data.append((line_number, line.strip().split('=')[1]) )  
+
+                
+                ###
+                # Find the position of the data 
+                ###
                 
                 positions_primary_data = [] # list of data entries position
                 
@@ -2757,6 +2793,10 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                         self.CV_data_entries[frame-1].CV_Potential = ureg.Quantity(dataxyfile[:, 0], 'volt')
                         self.CV_data_entries[frame-1].CV_Current = ureg.Quantity(dataxyfile[:, 1], 'ampere')
                         
+                        # Provide the Scanrate (in V/s) used in every run
+                        self.CV_data_entries[frame-1].CV_Scanrate = ureg.Quantity(float(positions_scanrate_data[frame][1]), 'volt/seconds')
+                        # Provide the Title of every measurement
+                        self.CV_data_entries[frame-1].name = positions_title_data[frame][1]
                         
                     
             #Check if any file is provided in any subsection for .txt files

@@ -3490,6 +3490,8 @@
     ],
     "CV_data_entries": [
       {
+        "name": "Au roughening01",
+        "CV_Scanrate": 0.015,
         "CV_Potential": [
           0.0,
           0.01,
@@ -4136,6 +4138,8 @@
         ]
       },
       {
+        "name": "Au roughening02",
+        "CV_Scanrate": 0.025,
         "CV_Potential": [
           0.0,
           0.01,
@@ -4782,6 +4786,8 @@
         ]
       },
       {
+        "name": "Au roughening03",
+        "CV_Scanrate": 0.035,
         "CV_Potential": [
           0.0,
           0.01,
@@ -5428,6 +5434,8 @@
         ]
       },
       {
+        "name": "Au roughening04",
+        "CV_Scanrate": 0.045,
         "CV_Potential": [
           0.0,
           0.01,
@@ -6083,17 +6091,23 @@
     "entry_type": "MeasurementCV",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_MeasurementCV_IDS.archive.yaml",
     "text_search_contents": [
-      "test MeasurementCV IDS",
+      "Au roughening02",
+      "Current-Potential linear plot",
+      "Au roughening03",
       "test_file_CV_IDS.ids",
-      "Current-Potential linear plot"
+      "test MeasurementCV IDS",
+      "Au roughening01",
+      "Au roughening04"
     ],
-    "n_quantities": 32,
+    "n_quantities": 40,
     "quantities": [
       "",
       "data",
       "data.CV_data_entries",
       "data.CV_data_entries.CV_Current",
       "data.CV_data_entries.CV_Potential",
+      "data.CV_data_entries.CV_Scanrate",
+      "data.CV_data_entries.name",
       "data.data_as_ids_file",
       "data.datetime",
       "data.datetime_end",
@@ -6134,12 +6148,12 @@
     "section_defs": [
       {
         "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.CVData",
-        "definition_id": "5fae0b859be7ad9c0c98790d2b7e6af2e448c10a",
+        "definition_id": "aef0bb2a4df39052e03bdf5d9804b2a1a136e75f",
         "used_directly": true
       },
       {
         "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
-        "definition_id": "edbf35dfe629b1ef453dbd835b8d217500ac68c1",
+        "definition_id": "b843bf7aab9bac1d899d08cd0fd1dde91faca60b",
         "used_directly": true
       },
       {
@@ -6235,6 +6249,54 @@
         "definition": "nomad.datamodel.metainfo.plot.Figure.label",
         "path_archive": "data.figures.0.label",
         "str_value": "Current-Potential linear plot"
+      },
+      {
+        "id": "data.CV_data_entries.CV_Scanrate#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CVData.CV_Scanrate",
+        "path_archive": "data.CV_data_entries.0.CV_Scanrate",
+        "float_value": 0.015
+      },
+      {
+        "id": "data.CV_data_entries.name#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CVData.name",
+        "path_archive": "data.CV_data_entries.0.name",
+        "str_value": "Au roughening01"
+      },
+      {
+        "id": "data.CV_data_entries.CV_Scanrate#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CVData.CV_Scanrate",
+        "path_archive": "data.CV_data_entries.1.CV_Scanrate",
+        "float_value": 0.025
+      },
+      {
+        "id": "data.CV_data_entries.name#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CVData.name",
+        "path_archive": "data.CV_data_entries.1.name",
+        "str_value": "Au roughening02"
+      },
+      {
+        "id": "data.CV_data_entries.CV_Scanrate#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CVData.CV_Scanrate",
+        "path_archive": "data.CV_data_entries.2.CV_Scanrate",
+        "float_value": 0.035
+      },
+      {
+        "id": "data.CV_data_entries.name#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CVData.name",
+        "path_archive": "data.CV_data_entries.2.name",
+        "str_value": "Au roughening03"
+      },
+      {
+        "id": "data.CV_data_entries.CV_Scanrate#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CVData.CV_Scanrate",
+        "path_archive": "data.CV_data_entries.3.CV_Scanrate",
+        "float_value": 0.045
+      },
+      {
+        "id": "data.CV_data_entries.name#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.CVData.name",
+        "path_archive": "data.CV_data_entries.3.name",
+        "str_value": "Au roughening04"
       },
       {
         "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementCV",
