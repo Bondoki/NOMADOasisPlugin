@@ -54664,8 +54664,8 @@
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_RamanMeasurementTVB.archive.yaml",
     "text_search_contents": [
       "test RamanMeasurementTVB",
-      "test_Raman_10Frames.tvb",
-      "Intensity-Raman shift linear plot"
+      "Intensity-Raman shift linear plot",
+      "test_Raman_10Frames.tvb"
     ],
     "n_quantities": 55,
     "quantities": [

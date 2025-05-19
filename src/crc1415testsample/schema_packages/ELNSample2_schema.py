@@ -1350,6 +1350,8 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     "Laser_Power",
                     "Ramification_Objective",
                     "Groove_Density",
+                    "Accumulation_Time",
+                    "No_of_Accumulations",
                     "description"
                 ]
             }
@@ -1395,14 +1397,14 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         type=np.float64,
         unit='second',
         description='The time intervall to average the measurement in the accumation step in Raman spectroscopy, second.',
-        a_eln=dict(component='NumberEditQuantity', label='Raman: Accumulation Time', defaultDisplayUnit= 'second'),
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Exposure Time per Accumulation', defaultDisplayUnit= 'second'),
     )
     
     No_of_Accumulations = Quantity(
         type=np.int32,
         unit='dimensionless',
         description='The number of accumulations for one frame during the measurement in Raman spectroscopy, dimensionless.',
-        a_eln=dict(component='NumberEditQuantity', label='Raman: Number of Accumulations', defaultDisplayUnit= 'dimensionless'),
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Number of Accumulations per Frame', defaultDisplayUnit= 'dimensionless'),
     )
     
     data_as_tvb_file = Quantity(
