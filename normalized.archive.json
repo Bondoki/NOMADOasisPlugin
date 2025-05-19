@@ -7,6 +7,8 @@
     "Laser_Power": 1684.0,
     "Ramification_Objective": 20.0,
     "Groove_Density": 300.0,
+    "Accumulation_Time": 10.0,
+    "No_of_Accumulations": 1,
     "data_as_tvb_file": "test_Raman_10Frames.tvb",
     "figures": [
       {
@@ -54661,17 +54663,19 @@
     "entry_type": "MeasurementRaman",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_RamanMeasurementTVB.archive.yaml",
     "text_search_contents": [
-      "Intensity-Raman shift linear plot",
       "test RamanMeasurementTVB",
-      "test_Raman_10Frames.tvb"
+      "test_Raman_10Frames.tvb",
+      "Intensity-Raman shift linear plot"
     ],
-    "n_quantities": 53,
+    "n_quantities": 55,
     "quantities": [
       "",
       "data",
+      "data.Accumulation_Time",
       "data.Groove_Density",
       "data.Laser_Excitation_Wavelength",
       "data.Laser_Power",
+      "data.No_of_Accumulations",
       "data.Raman_data_entries",
       "data.Raman_data_entries.Intensity",
       "data.Raman_data_entries.Raman_shift",
@@ -54715,7 +54719,7 @@
     "section_defs": [
       {
         "definition_qualified_name": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",
-        "definition_id": "a2ed9d95b09a01aff2e892e2c1049808f29b6e62",
+        "definition_id": "c6d25e3be6a7d23018cffe73c583110e66ceb599",
         "used_directly": true
       },
       {
@@ -54840,6 +54844,18 @@
         "definition": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman.Groove_Density",
         "path_archive": "data.Groove_Density",
         "float_value": 300.0
+      },
+      {
+        "id": "data.Accumulation_Time#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman.Accumulation_Time",
+        "path_archive": "data.Accumulation_Time",
+        "float_value": 10.0
+      },
+      {
+        "id": "data.No_of_Accumulations#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",
+        "definition": "crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman.No_of_Accumulations",
+        "path_archive": "data.No_of_Accumulations",
+        "int_value": 1
       },
       {
         "id": "data.datetime#crc1415testsample.schema_packages.ELNSample2_schema.MeasurementRaman",

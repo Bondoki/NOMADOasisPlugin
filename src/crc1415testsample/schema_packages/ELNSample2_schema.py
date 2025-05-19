@@ -1381,14 +1381,28 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         type=np.float64,
         unit='dimensionless',
         description='The ramification of the objective for the laser in Raman spectroscopy, dimensionless.',
-        a_eln=dict(component='NumberEditQuantity', label='Raman: Objective', defaultDisplayUnit= 'dimensionless'),
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Ramification Objective', defaultDisplayUnit= 'dimensionless'),
     )
     
     Groove_Density = Quantity(
         type=np.float64,
         unit='1/millimeter',
         description='The number of grooves per area of a grating in Raman spectroscopy, grooves/millimeter.',
-        a_eln=dict(component='NumberEditQuantity', label='Raman: Groove_Density', defaultDisplayUnit= '1/millimeter'),
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Groove Density', defaultDisplayUnit= '1/millimeter'),
+    )
+    
+    Accumulation_Time = Quantity(
+        type=np.float64,
+        unit='second',
+        description='The time intervall to average the measurement in the accumation step in Raman spectroscopy, second.',
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Accumulation Time', defaultDisplayUnit= 'second'),
+    )
+    
+    No_of_Accumulations = Quantity(
+        type=np.int32,
+        unit='dimensionless',
+        description='The number of accumulations for one frame during the measurement in Raman spectroscopy, dimensionless.',
+        a_eln=dict(component='NumberEditQuantity', label='Raman: Number of Accumulations', defaultDisplayUnit= 'dimensionless'),
     )
     
     data_as_tvb_file = Quantity(
@@ -1629,7 +1643,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     #print(CLXML)
                     
                     ###
-                    # XML part -> Date, LaserPower, Ramification Objective, Groove Density
+                    # XML part -> Date, LaserPower, Ramification Objective, Groove Density, Exposure_time, Number_Accumlations
                     ###
                     datasplice = contentTVBfile[0x1538:0x1538+1*CLXML]
                     # 'b': Signed char (1 byte)
@@ -1677,6 +1691,25 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                             number = float(number_str.replace(',', ''))
                             #print(number, unit_str)
                             self.Groove_Density = ureg.Quantity(number, '1/millimeter')
+                            
+                    if dataxmlfile['Info']['Groups']['Group'][4]['Items']['Item'][4]['Name'] == 'Exposure_Time_(ms)':
+                        accumulation_time_str = dataxmlfile['Info']['Groups']['Group'][4]['Items']['Item'][4]['Value'] # 10000
+                    
+                        match = re.match(r'([\d]+)', accumulation_time_str)
+                        if match:
+                            number_str = match.group(1)
+                            number = float(number_str)
+                            self.Accumulation_Time = ureg.Quantity(number, 'millisecond')
+                            
+                    if dataxmlfile['Info']['Groups']['Group'][4]['Items']['Item'][6]['Name'] == 'No_of_Accumulations':
+                        accumulation_number_str = dataxmlfile['Info']['Groups']['Group'][4]['Items']['Item'][6]['Value'] # 6
+                        
+                        match = re.match(r'([\d]+)', accumulation_number_str)
+                        if match:
+                            number_str = match.group(1)
+                            number = int(number_str)
+                            self.No_of_Accumulations = ureg.Quantity(number, 'dimensionless')
+
                     
                     from datetime import datetime
                     dateExpermimentParsed = datetime.strptime(string_experiment_time,'%d.%m.%Y %H:%M')
