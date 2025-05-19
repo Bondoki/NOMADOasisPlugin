@@ -29,8 +29,9 @@ import struct # for binary files
 import os    
 
 import re
-import numpy as np
 import json
+
+import zipfile
 
 from nomad.datamodel.metainfo.plot import PlotSection
 from nomad.datamodel.metainfo.eln import ELNMeasurement
@@ -1346,6 +1347,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     "datetime",
                     "location",
                     "data_as_tvb_file",
+                    "processed_data_as_zip_file",
                     "Laser_Excitation_Wavelength",
                     "Laser_Power",
                     "Ramification_Objective",
@@ -1417,8 +1419,22 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
             "component": "FileEditQuantity"
         },
     )
+        
+    processed_data_as_zip_file = Quantity(
+        type=str,
+        description="A reference to an uploaded .zip archive of processed data containing plain x-y-value table as .txt files.",
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            "component": "FileEditQuantity",
+            "label": "Processed data as zip archive"
+        },
+    )
     
     Raman_data_entries = SubSection(section_def=RamanData, repeats=True)
+    
+    Raman_processed_data_entries = SubSection(section_def=RamanData, repeats=True)
     
     
     def generate_plots(self) -> list[PlotlyFigure]:
@@ -1429,71 +1445,144 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
             list[PlotlyFigure]: The plotly figures.
         """
         figures = []
-        # Create the figure
-        fig = go.Figure()
-        
-        #for r_d_entries in self.Raman_data_entries:
-        for idx, r_d_entries in enumerate(self.Raman_data_entries):
-            #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
-            # Add line plots
-            x = r_d_entries.Raman_shift.to('1/centimeter').magnitude
-            y = r_d_entries.Intensity.to('dimensionless').magnitude
+        ##
+        # Create the figure - messured data
+        ##
+        if self.Raman_data_entries:
+            fig = go.Figure()
             
-            
-            # Get the Viridis color scale
-            viridis_colors = px.colors.sequential.Viridis
-            
-            color_index_line = int(idx / (len(self.Raman_data_entries)-1) * (len(viridis_colors) - 1)) if len(self.Raman_data_entries) > 1 else 0
-            
-            fig.add_trace(go.Scatter(
-                x=x,
-                y=y,
-                mode='lines',
-                name=f'frame: {idx}',
-                line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
-                hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
-            ))
+            #for r_d_entries in self.Raman_data_entries:
+            for idx, r_d_entries in enumerate(self.Raman_data_entries):
+                #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
+                # Add line plots
+                x = r_d_entries.Raman_shift.to('1/centimeter').magnitude
+                y = r_d_entries.Intensity.to('dimensionless').magnitude
+                
+                
+                # Get the Viridis color scale
+                viridis_colors = px.colors.sequential.Viridis
+                
+                color_index_line = int(idx / (len(self.Raman_data_entries)-1) * (len(viridis_colors) - 1)) if len(self.Raman_data_entries) > 1 else 0
+                
+                fig.add_trace(go.Scatter(
+                    x=x,
+                    y=y,
+                    mode='lines',
+                    name=f'frame: {idx}',
+                    line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                ))
 
-        # exemply use the first entry for the units
-        x_label = 'Raman shift'
-        xaxis_title = f'{x_label} ({self.Raman_data_entries[0].Raman_shift.units:~})'#(1/cm)' the ':~' gives the short form
-        
-        y_label = 'Intensity'
-        yaxis_title = f'{y_label} (a.u.)'
-        
-        fig.update_layout(
-            title=f'{y_label} over {x_label}',
-            xaxis_title=xaxis_title,
-            yaxis_title=yaxis_title,
-            xaxis=dict(
-                fixedrange=False,
-            ),
-            yaxis=dict(
-                fixedrange=False,
-            ),
-            #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
-            template='plotly_white',
-            showlegend=True,
-            hovermode="x unified",
-        )
-
-        # figures.append(
-        #     PlotlyFigure(
-        #         label=f'{y_label}-{x_label} linear plot',
-        #         #index=0,
-        #         figure=fig.to_plotly_json(),
-        #     ),
-        # )
-        
-        figure_json = fig.to_plotly_json()
-        figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
-        
-        figures.append(
-            PlotlyFigure(
-                label=f'{y_label}-{x_label} linear plot',
-                figure=figure_json
+            # exemply use the first entry for the units
+            x_label = 'Raman shift'
+            xaxis_title = f'{x_label} ({self.Raman_data_entries[0].Raman_shift.units:~})'#(1/cm)' the ':~' gives the short form
+            
+            y_label = 'Intensity'
+            yaxis_title = f'{y_label} (a.u.)'
+            
+            fig.update_layout(
+                title=f'{y_label} over {x_label}',
+                xaxis_title=xaxis_title,
+                yaxis_title=yaxis_title,
+                xaxis=dict(
+                    fixedrange=False,
+                ),
+                yaxis=dict(
+                    fixedrange=False,
+                ),
+                #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+                template='plotly_white',
+                showlegend=True,
+                hovermode="x unified",
             )
-        )
+
+            # figures.append(
+            #     PlotlyFigure(
+            #         label=f'{y_label}-{x_label} linear plot',
+            #         #index=0,
+            #         figure=fig.to_plotly_json(),
+            #     ),
+            # )
+            
+            figure_json = fig.to_plotly_json()
+            figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+            
+            figures.append(
+                PlotlyFigure(
+                    label=f'{y_label}-{x_label} linear plot',
+                    figure=figure_json
+                )
+            )
+        
+        ##
+        # Create the figure - processed data
+        ##
+        if self.Raman_processed_data_entries:
+            figProcessedData = go.Figure()
+            
+            #for r_d_entries in self.Raman_data_entries:
+            for idx, r_d_entries in enumerate(self.Raman_processed_data_entries):
+                #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
+                # Add line plots
+                x = r_d_entries.Raman_shift.to(r_d_entries.Raman_shift.units).magnitude
+                y = r_d_entries.Intensity.to('dimensionless').magnitude
+                
+                
+                # Get the Viridis color scale
+                viridis_colors = px.colors.sequential.Viridis
+                
+                color_index_line = int(idx / (len(self.Raman_processed_data_entries)-1) * (len(viridis_colors) - 1)) if len(self.Raman_processed_data_entries) > 1 else 0
+                
+                figProcessedData.add_trace(go.Scatter(
+                    x=x,
+                    y=y,
+                    mode='lines',
+                    name=f'frame: {idx}',
+                    line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                ))
+
+            # exemply use the first entry for the units
+            x_label = 'Raman shift'
+            xaxis_title = f'{x_label} ({self.Raman_processed_data_entries[0].Raman_shift.units:~})'#(1/cm)' the ':~' gives the short form
+            
+            y_label = 'Intensity'
+            yaxis_title = f'{y_label} (a.u.)'
+            
+            figProcessedData.update_layout(
+                title=f'Processed: {y_label} over {x_label}',
+                xaxis_title=xaxis_title,
+                yaxis_title=yaxis_title,
+                xaxis=dict(
+                    fixedrange=False,
+                ),
+                yaxis=dict(
+                    fixedrange=False,
+                ),
+                #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+                template='plotly_white',
+                showlegend=True,
+                hovermode="x unified",
+            )
+
+            # figures.append(
+            #     PlotlyFigure(
+            #         label=f'{y_label}-{x_label} linear plot',
+            #         #index=0,
+            #         figure=fig.to_plotly_json(),
+            #     ),
+            # )
+            
+            figure_json = figProcessedData.to_plotly_json()
+            figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+            
+            figures.append(
+                PlotlyFigure(
+                    label=f'Processed: {y_label}-{x_label} linear plot',
+                    figure=figure_json
+                )
+            )
+        
         
         self.figures = figures
 
@@ -1810,13 +1899,57 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                             r_d_entries.Raman_shift = ureg.Quantity(RamanWavenumber, f'1/{unitWave}') # dataxydfile[:, 0]  # First column
                             r_d_entries.Intensity = ureg.Quantity(Intensity, 'dimensionless') #dataxydfile[:, 1]  # Second column
                             
+            # Check if there's any zip file
+            if self.processed_data_as_zip_file:
+                # Check if the file has the correct extension: zip archive with plain 2-column txt
+                if not self.processed_data_as_zip_file.endswith('.zip'):
+                    raise DataFileError(f"The file '{self.processed_data_as_zip_file}' must have a .zip extension.")
+                
+                # Otherwise parse the file
+                with archive.m_context.raw_file(self.processed_data_as_zip_file,'rb') as zipf:
+                    #print(zipf)
+                  #= zipf.open()
+                    with zipfile.ZipFile(zipf, 'r') as zipArchiveFile:
+                        #print(zipArchiveFile.infolist(), " with length ", len(zipArchiveFile.infolist()))
+                        
+                        # Get the number of expected datasets
+                        number_of_processed_frames = len(zipArchiveFile.infolist())
+                        
+                        # Create subsection if not existing
+                        if not self.Raman_processed_data_entries:
+                            self.Raman_processed_data_entries = []
+                            # Ensure the list is long enough
+                            while len(self.Raman_processed_data_entries) < number_of_processed_frames:
+                                self.Raman_processed_data_entries.append(RamanData())  # Append a placeholder value
+                        
+                        # Create new if not sufficient long enough - overwrites the default
+                        if len(self.Raman_processed_data_entries) < number_of_processed_frames:
+                            self.Raman_processed_data_entries = []
+                            while len(self.Raman_processed_data_entries) < number_of_processed_frames:
+                                self.Raman_processed_data_entries.append(RamanData())  # Append a placeholder value
+                        
+                        for index, file_info in enumerate(zipArchiveFile.infolist()):
+                            #print(zipfile.infolist())
+                            # Loop over every file
+                            with zipArchiveFile.open(file_info) as zipFileContent:
+                                #content = zipFileContent.read()#.decode('utf-8')  # Decode bytes to string
+                                import numpy as np
+                                content = np.loadtxt(zipFileContent)
+                                
+                                self.Raman_processed_data_entries[index].Raman_shift = ureg.Quantity(content[:, 0], '1/centimeter')
+                                
+                                self.Raman_processed_data_entries[index].Intensity = ureg.Quantity(content[:, 1], 'dimensionless')
+                                
+                                self.Raman_processed_data_entries[index].name = file_info.filename
+                                #print(f'Content of {file_info.filename}:\n{content}\n')
+
             
         except Exception as e:
-            logger.error('Invalid file extension for parsing.', exc_info=e)
+            logger.error('Invalid file parsing error.', exc_info=e)
         
-        if self.Raman_data_entries:
-            #Otherwise create plot
-            self.figures = self.generate_plots()
+        # if self.Raman_data_entries:
+        #Otherwise create plot
+        self.figures = self.generate_plots()
         
         super().normalize(archive, logger)
 

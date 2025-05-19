@@ -113,6 +113,15 @@ def test_RamanMeasurementTVB2_package():
     
     assert entry_archive.data.data_as_tvb_file == 'test_Raman_1Frame.tvb'
     
+    
+def test_RamanMeasurementZIP_package():
+    test_file = os.path.join('tests', 'data', 'test_RamanMeasurementZIP.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    #normalize_all(entry_archive)
+    print("Run RamanMeasurement ZIP")
+    
+    normalize_all(entry_archive)
+
 
 def test_XRDMeasurement_package():
     test_file = os.path.join('tests', 'data', 'test_XRDMeasurementXYD.archive.yaml')
