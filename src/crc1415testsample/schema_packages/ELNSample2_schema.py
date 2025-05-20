@@ -761,7 +761,7 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
     IR_Solvent  = Quantity(
         type=str,
         description='The solvent used for solving the sample in the IR experiment.',
-        a_eln=dict(component='EnumEditQuantity', label='IR Solvent', suggestions=['Acetone', 'THF', 'CCl4', 'CHCl3', 'CS2']),
+        a_eln=dict(component='EnumEditQuantity', label='IR Solvent', suggestions=['Acetone', 'Acetonitrile (MeCN)', 'DMF (Dimethylformamide)', 'Ethanol', 'Isopropyl alcohol', 'Water']),
     )
     
     Wavenumber = Quantity(
