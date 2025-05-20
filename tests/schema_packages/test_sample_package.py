@@ -195,3 +195,18 @@ def test_MeasurementCV_IDS_package():
     
     normalize_all(entry_archive)
 
+def test_MeasurementGeneric_ZIP_package():
+    test_file = os.path.join('tests', 'data', 'test_MeasurementGeneric_ZIP.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    #normalize_all(entry_archive)
+    print("Run Measurement Generic zip")
+    
+    normalize_all(entry_archive)
+    
+def test_MeasurementGeneric_TXT_package():
+    test_file = os.path.join('tests', 'data', 'test_MeasurementGeneric_TXT.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    #normalize_all(entry_archive)
+    print("Run Measurement Generic txt")
+    
+    normalize_all(entry_archive)

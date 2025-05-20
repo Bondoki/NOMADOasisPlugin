@@ -1,0 +1,13 @@
+data:
+  m_def: crc1415testsample.schema_packages.MeasurementGeneric.MeasurementGeneric
+  Generic_X_Axis_Label: 'Shift'
+  Generic_X_Unit: 'cm'
+  Generic_Y_Axis_Label: 'Intensity'
+  Generic_Y_Unit: 'a.u'
+  Generic_Title_Label: 'Common Title'
+  #Generic_Data_as_zip_file: 'test_Raman_3Frames_ProcessedData.zip'
+  Generic_data_entries:
+    - name: 'TestTXT01'
+      data_as_txt_file: 'test_MeasurementGeneric_TXT01.txt'
+    - name: 'TestTXT02'
+      data_as_txt_file: 'test_MeasurementGeneric_TXT02.txt'

@@ -44,3 +44,17 @@ CRC1415Chemical = CRC1414SampleEntryPoint(
     name='CRC1415Chemical',
     description='New test sample2 package for CRC1415.',
 )
+
+# class CRCGMSchemaEntryPoint(SchemaPackageEntryPoint):
+#     parameter: int = Field(0, description='Custom configuration parameter here')
+# 
+#     def load(self):
+#         from crc1415testsample.schema_packages.MeasurementGeneric import m_package
+# 
+#         return m_package
+# 
+# 
+# MeasurementGeneric = CRCGMSchemaEntryPoint(
+#     name='CRC1415GM',
+#     description='New test schema package for CRC1415 Generic ELN.',
+# )

@@ -90,6 +90,7 @@ if TYPE_CHECKING:
     from structlog.stdlib import (
         BoundLogger,
     )
+    
 
 m_package = SchemaPackage(name='CRC1415 Sample ELN Molecule')
 
@@ -1954,6 +1955,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         super().normalize(archive, logger)
 
 
+
 class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
     '''
     Class for handling measurement of Adsorption.
@@ -3231,6 +3233,12 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
     
     Measurement_XRD = SubSection(
         section_def=MeasurementXRD,
+        repeats=True,
+    )
+    
+    from crc1415testsample.schema_packages.MeasurementGeneric import MeasurementGeneric
+    Measurement_Generic = SubSection(
+        section_def=MeasurementGeneric,
         repeats=True,
     )
     
