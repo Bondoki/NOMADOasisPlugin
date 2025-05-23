@@ -1325,6 +1325,47 @@ class RamanData(ArchiveSection):
         unit='dimensionless',
         description='The intensity or counts at each Raman wavenumber value, dimensionless',
     )
+    
+class ReferencedRamanData(ArchiveSection):
+    """General data section for Raman spectroscopy"""
+
+    m_def = Section(
+        label_quantity='name',
+        a_eln={
+            # "overview": False,
+            # "hide": [
+            #     "name",
+            #     "lab_id",
+            #     "method",
+            #     "samples",
+            #     "measurement_identifiers"
+            # ],
+            "properties": {
+                "order": [
+                    "name",
+                    "Reference_to_Raman_Data",
+                ]
+            }
+        },
+    )
+    
+    name = Quantity(
+        type=str,
+        #default='TestName',
+        description='Name of the section or brief title',
+        a_eln={'component': 'StringEditQuantity'},
+    )
+    
+    Reference_to_Raman_Data = Quantity(
+        type='RamanData',
+        description='If you want to plot the data, then reference it here.',
+        a_eln={
+            "component": "ReferenceEditQuantity"
+        },
+        shape=["*"],
+    )
+    
+    
 
 class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
     '''
@@ -1336,7 +1377,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln={
             "overview": True,
             "hide": [
-                "name",
+                #"name",
                 "lab_id",
                 "method",
                 "samples",
@@ -1346,6 +1387,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                 "order": [
                     "tags",
                     "datetime",
+                    "name",
                     "location",
                     "data_as_tvb_file",
                     "processed_data_as_zip_file",
@@ -1355,7 +1397,10 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     "Groove_Density",
                     "Accumulation_Time",
                     "No_of_Accumulations",
-                    "description"
+                    "description",
+                    "Raman_data_entries",
+                    "Raman_processed_data_entries",
+                    "Raman_referenced_data_entries",
                 ]
             }
         },
@@ -1366,6 +1411,13 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         a_display={
             "visible": False
         },
+    )
+        
+    name = Quantity(
+        type=str,
+        #default='TestName',
+        description='Name of the section of Raman measurement',
+        a_eln={'component': 'StringEditQuantity', 'label': 'Raman: Brief title of the measurement'},
     )
     
     Laser_Excitation_Wavelength = Quantity(
@@ -1417,7 +1469,8 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
             "adaptor": "RawFileAdaptor"
         },
         a_eln={
-            "component": "FileEditQuantity"
+            "component": "FileEditQuantity",
+            "label": "Raman data as .tvb file"
         },
     )
         
@@ -1429,13 +1482,16 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         },
         a_eln={
             "component": "FileEditQuantity",
-            "label": "Processed data as zip archive"
+            "label": "Processed Raman data as .zip archive"
         },
     )
+    
     
     Raman_data_entries = SubSection(section_def=RamanData, repeats=True)
     
     Raman_processed_data_entries = SubSection(section_def=RamanData, repeats=True)
+    
+    Raman_referenced_data_entries = SubSection(section_def=ReferencedRamanData)#, repeats=True)
     
     
     def generate_plots(self) -> list[PlotlyFigure]:
@@ -1580,6 +1636,75 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
             figures.append(
                 PlotlyFigure(
                     label=f'Processed: {y_label}-{x_label} linear plot',
+                    figure=figure_json
+                )
+            )
+        
+        ##
+        # Create the figure - referenced data
+        ##
+        if self.Raman_referenced_data_entries:
+            figReferencedData = go.Figure()
+            
+            #for r_d_entries in self.Raman_data_entries:
+            for idx, r_d_entries in enumerate(self.Raman_referenced_data_entries.Reference_to_Raman_Data):
+                #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
+                # Add line plots
+                x = r_d_entries.Raman_shift.to(r_d_entries.Raman_shift.units).magnitude
+                y = r_d_entries.Intensity.to('dimensionless').magnitude
+                
+                
+                # Get the Viridis color scale
+                viridis_colors = px.colors.sequential.Viridis
+                
+                color_index_line = int(idx / (len(self.Raman_referenced_data_entries.Reference_to_Raman_Data)-1) * (len(viridis_colors) - 1)) if len(self.Raman_referenced_data_entries.Reference_to_Raman_Data) > 1 else 0
+                
+                figReferencedData.add_trace(go.Scatter(
+                    x=x,
+                    y=y,
+                    mode='lines',
+                    name=f'frame: {r_d_entries.name}',
+                    line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                ))
+
+            # exemply use the first entry for the units
+            x_label = 'Raman shift'
+            xaxis_title = f'{x_label} (1/cm)'#(1/cm)' the ':~' gives the short form
+            
+            y_label = 'Intensity'
+            yaxis_title = f'{y_label} (a.u.)'
+            
+            figReferencedData.update_layout(
+                title=f'Compare: {y_label} over {x_label}',
+                xaxis_title=xaxis_title,
+                yaxis_title=yaxis_title,
+                xaxis=dict(
+                    fixedrange=False,
+                ),
+                yaxis=dict(
+                    fixedrange=False,
+                ),
+                #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+                template='plotly_white',
+                showlegend=True,
+                hovermode="x unified",
+            )
+
+            # figures.append(
+            #     PlotlyFigure(
+            #         label=f'{y_label}-{x_label} linear plot',
+            #         #index=0,
+            #         figure=fig.to_plotly_json(),
+            #     ),
+            # )
+            
+            figure_json = figReferencedData.to_plotly_json()
+            figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+            
+            figures.append(
+                PlotlyFigure(
+                    label=f'Compare: {y_label}-{x_label} linear plot',
                     figure=figure_json
                 )
             )
@@ -1758,7 +1883,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                         if match:
                             number_str, unit_str = match.groups()
                             # Remove commas and convert to float
-                            number = float(number_str.replace(',', ''))
+                            number = float(number_str.replace(',', '.'))
                             #print(number, unit_str)
                             self.Laser_Power = ureg.Quantity(number, unit_str)
                             
@@ -2673,12 +2798,6 @@ class CVData(ArchiveSection):
         a_eln={'component': 'StringEditQuantity', 'label': 'CV: Title of the measurement'},
     )
     
-    # Laser_Excitation_Wavelength = Quantity(
-    #     type=np.float64,
-    #     unit='nanometer',
-    #     description='The wavelength of the laser for Raman spectroscopy.',
-    # )
-    
     data_as_txt_file = Quantity(
         type=str,
         description="A reference to an uploaded .txt file produced by the cyclic voltammetry instrument.",
@@ -3069,7 +3188,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                         # Provide the Scanrate (in V/s) used in every run
                         self.CV_data_entries[frame-1].CV_Scanrate = ureg.Quantity(float(positions_scanrate_data[frame][1]), 'volt/second')
                         # Provide the Title of every measurement if not present
-                        if self.CV_data_entries[frame-1].name != '':
+                        if self.CV_data_entries[frame-1].name is None:
                             self.CV_data_entries[frame-1].name = positions_title_data[frame][1]
                         
                     
