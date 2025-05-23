@@ -145,7 +145,7 @@ class MeasurementGeneric(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln={
             "overview": True,
             "hide": [
-                "name",
+                #"name",
                 "lab_id",
                 "method",
                 "samples",
@@ -154,6 +154,7 @@ class MeasurementGeneric(ELNMeasurement, PlotSection, ArchiveSection):
             "properties": {
                 "order": [
                     "tags",
+                    "name", 
                     "datetime",
                     "location",
                     "Generic_Data_as_zip_file",
@@ -173,6 +174,12 @@ class MeasurementGeneric(ELNMeasurement, PlotSection, ArchiveSection):
         a_display={
             "visible": False
         },
+    )
+    
+    name = Quantity(
+        type=str,
+        description='A descriptive text for naming the section.',
+        a_eln=dict(component='StringEditQuantity', label='Descriptive Name'),
     )
     
     Generic_X_Unit  = Quantity(
@@ -352,7 +359,8 @@ class MeasurementGeneric(ELNMeasurement, PlotSection, ArchiveSection):
                                 
                                 self.Generic_data_entries[index].Generic_Data_Y = ureg.Quantity(content[:, 1], 'dimensionless')
                                 
-                                self.Generic_data_entries[index].name = file_info.filename
+                                if not self.Generic_data_entries[index].name:
+                                  self.Generic_data_entries[index].name = file_info.filename
                                 #print(f'Content of {file_info.filename}:\n{content}\n')
                                 
             #Check if any file is provided in any subsection for .tvb or .txt files

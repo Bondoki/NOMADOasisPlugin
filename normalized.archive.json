@@ -2,7 +2,7 @@
   "data": {
     "m_def": "crc1415testsample.schema_packages.MeasurementGeneric.MeasurementGeneric",
     "name": "test MeasurementGeneric TXT",
-    "datetime": "2025-05-20T18:02:23.646088+00:00",
+    "datetime": "2025-05-20T18:38:57.603786+00:00",
     "Generic_X_Unit": "cm",
     "Generic_Y_Unit": "a.u",
     "Generic_Title_Label": "Common Title",
@@ -972,15 +972,15 @@
     "entry_type": "MeasurementGeneric",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/data/test_MeasurementGeneric_TXT.archive.yaml",
     "text_search_contents": [
-      "Shift",
-      "Common Title",
-      "Processed: Intensity-Shift linear plot",
-      "Intensity",
-      "cm",
-      "a.u",
-      "test_MeasurementGeneric_TXT02.txt",
       "test_MeasurementGeneric_TXT01.txt",
-      "test MeasurementGeneric TXT"
+      "Intensity",
+      "Shift",
+      "Processed: Intensity-Shift linear plot",
+      "a.u",
+      "Common Title",
+      "test MeasurementGeneric TXT",
+      "cm",
+      "test_MeasurementGeneric_TXT02.txt"
     ],
     "n_quantities": 33,
     "quantities": [
@@ -1039,7 +1039,7 @@
       },
       {
         "definition_qualified_name": "crc1415testsample.schema_packages.MeasurementGeneric.MeasurementGeneric",
-        "definition_id": "c770071b64833a1f5af30fd0a9b39a50312cfcc7",
+        "definition_id": "208f77f179acdc005d82e39365723ab59fd73d4c",
         "used_directly": true
       },
       {
@@ -1186,7 +1186,7 @@
       },
       {
         "id": "data.name#crc1415testsample.schema_packages.MeasurementGeneric.MeasurementGeneric",
-        "definition": "nomad.datamodel.metainfo.basesections.v1.BaseSection.name",
+        "definition": "crc1415testsample.schema_packages.MeasurementGeneric.MeasurementGeneric.name",
         "path_archive": "data.name",
         "str_value": "test MeasurementGeneric TXT"
       },
@@ -1194,7 +1194,7 @@
         "id": "data.datetime#crc1415testsample.schema_packages.MeasurementGeneric.MeasurementGeneric",
         "definition": "nomad.datamodel.metainfo.basesections.v1.Activity.datetime",
         "path_archive": "data.datetime",
-        "datetime_value": "2025-05-20T18:02:23.646088+00:00"
+        "datetime_value": "2025-05-20T18:38:57.603786+00:00"
       }
     ]
   },
