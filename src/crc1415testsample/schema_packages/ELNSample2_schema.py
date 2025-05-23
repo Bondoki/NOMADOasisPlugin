@@ -1644,70 +1644,73 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         # Create the figure - referenced data
         ##
         if self.Raman_referenced_data_entries:
-            figReferencedData = go.Figure()
             
-            #for r_d_entries in self.Raman_data_entries:
-            for idx, r_d_entries in enumerate(self.Raman_referenced_data_entries.Reference_to_Raman_Data):
-                #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
-                # Add line plots
-                x = r_d_entries.Raman_shift.to(r_d_entries.Raman_shift.units).magnitude
-                y = r_d_entries.Intensity.to('dimensionless').magnitude
+            # if theres is any referenced data
+            if self.Raman_referenced_data_entries.Reference_to_Raman_Data:
                 
+                figReferencedData = go.Figure()
                 
-                # Get the Viridis color scale
-                viridis_colors = px.colors.sequential.Viridis
-                
-                color_index_line = int(idx / (len(self.Raman_referenced_data_entries.Reference_to_Raman_Data)-1) * (len(viridis_colors) - 1)) if len(self.Raman_referenced_data_entries.Reference_to_Raman_Data) > 1 else 0
-                
-                figReferencedData.add_trace(go.Scatter(
-                    x=x,
-                    y=y,
-                    mode='lines',
-                    name=f'frame: {r_d_entries.name}',
-                    line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
-                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
-                ))
+                for idx, r_d_entries in enumerate(self.Raman_referenced_data_entries.Reference_to_Raman_Data):
+                    #print(f"Index {idx}/{(len(self.Raman_data_entries) - 1)}: {r_d_entries}")
+                    # Add line plots
+                    x = r_d_entries.Raman_shift.to(r_d_entries.Raman_shift.units).magnitude
+                    y = r_d_entries.Intensity.to('dimensionless').magnitude
+                    
+                    
+                    # Get the Viridis color scale
+                    viridis_colors = px.colors.sequential.Viridis
+                    
+                    color_index_line = int(idx / (len(self.Raman_referenced_data_entries.Reference_to_Raman_Data)-1) * (len(viridis_colors) - 1)) if len(self.Raman_referenced_data_entries.Reference_to_Raman_Data) > 1 else 0
+                    
+                    figReferencedData.add_trace(go.Scatter(
+                        x=x,
+                        y=y,
+                        mode='lines',
+                        name=f'frame: {r_d_entries.name}',
+                        line=dict(color=viridis_colors[color_index_line]), # int(idx / (len(self.Raman_data_entries)) * (len(viridis_colors) - 1))]),
+                        hovertemplate='(x: %{x}, y: %{y})<extra></extra>',
+                    ))
 
-            # exemply use the first entry for the units
-            x_label = 'Raman shift'
-            xaxis_title = f'{x_label} (1/cm)'#(1/cm)' the ':~' gives the short form
-            
-            y_label = 'Intensity'
-            yaxis_title = f'{y_label} (a.u.)'
-            
-            figReferencedData.update_layout(
-                title=f'Compare: {y_label} over {x_label}',
-                xaxis_title=xaxis_title,
-                yaxis_title=yaxis_title,
-                xaxis=dict(
-                    fixedrange=False,
-                ),
-                yaxis=dict(
-                    fixedrange=False,
-                ),
-                #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
-                template='plotly_white',
-                showlegend=True,
-                hovermode="x unified",
-            )
-
-            # figures.append(
-            #     PlotlyFigure(
-            #         label=f'{y_label}-{x_label} linear plot',
-            #         #index=0,
-            #         figure=fig.to_plotly_json(),
-            #     ),
-            # )
-            
-            figure_json = figReferencedData.to_plotly_json()
-            figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
-            
-            figures.append(
-                PlotlyFigure(
-                    label=f'Compare: {y_label}-{x_label} linear plot',
-                    figure=figure_json
+                # exemply use the first entry for the units
+                x_label = 'Raman shift'
+                xaxis_title = f'{x_label} (1/cm)'#(1/cm)' the ':~' gives the short form
+                
+                y_label = 'Intensity'
+                yaxis_title = f'{y_label} (a.u.)'
+                
+                figReferencedData.update_layout(
+                    title=f'Compare: {y_label} over {x_label}',
+                    xaxis_title=xaxis_title,
+                    yaxis_title=yaxis_title,
+                    xaxis=dict(
+                        fixedrange=False,
+                    ),
+                    yaxis=dict(
+                        fixedrange=False,
+                    ),
+                    #legend=dict(yanchor='top', y=0.99, xanchor='left', x=0.01),
+                    template='plotly_white',
+                    showlegend=True,
+                    hovermode="x unified",
                 )
-            )
+
+                # figures.append(
+                #     PlotlyFigure(
+                #         label=f'{y_label}-{x_label} linear plot',
+                #         #index=0,
+                #         figure=fig.to_plotly_json(),
+                #     ),
+                # )
+                
+                figure_json = figReferencedData.to_plotly_json()
+                figure_json['config'] = {'staticPlot': False, 'displayModeBar': True, 'scrollZoom': True, 'responsive': True, 'displaylogo': True, 'dragmode': True}
+                
+                figures.append(
+                    PlotlyFigure(
+                        label=f'Compare: {y_label}-{x_label} linear plot',
+                        figure=figure_json
+                    )
+                )
         
         
         self.figures = figures
@@ -2066,7 +2069,8 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                                 
                                 self.Raman_processed_data_entries[index].Intensity = ureg.Quantity(content[:, 1], 'dimensionless')
                                 
-                                self.Raman_processed_data_entries[index].name = file_info.filename
+                                if self.Raman_processed_data_entries[index].name is None:
+                                    self.Raman_processed_data_entries[index].name = file_info.filename
                                 #print(f'Content of {file_info.filename}:\n{content}\n')
 
             
