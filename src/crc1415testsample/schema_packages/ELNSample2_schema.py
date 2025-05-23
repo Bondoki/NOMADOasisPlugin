@@ -2736,7 +2736,11 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                     "datetime_end",
                     "location",
                     "CV_Electrolyte",
-                    "CV_Reference_Electrode_Material",
+                    "CV_Electrolyte_Concentration",
+                    "CV_pH_Value",
+                    "CV_Reference_Electrode",
+                    "CV_Counter_Electrode_Material",
+                    "CV_Working_Electrode_Material",
                     "data_as_ids_file",
                     "description"
                 ]
@@ -2757,19 +2761,48 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln=dict(component='DateTimeEditQuantity', label='Ending Time'),
     )
     
-    CV_Reference_Electrode_Material = Quantity(
-        type=str,
-        #default='TestName',
-        description='The material, which the reference electrode is made of.',
-        a_eln=dict(component='EnumEditQuantity', label='Reference Electrode Material', suggestions=['SCE (saturated calomel electrode)', 'SHE (standard hydrogen electrode (SHE)', 'AgCl/Ag']),
-    )
-    
     CV_Electrolyte = Quantity(
         type=str,
         #default='TestName',
         description='The electrolytes in cyclic voltammetry facilitate ion transport, enabling electrochemical reaction measurements',
-        a_eln=dict(component='EnumEditQuantity', label='Electrolyte', suggestions=['KCl', 'Na2SO4', 'LiClO4', 'KNO3']),
+        a_eln=dict(component='EnumEditQuantity', label='CV: Electrolyte', suggestions=['KHCO3', 'KCl', 'Na2SO4']),
     )
+    
+    CV_Electrolyte_Concentration = Quantity(
+        type=np.float64,
+        unit='mol/l',
+        description='The concentration of the electrolytes in cyclic voltammetry, mol/liter.',
+        a_eln=dict(component='NumberEditQuantity', label='CV: Electrolyte Concentration', defaultDisplayUnit= 'mol/liter'),
+    )
+    
+    CV_pH_Value = Quantity(
+        type=np.float64,
+        unit='dimensionless',
+        description='The pH value in cyclic voltammetry experiment, dimensionless.',
+        a_eln=dict(component='NumberEditQuantity', label='CV: pH Value', defaultDisplayUnit= 'dimensionless'),
+    )
+    
+    CV_Reference_Electrode = Quantity(
+        type=str,
+        #default='TestName',
+        description='The used reference electrode in the experiment.',
+        a_eln=dict(component='EnumEditQuantity', label='CV: Reference Electrode', suggestions=['Ag|AgCl (3M)', 'Ag|AgCl (saturated)', 'Hg/Hg2Cl2 (saturated)', 'RHE (reversible hydrogen electrode)']),
+    )
+    
+    CV_Counter_Electrode_Material = Quantity(
+        type=str,
+        #default='TestName',
+        description='The material, which the counter electrode is made of.',
+        a_eln=dict(component='EnumEditQuantity', label='CV: Counter Electrode Material', suggestions=['Platinum wire', 'Platinum mesh', 'Graphite', 'Gold']),
+    )
+    
+    CV_Working_Electrode_Material = Quantity(
+        type=str,
+        #default='TestName',
+        description='The material, which the working electrode is made of.',
+        a_eln=dict(component='EnumEditQuantity', label='CV: Working Electrode Material', suggestions=['Graphite', 'Glassy carbon', 'Gold', 'Silver']),
+    )
+    
     
     data_as_ids_file = Quantity(
         type=str,
@@ -3035,8 +3068,9 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                         
                         # Provide the Scanrate (in V/s) used in every run
                         self.CV_data_entries[frame-1].CV_Scanrate = ureg.Quantity(float(positions_scanrate_data[frame][1]), 'volt/second')
-                        # Provide the Title of every measurement
-                        self.CV_data_entries[frame-1].name = positions_title_data[frame][1]
+                        # Provide the Title of every measurement if not present
+                        if self.CV_data_entries[frame-1].name != '':
+                            self.CV_data_entries[frame-1].name = positions_title_data[frame][1]
                         
                     
             #Check if any file is provided in any subsection for .txt files
