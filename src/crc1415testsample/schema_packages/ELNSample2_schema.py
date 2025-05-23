@@ -641,7 +641,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         # Data
                         ###
 
-                        datasplice = contentrawfile[0x40800:0x42BC0]
+                        datasplice = contentrawfile[0x40800:0x40800+4*countDataEntries]
                         #'i': Integer (4 bytes)
                         #'f': Float (4 bytes)
                         #'d': Double (8 bytes)
@@ -659,7 +659,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         
                         # Sanity check
                         if len(x_range) != len(y_data):
-                            raise DataFileError(f"The data in file '{self.data_as_dpt_file}' could not parsed. '{countDataEntries}' expected, but {len(y_data)} found!")
+                            raise DataFileError(f"The data in file '{self.data_as_raw_or_xyd_file}' could not parsed. '{countDataEntries}' expected, but {len(y_data)} found!")
                         
                         # Create plot
                         #self.figures = self.generate_plots()
