@@ -137,7 +137,7 @@ class CRC1415Category(EntryDataCategory):
 
 class MeasurementGeneric(ELNMeasurement, PlotSection, ArchiveSection):
     '''
-    Class for handling measurement of Raman spectroscopy.
+    Class for handling measurement of MeasurementGeneric.
     '''
     m_def = Section(
         categories=[CRC1415Category],
