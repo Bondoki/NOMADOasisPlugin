@@ -76,7 +76,6 @@ from nomad.datamodel.metainfo.plot import (
     PlotSection,
 )
 from nomad.config import config
-
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,
 #     material_entry_type,
@@ -111,45 +110,44 @@ class CRC1415Category(EntryDataCategory):
 
     m_def = Category(label='CRC1415', categories=[EntryDataCategory])
 
-# class CRC1415Chemical(Chemical, EntryData, ArchiveSection):
-#     '''
-#     This is an example description for Chemical.
-#     A description can contain **markdown** markup and TeX formulas, like $\\sum\\limits_{i=0}^{n}$.
-#     '''
-#     m_def = Section(
-#         categories=[CRC1415Category],
-#         label='CRC1415-Chemical',
-#     )
-#     form = Quantity(
-#         type=MEnum(['crystalline solid', 'powder', 'solution']),
-#         a_eln={
-#             "component": "EnumEditQuantity"
-#         },
-#     )
-#     cas_number = Quantity(
-#         type=str,
-#         a_eln={
-#             "component": "StringEditQuantity"
-#         },
-#     )
-#     ec_number = Quantity(
-#         type=str,
-#         a_eln={
-#             "component": "StringEditQuantity"
-#         },
-#     )
-# 
-#     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
-#         '''
-#         The normalizer for the `CRC1415Chemical` class.
-# 
-#         Args:
-#             archive (EntryArchive): The archive containing the section that is being
-#             normalized.
-#             logger (BoundLogger): A structlog logger.
-#         '''
-#         super().normalize(archive, logger)
+class CRC1415Chemical(Chemical, EntryData, ArchiveSection):
+    '''
+    This is an example description for Chemical.
+    A description can contain **markdown** markup and TeX formulas, like $\\sum\\limits_{i=0}^{n}$.
+    '''
+    m_def = Section(
+        categories=[CRC1415Category],
+        label='CRC1415-Chemical',
+    )
+    form = Quantity(
+        type=MEnum(['crystalline solid', 'powder', 'solution']),
+        a_eln={
+            "component": "EnumEditQuantity"
+        },
+    )
+    cas_number = Quantity(
+        type=str,
+        a_eln={
+            "component": "StringEditQuantity"
+        },
+    )
+    ec_number = Quantity(
+        type=str,
+        a_eln={
+            "component": "StringEditQuantity"
+        },
+    )
 
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        '''
+        The normalizer for the `CRC1415Chemical` class.
+
+        Args:
+            archive (EntryArchive): The archive containing the section that is being
+            normalized.
+            logger (BoundLogger): A structlog logger.
+        '''
+        super().normalize(archive, logger)
 
 
 class Instrument(ELNInstrument, EntryData, ArchiveSection):
@@ -3234,7 +3232,8 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
 
 #from nomad.datamodel.metainfo.eln import BasicEln # ElnWithStructureFile
 #class OverviewClass(ElnWithStructureFile, Schema):
-class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, EntryData, ArchiveSection):
+from nomad.datamodel.data import Schema
+class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, Schema): #EntryData, ArchiveSection):
 #class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
 
 #import runschema.run
@@ -3323,14 +3322,13 @@ class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, EntryData, ArchiveSec
         },
     )
         
-    # chemicals = Quantity(
-    #     type=CRC1415Chemical,
-    #     a_eln={
-    #         "component": "ReferenceEditQuantity"
-    #     },
-    #     shape=["*"],
-    # )
-        
+    chemicals = Quantity(
+        type=CRC1415Chemical,
+        a_eln={
+            "component": "ReferenceEditQuantity"
+        },
+        shape=["*"],
+    )
     substance_type = Quantity(
         type=MEnum(['crystalline solid', 'powder', 'solution', 'other']),
         a_eln={
