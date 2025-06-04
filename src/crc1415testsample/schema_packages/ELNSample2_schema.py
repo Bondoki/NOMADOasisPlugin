@@ -75,6 +75,7 @@ from nomad.datamodel.metainfo.plot import (
     PlotlyFigure,
     PlotSection,
 )
+from nomad.config import config
 
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,
@@ -91,6 +92,9 @@ if TYPE_CHECKING:
         BoundLogger,
     )
     
+configuration = config.get_plugin_entry_point(
+    'crc1415testsample.schema_packages:CRC1415SampleOverview'
+)
 
 m_package = SchemaPackage(name='CRC1415 Sample ELN')
 
@@ -107,44 +111,45 @@ class CRC1415Category(EntryDataCategory):
 
     m_def = Category(label='CRC1415', categories=[EntryDataCategory])
 
-class CRC1415Chemical(Chemical, EntryData, ArchiveSection):
-    '''
-    This is an example description for Chemical.
-    A description can contain **markdown** markup and TeX formulas, like $\\sum\\limits_{i=0}^{n}$.
-    '''
-    m_def = Section(
-        categories=[CRC1415Category],
-        label='CRC1415-Chemical',
-    )
-    form = Quantity(
-        type=MEnum(['crystalline solid', 'powder', 'solution']),
-        a_eln={
-            "component": "EnumEditQuantity"
-        },
-    )
-    cas_number = Quantity(
-        type=str,
-        a_eln={
-            "component": "StringEditQuantity"
-        },
-    )
-    ec_number = Quantity(
-        type=str,
-        a_eln={
-            "component": "StringEditQuantity"
-        },
-    )
+# class CRC1415Chemical(Chemical, EntryData, ArchiveSection):
+#     '''
+#     This is an example description for Chemical.
+#     A description can contain **markdown** markup and TeX formulas, like $\\sum\\limits_{i=0}^{n}$.
+#     '''
+#     m_def = Section(
+#         categories=[CRC1415Category],
+#         label='CRC1415-Chemical',
+#     )
+#     form = Quantity(
+#         type=MEnum(['crystalline solid', 'powder', 'solution']),
+#         a_eln={
+#             "component": "EnumEditQuantity"
+#         },
+#     )
+#     cas_number = Quantity(
+#         type=str,
+#         a_eln={
+#             "component": "StringEditQuantity"
+#         },
+#     )
+#     ec_number = Quantity(
+#         type=str,
+#         a_eln={
+#             "component": "StringEditQuantity"
+#         },
+#     )
+# 
+#     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+#         '''
+#         The normalizer for the `CRC1415Chemical` class.
+# 
+#         Args:
+#             archive (EntryArchive): The archive containing the section that is being
+#             normalized.
+#             logger (BoundLogger): A structlog logger.
+#         '''
+#         super().normalize(archive, logger)
 
-    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
-        '''
-        The normalizer for the `CRC1415Chemical` class.
-
-        Args:
-            archive (EntryArchive): The archive containing the section that is being
-            normalized.
-            logger (BoundLogger): A structlog logger.
-        '''
-        super().normalize(archive, logger)
 
 
 class Instrument(ELNInstrument, EntryData, ArchiveSection):
@@ -3318,13 +3323,14 @@ class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, EntryData, ArchiveSec
         },
     )
         
-    chemicals = Quantity(
-        type=CRC1415Chemical,
-        a_eln={
-            "component": "ReferenceEditQuantity"
-        },
-        shape=["*"],
-    )
+    # chemicals = Quantity(
+    #     type=CRC1415Chemical,
+    #     a_eln={
+    #         "component": "ReferenceEditQuantity"
+    #     },
+    #     shape=["*"],
+    # )
+        
     substance_type = Quantity(
         type=MEnum(['crystalline solid', 'powder', 'solution', 'other']),
         a_eln={
