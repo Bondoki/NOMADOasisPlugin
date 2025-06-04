@@ -37,7 +37,7 @@ from nomad.datamodel.metainfo.plot import PlotSection
 from nomad.datamodel.metainfo.eln import ELNMeasurement
 #from nomad.parsing.tabular import TableData
 from nomad.datamodel.data import UserReference, AuthorReference
-from nomad.datamodel.metainfo.eln import ELNSubstance
+from nomad.datamodel.metainfo.eln import BasicEln
 from nomad.datamodel.metainfo.basesections.v1 import ReadableIdentifiers
 from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
 from nomad.datamodel.metainfo.basesections.v1 import PureSubstanceSection
@@ -3227,9 +3227,10 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
 
 
 
-#import runschema.run
-#class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, runschema.run.Run):
-class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
+#from nomad.datamodel.metainfo.eln import BasicEln # ElnWithStructureFile
+#class OverviewClass(ElnWithStructureFile, Schema):
+class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, EntryData, ArchiveSection):
+#class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
 
 #import runschema.run
 #class CRC1415SampleOverview(ReadableIdentifiers, EntryData, runschema.run.Run):
@@ -3430,12 +3431,6 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
         '''
         super().normalize(archive, logger)
         
-        # from runschema.run import Run, Program, TimeRun
-        # from runschema.method import Method, ForceField, Model, Interaction, AtomParameters
-        # from runschema.system import System, Atoms, AtomsGroup
-        # from runschema.calculation import Calculation
-        #from nomad.datamodel.metainfo.simulation.system import System, Atoms, AtomsGroup
-        #from nomad.datamodel.metainfo.simulation.run import Program, Run
         
         try:
             #Check if there's any .cif file provided in main section
@@ -3443,205 +3438,73 @@ class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, Archiv
                 if not self.data_as_cif_file.endswith('.cif'):
                     raise DataFileError(f"The file '{self.data_as_cif_file}' must have a .cif extension.")
                 
+                from ase.io import read
+
                 from nomad.normalizing import normalizers
                 from nomad.normalizing.results import ResultsNormalizer
-                #from nomad.normalizing.optimade import OptimadeNormalizer
-                
 
                 system_normalizer_cls = None
                 for normalizer in normalizers:
                     if normalizer.__name__ == 'SystemNormalizer':
                         system_normalizer_cls = normalizer
-                        print(system_normalizer_cls)
                         break
-                
+
                 from nomad.datamodel.metainfo import runschema
-                #import runschema
                 from nomad.normalizing.optimade import OptimadeNormalizer
                 from nomad.atomutils import Formula
                 from nomad.datamodel.results import Material, System
                 from nomad.normalizing.common import nomad_atoms_from_ase_atoms
                 from nomad.normalizing.topology import add_system_info, add_system
-                
-                
-                with archive.m_context.raw_file(self.data_as_cif_file,'r') as ciffile:
-                    # Load the data from the file
-                    #contentIDSlines = ciffile.readlines()  # Read all lines into a listidsfile.read()
-                    
-                    # see https://github.com/nomad-coe/atomistic-parsers/blob/develop/atomisticparsers/gulp/parser.py#L1058
-                    # see https://github.com/nomad-coe/nomad-schema-plugin-run/blob/develop/runschema/system.py
-                    # see https://github.com/nomad-coe/atomistic-parsers/blob/develop/atomisticparsers/gromacs/parser.py
-                    # https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-FAIR/-/blob/v1.3.16/nomad/datamodel/metainfo/eln/__init__.py?ref_type=tags#L1036
-                    from ase.io import read
-                    from ase.data import atomic_numbers
-                    
+
+                with archive.m_context.raw_file(self.data_as_cif_file) as f:
                     try:
-                        ase_atoms = read(ciffile.name)
+                        ase_atoms = read(f.name)
                     except Exception as e:
                         raise ValueError('could not read structure file') from e
 
                     if not archive.results.material:
                         archive.results.material = Material()
-                    # formula = Formula(self.molecular_formula)
-                    # formula.populate(archive.results.material)
+                        # extract molecular_formula out of cif file
+                        self.molecular_formula = ase_atoms.get_chemical_formula()
+                        formula = Formula(ase_atoms.get_chemical_formula())
+                        formula.populate(archive.results.material)
 
                     # Create a System: this is a NOMAD specific data structure for storing structural
                     # and chemical information that is suitable for both experiments and simulations.
-                    #import runschema
-                    #runschema.run_schema_entry_point.load()
-                    #import runschema.system
-                    if runschema:
-                        print(runschema)
-                        system = System(
-                            atoms=nomad_atoms_from_ase_atoms(ase_atoms),
-                            label='Structure from file',
-                            description='Structure read from the file.',
-                            structural_type='bulk',
-                            dimensionality='3D',
-                        )
+                    system = System(
+                        atoms=nomad_atoms_from_ase_atoms(ase_atoms),
+                        label='File:' + self.data_as_cif_file,
+                        description='Structure read from the file.',
+                        structural_type='bulk',
+                        dimensionality='3D',
+                    )
 
-                        # archive.results.topology can used to represent relations between systems.
-                        # E.g. "System A is part of System B". In our case there is only a single system.
-                        topology = {}
-                        add_system_info(system, topology)
-                        add_system(system, topology)
-                        archive.results.material.topology = list(topology.values())
+                    # archive.results.topology can used to represent relations between systems.
+                    # E.g. "System A is part of System B". In our case there is only a single system.
+                    topology = {}
+                    add_system_info(system, topology)
+                    add_system(system, topology)
+                    archive.results.material.topology = list(topology.values())
                     
-#                     # Read the CIF file
-#                     atoms = read(ciffile)
-# 
-#                     # Extract atomic positions
-#                     positionsASE = atoms.get_positions()
-# 
-#                     # Extract atomic labels (chemical symbols)
-#                     labelsASE = atoms.get_chemical_symbols()
-#                     
-#                     #labels: list[str] = []
-#                     #positions: list[list[float]] = []
-#                     # Print the atomic labels and positions
-#                     #for index, (label_, position_) in enumerate(zip(labelsASE, positionsASE)):
-#                     #    labels.append(label_)
-#                     #    positions.append([ float(f"{position_[0]}"), float(f"{position_[1]}"), float(f"{position_[2]}")])#     atom.attrib[f"{x}3"]) for x in ["x", "y", "z"]])
-#                     #    print(f"Atom {index + 1}: Label = {label}, Position (x, y, z) = {position}")
-#                         
-#                     if archive.run:
-#                         sec_run = archive.run[-1]
-#                     else:
-#                         sec_run = Run()
-#                         archive.run.append(sec_run)
-#                     
-#                     sec_run.program = Program(name='CIF Import via ASE', version='0.1')
-#                     
-#                     if sec_run.system:
-#                         sec_system = sec_run.system[-1]
-#                     else:
-#                         sec_system = System()
-#                         sec_run.system.append(sec_system)
-#                     
-#                     if sec_run.method:
-#                         sec_method = sec_run.method[-1]
-#                     else:
-#                         sec_method = Method()
-#                         sec_run.method.append(sec_method)
-#                     
-#                     if sec_run.calculation:
-#                         sec_calculation = sec_run.calculation[-1]
-#                     else:
-#                         sec_calculation = Calculation()
-#                         sec_run.calculation.append(sec_calculation)
-#                         # archive.run[0].system[0]
-#                     #sec_system = System()
-#                     #sec_run.system.append(sec_system)
-#                     
-#                     # sec_run.system.append(
-#                     #     System(
-#                     #         atoms=Atoms(labels=labels, positions=positions * ureg.angstrom, periodic=[False] * 3),
-#                     #         #atoms_group=[self.all_atoms_group],
-#                     #         is_representative=True,
-#                     #     )
-#                     # )
-#                    
-#                     sec_system.atoms = Atoms(
-#                         positions=atoms.get_positions() * ureg.angstrom,
-#                         labels=atoms.get_chemical_symbols(),
-#                         lattice_vectors=atoms.get_cell() * ureg.angstrom,
-#                         periodic=atoms.pbc,
-#                         species=[atomic_numbers[symbol] for symbol in atoms.get_chemical_symbols()]
-#                     )
-#                     
-#                     #sec_system.chemical_composition_reduced = atoms.get_chemical_formula()
-#                     
-#                     #if sec_system.atoms_group is None:
-#                     #    sec_system.atoms_group = []
-#                     
-#                     # Get the unique elements by converting the list to a set
-#                     unique_atoms = set(labelsASE)
-#                     # Print the unique atoms
-#                     #print("Unique Atoms:", unique_atoms)
-#                     
-#                     # Loop over each unique atom and get their positions
-#                     for idx, atom in enumerate(unique_atoms):
-#                         # Get the indices of the atoms that match the current unique atom
-#                         indices = [i for i, symbol in enumerate(labelsASE) if symbol == atom]
-#                         
-#                         # Get the positions of these atoms
-#                         positions = atoms.get_positions()[indices]
-#                         
-#                         #print(f"Atom: {atom}")
-#                         #print(indices)
-#                         
-#                         sec_molecule = AtomsGroup()
-#                         sec_system.atoms_group.append(sec_molecule)
-#                         sec_molecule.index = idx
-#                         sec_molecule.atom_indices = indices #np.where(atoms_molnums == molecule)[0]
-#                         sec_molecule.n_atoms = len(sec_molecule.atom_indices)
-#                         # use first particle to get the moltype
-#                         # not sure why but this value is being cast to int, cast back to str
-#                         sec_molecule.label = str(labelsASE[sec_molecule.atom_indices[0]])
-#                         sec_molecule.type = 'atom'
-#                         sec_molecule.is_molecule = False
-#                     
-#                     #sec_system.is_representative=True
-#                     
-#                     # sec_run.system.append(
-#                     #     System(
-#                     #         atoms=Atoms(labels=labels, positions=positions * ureg.angstrom, periodic=[False] * 3),
-#                     #         #atoms_group=[self.all_atoms_group],
-#                     #         is_representative=True,
-#                     #     )
-#                     # )
-#                     sec_run.normalize(archive, logger)
-#                     if system_normalizer_cls:
-#                         system_normalizer = system_normalizer_cls(archive)
-#                         system_normalizer.normalize()
-#                     optimade_normalizer = OptimadeNormalizer()
-#                     optimade_normalizer.normalize(archive)
-#                     results_normalizer = ResultsNormalizer()
-#                     results_normalizer.normalize(archive)
-                    
-            
+
         except Exception as e:
             logger.error('Error exception during parsing/processing.', exc_info=e)
         
+        from nomad.atomutils import Formula
+        from nomad.datamodel.results import Material, System
+        
         # # in case only molecular_formula is provided
-        # if self.molecular_formula and self.pure_substance is None:
-        #     #if self.substance_name and self.pure_substance is None:
-        #     self.pure_substance = PureSubstanceSection(name=self.molecular_formula, molecular_formula=self.molecular_formula)
-        #     #self.pure_substance = PubChemPureSubstanceSection(name=self.molecular_formula)
-        #     self.pure_substance.normalize(archive, logger)
-        # elif self.molecular_formula and self.pure_substance is not None:
-        #     # PureSubstanceSection already exists and we need to update
-        #     self.pure_substance = None
-        #     self.pure_substance = PureSubstanceSection(name=self.molecular_formula, molecular_formula=self.molecular_formula)
-        #     self.pure_substance.molecular_formula = self.molecular_formula
-        #     # we need to delete manually the results section as
-        #     # elements will by populate by System.normalize fct
-        #     self.elemental_composition = None
-        #     archive.results.material.elements = []
-        #     archive.results.material.elemental_composition = []
-        #     self.pure_substance.normalize(archive, logger)
-            
-        #super().normalize(archive, logger)
+        if self.molecular_formula and not self.data_as_cif_file:
+            logger.warn(f'This overview page holds: {self.data_as_cif_file} with formula: {self.molecular_formula}')
+            if not archive.results.material:
+                archive.results.material = Material()
+                formula = Formula(self.molecular_formula)
+                formula.populate(archive.results.material)
+            else:
+                formula = Formula(self.molecular_formula)
+                formula.populate(archive.results.material)
+                
+
 
 
 from nomad.datamodel.metainfo.plot import PlotSection, PlotlyFigure
