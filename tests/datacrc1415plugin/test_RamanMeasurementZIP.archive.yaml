@@ -1,0 +1,4 @@
+data:
+  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementRaman
+  processed_data_as_zip_file: 'test_Raman_3Frames_ProcessedData.zip'
+

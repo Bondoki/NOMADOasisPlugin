@@ -1,0 +1,27 @@
+data:
+  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical
+  #
+  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample
+  # molecular_formula: 'VK0.5'
+  #
+  #m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementXRD
+  #data_file: test.xyd
+  #
+  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementRaman
+  #Raman_data_entries.RamanData with name, data_as_tvf_or_txt_file 
+  #rd: RamanData
+  #rd.name : "John Doe"
+  #Raman_data_entries.RamanData: [rd]
+  #Raman_data_entries.RamanData: [[name: 'testSEM.tif']]
+  #rd: [RamanData,RamanData]
+  #rd.name: "John Doe"
+  #Raman_data_entries: [rd]
+  #Raman_data_entries: Raman_data_entries.extend(rd)
+  #Raman_data_entries: [RamanData]
+  Raman_data_entries:
+    - name: 'TestTXT'
+      data_as_tvf_or_txt_file: 'testTXTRaman.txt'
+    - name: 'TestTVF'
+      data_as_tvf_or_txt_file: 'testTVFRaman.tvf'
+   #- name: 'Test3'
+   #  data_as_tvf_or_txt_file: testTVFRaman.tvf

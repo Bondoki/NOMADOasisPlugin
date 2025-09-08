@@ -1,0 +1,3 @@
+data:
+  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementTGA
+  data_as_txt_file: test_TGA_File.txt

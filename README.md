@@ -1,4 +1,4 @@
-# crc1415testsample
+# crc1415plugin
 
 This is a schema package plugin for testing purpose.
 
@@ -9,8 +9,8 @@ This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`co
 
 If you want to develop locally this plugin, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.9, 3.10, or 3.11):
 ```sh
-git clone https://github.com/Bondoki/crc1415testsample.git
-cd crc1415testsample
+git clone https://github.com/Bondoki/NOMADOasisPlugin.git
+cd NOMADOasisPlugin
 python3.11 -m venv .pyenv
 . .pyenv/bin/activate
 ```

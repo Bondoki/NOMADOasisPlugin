@@ -1,0 +1,4 @@
+data:
+  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementRaman
+  data_as_tvb_file: 'test_Raman_10Frames.tvb'
+

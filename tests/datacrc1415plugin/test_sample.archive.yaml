@@ -1,0 +1,17 @@
+data:
+  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Chemical
+  #
+  # m_def: crc1415testsample.schema_packages.ELNSample2_schema.CRC1415Sample
+  # molecular_formula: 'VK0.5'
+  #
+  # exeception expected
+  #m_def: crc1415testsample.schema_packages.ELNSample2_schema.XRDMeasurement
+  #data_file: test.csv #test.xyd
+  # no exeception 
+  #m_def: crc1415testsample.schema_packages.ELNSample2_schema.XRDMeasurement
+  #data_file: test.xyd
+  #
+  #m_def: crc1415testsample.schema_packages.ELNSample2_schema.IRMeasurement
+  #data_file: test.xyd
+  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementSEM
+  data_as_tif_or_tiff_file: ['testSEM.tif', 'testSEM3.tiff']

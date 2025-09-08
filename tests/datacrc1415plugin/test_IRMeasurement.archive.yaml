@@ -1,0 +1,5 @@
+data:
+  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementIR
+  data_as_dpt_file: IRtest.dpt
+  IR_Solvent: 'Acetone'
+  IR_Substance_Type: 'powder'

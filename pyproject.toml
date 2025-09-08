@@ -13,8 +13,8 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
 ]
-name = "crc1415testsample"
-description = "This is a schema package plugin for testing purpose."
+name = "crc1415plugin"
+description = "This is a schema package plugin for the CRC1415."
 version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -32,7 +32,7 @@ dependencies = [
 ]
 
 [project.urls]
-Repository = "https://github.com/Bondoki/crc1415testsample"
+Repository = "https://github.com/Bondoki/NOMADOasisPlugin"
 
 [project.optional-dependencies]
 dev = ["ruff", "pytest", "structlog"]
@@ -112,7 +112,7 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [project.entry-points.'nomad.plugin']
-CRC1415SampleOverview = "crc1415testsample.schema_packages:CRC1415SampleOverview"
+CRC1415SampleOverview = "crc1415plugin.schema_packages:CRC1415SampleOverview"
 #CRC1415_A04_schema = "crc1415testsample.schema_packages:CRC1415_A04_schema"
 #CRC1415Chemical = "crc1415testsample.schema_packages:CRC1415Chemical"
 

@@ -1,0 +1,3 @@
+data:
+  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementXRD
+  data_as_raw_or_xyd_file: test.xyd

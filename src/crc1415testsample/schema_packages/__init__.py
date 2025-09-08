@@ -35,14 +35,14 @@ class CRC1414SampleEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415testsample.schema_packages.ELNSample2_schema import m_package
+        from crc1415plugin.schema_packages.ELNSampleOverviewSchema import m_package
 
         return m_package
 
 
 CRC1415SampleOverview = CRC1414SampleEntryPoint(
     name='CRC1415SampleOverview',
-    description='New test sample2 package for CRC1415.',
+    description='Schema package for CRC1415 for the sample overview schema.',
 )
 
 # class CRCGMSchemaEntryPoint(SchemaPackageEntryPoint):
