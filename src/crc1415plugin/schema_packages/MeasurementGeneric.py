@@ -128,19 +128,19 @@ class GenericData(ArchiveSection):
         description='The generic data on y-axis of the data set, dimensionless.',
     )
 
-class CRC1415Category(EntryDataCategory):
+class CRC1415CategoryReleaseCandidate(EntryDataCategory):
     """
     A category for all plugins defined in the `crc1415-plugin` plugin.
     """
 
-    m_def = Category(label='CRC1415', categories=[EntryDataCategory])
+    m_def = Category(label='CRC1415-ReleaseCandidate', categories=[EntryDataCategory])
 
 class MeasurementGeneric(ELNMeasurement, PlotSection, ArchiveSection):
     '''
     Class for handling measurement of MeasurementGeneric.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryReleaseCandidate],
         label='CRC1415-Measurement-Generic',
         a_eln={
             "overview": True,
