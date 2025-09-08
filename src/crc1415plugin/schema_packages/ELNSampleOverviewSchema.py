@@ -109,6 +109,14 @@ class CRC1415Category(EntryDataCategory):
     """
 
     m_def = Category(label='CRC1415', categories=[EntryDataCategory])
+    
+
+class CRC1415CategoryMeasurement(EntryDataCategory):
+    """
+    A category for all plugins defined in the `crc1415-plugin` plugin.
+    """
+
+    m_def = Category(label='CRC1415-Measurement', categories=[EntryDataCategory])
 
 class CRC1415Chemical(Chemical, EntryData, ArchiveSection):
     '''
@@ -116,7 +124,7 @@ class CRC1415Chemical(Chemical, EntryData, ArchiveSection):
     A description can contain **markdown** markup and TeX formulas, like $\\sum\\limits_{i=0}^{n}$.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Chemical',
     )
     form = Quantity(
@@ -194,7 +202,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
     Class for handling measurement of XRD.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Measurement-XRD',
         a_eln={
             "overview": True,
@@ -712,7 +720,7 @@ class MeasurementIR(ELNMeasurement, PlotSection, ArchiveSection):
     Class for handling measurement of IR.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Measurement-IR',
         a_eln={
             "overview": True,
@@ -885,7 +893,7 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
     Class for handling measurement of SEM.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Measurement-SEM',
         a_eln={
             "overview": True,
@@ -1115,7 +1123,7 @@ class MeasurementTEM(ELNMeasurement, PlotSection, ArchiveSection):
     Class for handling measurement of SEM.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Measurement-TEM',
         a_eln={
             "overview": True,
@@ -1375,7 +1383,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
     Class for handling measurement of Raman spectroscopy.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Measurement-Raman',
         a_eln={
             "overview": True,
@@ -2093,7 +2101,7 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
     Class for handling measurement of Adsorption.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Measurement-Adsorption',
         a_eln={
             "overview": True,
@@ -2535,7 +2543,7 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
     Class for handling measurement of ThermoGravimetricAnalysis.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Measurement-TGA',
         a_eln={
             "overview": True,
@@ -2844,7 +2852,7 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
     Class for handling measurement of cyclic voltammetry experiment.
     '''
     m_def = Section(
-        categories=[CRC1415Category],
+        categories=[CRC1415CategoryMeasurement],
         label='CRC1415-Measurement-CV',
         a_eln={
             "overview": True,
@@ -3416,7 +3424,7 @@ class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, Schema): #EntryData, 
         repeats=True,
     )
     
-    from crc1415testsample.schema_packages.MeasurementGeneric import MeasurementGeneric
+    from crc1415plugin.schema_packages.MeasurementGeneric import MeasurementGeneric
     Measurement_Generic = SubSection(
         section_def=MeasurementGeneric,
         repeats=True,
