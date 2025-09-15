@@ -160,7 +160,7 @@ def test_AdsorptionMeasurement_package():
     
     #assert entry_archive.data.data_as_txt_file == 'test_QuantachromeAdsorption.txt'
 
-def test_AdsorptionMeasurement_package():
+def test_TGAMeasurement_package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementTGA.archive.yaml')
     entry_archive = parse(test_file)[0]
     print("Run TGA")
