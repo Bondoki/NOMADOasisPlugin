@@ -1072,10 +1072,10 @@
     "entry_type": "MeasurementAdsorption",
     "mainfile": "/home/bondoki_vdr/Downloads/tmp/nomad_lab-official3.1.4/NOMADOasisPlugin/tests/datacrc1415plugin/test_AdsorptionMeasurement.archive.yaml",
     "text_search_contents": [
-      "test AdsorptionMeasurement",
       "test_QuantachromeAdsorption.txt",
-      "Adsorbed Volume-Relative Pressure linear plot",
-      "Nitrogen"
+      "test AdsorptionMeasurement",
+      "Nitrogen",
+      "Adsorbed Volume-Relative Pressure linear plot"
     ],
     "n_quantities": 28,
     "quantities": [
