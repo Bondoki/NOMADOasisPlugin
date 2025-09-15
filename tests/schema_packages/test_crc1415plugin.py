@@ -60,7 +60,7 @@ def test_Overview_package():
     #assert entry_archive.data.data_file == 'test.csv' 
     #assert entry_archive.data.data_file == 'testSEM.jpg' 
 
-from crc1415plugin.schema_packages.ELNSampleOverviewSchema import RamanData
+#from crc1415plugin.schema_packages.ELNSampleOverviewSchema import RamanData
 
 def test_RamanMeasurement_package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_RamanMeasurement.archive.yaml')
