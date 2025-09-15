@@ -2468,7 +2468,7 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 
                 #y_label = '\u25CF Adsorbed Volume and \u25A1 Desorbed Volume'
                 y_label = 'Adsorbed Volume'
-                yaxis_title = f'Adsorbed Volume [mmol/g] ({self.Analysis_Gas}, {self.Bath_Temperature.to('kelvin').magnitude} {self.Bath_Temperature.units:~})'
+                yaxis_title = f"Adsorbed Volume [mmol/g] ({self.Analysis_Gas}, {self.Bath_Temperature.to('kelvin').magnitude} {self.Bath_Temperature.units:~})"
                 y_ads = adsorption_adsorpedVolume
                 y_des = desorption_adsorpedVolume
                 
