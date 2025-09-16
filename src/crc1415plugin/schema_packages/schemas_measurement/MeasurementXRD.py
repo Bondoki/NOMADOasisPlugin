@@ -91,7 +91,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln={
             "overview": True,
             "hide": [
-                "name",
+                #"name",
                 "lab_id",
                 "method",
                 "samples",
@@ -100,6 +100,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
             "properties": {
                 "order": [
                     "tags",
+                    "name",
                     "datetime",
                     "datetime_end",
                     "location",
@@ -130,6 +131,13 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         a_display={
             "visible": False
         },
+    )
+        
+    name = Quantity(
+        type=str,
+        #default='TestName',
+        description='Name of the section of XRD measurement',
+        a_eln={'component': 'StringEditQuantity', 'label': 'XRD: Brief title of the measurement'},
     )
     
     datetime_end = Quantity(
