@@ -76,20 +76,6 @@ def test_MeasurementXRD_XYE_package():
     print("Run MeasurementXRD XYE file")
 
 
-    
-    
-def test_Overview_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_overview.archive.yaml')
-    entry_archive = parse(test_file)[0]
-    normalize_all(entry_archive)
-    print("Run Overview")
-
-    #assert entry_archive.data.data_file == 'test.xyd' 
-    #assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
-    #assert entry_archive.data.data_file == 'test.csv' 
-    #assert entry_archive.data.data_file == 'testSEM.jpg' 
-
-#from crc1415plugin.schema_packages.ELNSampleOverviewSchema import RamanData
 
 def test_MeasurementRaman__package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementRaman.archive.yaml')
@@ -153,8 +139,8 @@ def test_MeasurementRaman_ZIP_package():
 
 
 
-def test_AdsorptionMeasurement_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_AdsorptionMeasurement.archive.yaml')
+def test_MeasurementAdsorption_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementAdsorption.archive.yaml')
     entry_archive = parse(test_file)[0]
     print("Run Adsorption")
     
@@ -212,3 +198,17 @@ def test_MeasurementGeneric_TXT_package():
     print("Run Measurement Generic txt")
     
     normalize_all(entry_archive)
+    
+
+    
+    
+def test_Overview_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_overview.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run Overview")
+
+    #assert entry_archive.data.data_file == 'test.xyd' 
+    #assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
+    #assert entry_archive.data.data_file == 'test.csv' 
+    #assert entry_archive.data.data_file == 'testSEM.jpg' 
