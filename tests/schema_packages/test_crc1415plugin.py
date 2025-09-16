@@ -13,6 +13,16 @@ def test_schema_package():
     assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
     #assert entry_archive.data.data_file == 'test.csv' 
     #assert entry_archive.data.data_file == 'testSEM.jpg' 
+    
+def test_IRMeasurement_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementIR.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run IRMeasurement")
+
+    assert entry_archive.data.data_as_dpt_file == 'test_file_IR.dpt' 
+    
+    assert len(entry_archive.data.Transmittance) == 3525 
 
 def test_MeasurementSEM_package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementSEM.archive.yaml')
@@ -38,15 +48,7 @@ def test_MeasurementTEM_package():
 
     assert entry_archive.data.data_as_tif_or_tiff_file == ['testTEM01.tif', 'testTEM02.tiff'] 
     
-def test_IRMeasurement_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_IRMeasurement.archive.yaml')
-    entry_archive = parse(test_file)[0]
-    normalize_all(entry_archive)
-    print("Run IRMeasurement")
 
-    assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
-    
-    assert len(entry_archive.data.Transmittance) == 3525 
     
     
 def test_Overview_package():

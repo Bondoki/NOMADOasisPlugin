@@ -1,0 +1,5 @@
+data:
+  m_def: crc1415plugin.schema_packages.schemas_measurement.MeasurementIR
+  data_as_dpt_file: test_file_IR.dpt
+  IR_Solvent: 'Acetone'
+  IR_Substance_Type: 'powder'
