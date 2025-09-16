@@ -101,6 +101,20 @@ CRC1415MeasurementSEM = CRC1414MeasurementSEMEntryPoint(
     description='Schema package for CRC1415 - MeasurementSEM.',
 )
 
+class CRC1414MeasurementTEMEntryPoint(SchemaPackageEntryPoint):
+    parameter: int = Field(0, description='Custom configuration parameter for sample')
+
+    def load(self):
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementTEM import m_package
+
+        return m_package
+
+
+CRC1415MeasurementTEM = CRC1414MeasurementTEMEntryPoint(
+    name='CRC1415MeasurementTEM',
+    description='Schema package for CRC1415 - MeasurementTEM.',
+)
+
 # class CRCGMSchemaEntryPoint(SchemaPackageEntryPoint):
 #     parameter: int = Field(0, description='Custom configuration parameter here')
 # 

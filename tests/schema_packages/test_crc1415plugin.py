@@ -38,7 +38,7 @@ def test_MeasurementSEM_Auxiliary_package():
     normalize_all(entry_archive)
     print("Run Measurement SEM Auxiliary")
 
-    assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
+    assert entry_archive.data.data_as_tif_or_tiff_file == ['test_file_SEM_02.tiff', 'test_file_SEM_03.tif'] #'testSEM.tif' 
 
 def test_MeasurementTEM_package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementTEM.archive.yaml')
@@ -46,8 +46,35 @@ def test_MeasurementTEM_package():
     normalize_all(entry_archive)
     print("Run Measurement TEM")
 
-    assert entry_archive.data.data_as_tif_or_tiff_file == ['testTEM01.tif', 'testTEM02.tiff'] 
+    assert entry_archive.data.data_as_tif_or_tiff_file == ['test_file_TEM_01.tif', 'test_file_TEM_02.tiff'] 
     
+
+def test_MeasurementXRD_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementXRD_XYD.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run XRDMeasurement XYD file")
+
+    #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
+    
+    #assert len(entry_archive.data.Transmittance) == 3525 
+    
+def test_MeasurementXRD_RAW_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementXRD_RAW.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run XRDMeasurement RAW file")
+
+    #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
+    
+    #assert len(entry_archive.data.Transmittance) == 3525 
+
+def test_MeasurementXRD_XYE_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementXRD_XYE.archive.yaml')
+    entry_archive = parse(test_file)[0]
+    normalize_all(entry_archive)
+    print("Run MeasurementXRD XYE file")
+
 
     
     
@@ -123,33 +150,6 @@ def test_RamanMeasurementZIP_package():
     print("Run RamanMeasurement ZIP")
     
     normalize_all(entry_archive)
-
-
-def test_XRDMeasurement_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_XRDMeasurementXYD.archive.yaml')
-    entry_archive = parse(test_file)[0]
-    normalize_all(entry_archive)
-    print("Run XRDMeasurement XYD file")
-
-    #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
-    
-    #assert len(entry_archive.data.Transmittance) == 3525 
-    
-def test_XRDMeasurementRAW_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_XRDMeasurementRAW.archive.yaml')
-    entry_archive = parse(test_file)[0]
-    normalize_all(entry_archive)
-    print("Run XRDMeasurement RAW file")
-
-    #assert entry_archive.data.data_as_dpt_file == 'IRtest.dpt' 
-    
-    #assert len(entry_archive.data.Transmittance) == 3525 
-
-def test_MeasurementXRD_XYE_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementXRD_XYE.archive.yaml')
-    entry_archive = parse(test_file)[0]
-    normalize_all(entry_archive)
-    print("Run MeasurementXRD XYE file")
 
 
 

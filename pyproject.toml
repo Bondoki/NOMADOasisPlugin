@@ -117,6 +117,7 @@ CRC1415MeasurementGeneric = "crc1415plugin.schema_packages:CRC1415MeasurementGen
 CRC1415MeasurementXRD = "crc1415plugin.schema_packages:CRC1415MeasurementXRD"
 CRC1415MeasurementIR = "crc1415plugin.schema_packages:CRC1415MeasurementIR"
 CRC1415MeasurementSEM = "crc1415plugin.schema_packages:CRC1415MeasurementSEM"
+CRC1415MeasurementTEM = "crc1415plugin.schema_packages:CRC1415MeasurementTEM"
 #CRC1415_A04_schema = "crc1415testsample.schema_packages:CRC1415_A04_schema"
 #CRC1415Chemical = "crc1415testsample.schema_packages:CRC1415Chemical"
 
