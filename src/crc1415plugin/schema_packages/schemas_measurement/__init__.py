@@ -1,4 +1,5 @@
 from .MeasurementAdsorption import MeasurementAdsorption
+from .MeasurementCV import MeasurementCV
 from .MeasurementGeneric import MeasurementGeneric 
 from .MeasurementIR import MeasurementIR 
 from .MeasurementRaman import MeasurementRaman 

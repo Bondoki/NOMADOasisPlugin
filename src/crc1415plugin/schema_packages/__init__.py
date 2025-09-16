@@ -157,7 +157,19 @@ CRC1415MeasurementTGA = CRC1414MeasurementTGAEntryPoint(
     description='Schema package for CRC1415 - MeasurementTGA.',
 )
 
+class CRC1414MeasurementCVEntryPoint(SchemaPackageEntryPoint):
+    parameter: int = Field(0, description='Custom configuration parameter for sample')
 
+    def load(self):
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementCV import m_package
+
+        return m_package
+
+
+CRC1415MeasurementCV = CRC1414MeasurementCVEntryPoint(
+    name='CRC1415MeasurementCV',
+    description='Schema package for CRC1415 - MeasurementCV.',
+)
 # class CRCGMSchemaEntryPoint(SchemaPackageEntryPoint):
 #     parameter: int = Field(0, description='Custom configuration parameter here')
 # 
