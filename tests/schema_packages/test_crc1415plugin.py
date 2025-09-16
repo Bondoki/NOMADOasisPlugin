@@ -14,7 +14,7 @@ def test_schema_package():
     #assert entry_archive.data.data_file == 'test.csv' 
     #assert entry_archive.data.data_file == 'testSEM.jpg' 
     
-def test_IRMeasurement_package():
+def test_MeasurementIR_package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementIR.archive.yaml')
     entry_archive = parse(test_file)[0]
     normalize_all(entry_archive)
@@ -30,7 +30,7 @@ def test_MeasurementSEM_package():
     normalize_all(entry_archive)
     print("Run Measurement SEM")
 
-    assert entry_archive.data.data_as_tif_or_tiff_file == ['testSEM.tif', 'testSEM3.tiff'] #'testSEM.tif' 
+    assert entry_archive.data.data_as_tif_or_tiff_file == ['test_file_SEM_01.tif', 'test_file_SEM_03.tiff'] #'testSEM.tif' 
 
 def test_MeasurementSEM_Auxiliary_package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementSEM_Auxiliary.archive.yaml')

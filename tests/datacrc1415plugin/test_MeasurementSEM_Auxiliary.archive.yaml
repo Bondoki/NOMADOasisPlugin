@@ -1,4 +1,4 @@
 data:
-  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementSEM
-  data_as_tif_or_tiff_file: ['testSEM.tif', 'testSEM3.tiff']
-  auxiliary_data_file: 'test_File_SEM_Auxiliary.txt'
+  m_def: crc1415plugin.schema_packages.schemas_measurement.MeasurementSEM
+  data_as_tif_or_tiff_file: ['test_file_SEM_02.tiff', 'test_file_SEM_03.tif']
+  auxiliary_data_file: 'test_file_SEM_Auxiliary.txt'
