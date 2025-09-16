@@ -3424,7 +3424,8 @@ class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, Schema): #EntryData, 
         repeats=True,
     )
     
-    from crc1415plugin.schema_packages.MeasurementGeneric import MeasurementGeneric
+    # from crc1415plugin.schema_packages.MeasurementGeneric import MeasurementGeneric
+    from .schemas_measurement import MeasurementGeneric
     Measurement_Generic = SubSection(
         section_def=MeasurementGeneric,
         repeats=True,

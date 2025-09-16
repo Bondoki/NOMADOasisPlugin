@@ -45,6 +45,20 @@ CRC1415SampleOverview = CRC1414SampleEntryPoint(
     description='Schema package for CRC1415 for the sample overview schema.',
 )
 
+class CRC1414MeasurementGenericEntryPoint(SchemaPackageEntryPoint):
+    parameter: int = Field(0, description='Custom configuration parameter for sample')
+
+    def load(self):
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementGeneric import m_package
+
+        return m_package
+
+
+CRC1415MeasurementGeneric = CRC1414MeasurementGenericEntryPoint(
+    name='CRC1415MeasurementGeneric',
+    description='Schema package for CRC1415 - MeasurementGeneric.',
+)
+
 # class CRCGMSchemaEntryPoint(SchemaPackageEntryPoint):
 #     parameter: int = Field(0, description='Custom configuration parameter here')
 # 

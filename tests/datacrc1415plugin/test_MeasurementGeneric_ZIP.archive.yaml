@@ -1,5 +1,6 @@
 data:
-  m_def: crc1415plugin.schema_packages.MeasurementGeneric.MeasurementGeneric
+  #m_def: crc1415plugin.schema_packages.MeasurementGeneric.MeasurementGeneric
+  m_def: crc1415plugin.schema_packages.schemas_measurement.MeasurementGeneric.MeasurementGeneric
   Generic_X_Axis_Label: 'Shift'
   Generic_X_Unit: 'cm'
   Generic_Y_Axis_Label: 'Intensity'
