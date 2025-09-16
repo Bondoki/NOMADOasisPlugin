@@ -110,7 +110,6 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                     "name",
                     "datetime",
                     "location",
-                    "name",
                     "data_as_tif_or_tiff_file",
                     "auxiliary_data_file",
                     "SEM_Accelerating_Voltage",

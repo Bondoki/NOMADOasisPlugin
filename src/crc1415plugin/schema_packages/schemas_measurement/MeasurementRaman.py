@@ -204,8 +204,8 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
             "properties": {
                 "order": [
                     "tags",
-                    "datetime",
                     "name",
+                    "datetime",
                     "location",
                     "data_as_tvb_file",
                     "processed_data_as_zip_file",
