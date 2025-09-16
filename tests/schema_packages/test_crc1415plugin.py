@@ -91,8 +91,8 @@ def test_Overview_package():
 
 #from crc1415plugin.schema_packages.ELNSampleOverviewSchema import RamanData
 
-def test_RamanMeasurement_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_RamanMeasurement.archive.yaml')
+def test_MeasurementRaman__package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementRaman.archive.yaml')
     entry_archive = parse(test_file)[0]
     #normalize_all(entry_archive)
     print("Run RamanMeasurement")
@@ -122,29 +122,29 @@ def test_MeasurementRaman_1TVF_package():
     
     print("Length Raman-Entries:", len(entry_archive.data.Raman_data_entries))
 
-def test_RamanMeasurementTVB_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_RamanMeasurementTVB.archive.yaml')
+def test_MeasurementRaman_TVB_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementRaman_TVB.archive.yaml')
     entry_archive = parse(test_file)[0]
     #normalize_all(entry_archive)
     print("Run RamanMeasurement TVB")
     
     normalize_all(entry_archive)
     
-    assert entry_archive.data.data_as_tvb_file == 'test_Raman_10Frames.tvb'
+    assert entry_archive.data.data_as_tvb_file == 'test_file_Raman_TVB_10Frames.tvb'
     
-def test_RamanMeasurementTVB2_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_RamanMeasurementTVB2.archive.yaml')
+def test_MeasurementRaman_TVB2_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementRaman_TVB_02.archive.yaml')
     entry_archive = parse(test_file)[0]
     #normalize_all(entry_archive)
-    print("Run RamanMeasurement TVB")
+    print("Run RamanMeasurement TVB02")
     
     normalize_all(entry_archive)
     
-    assert entry_archive.data.data_as_tvb_file == 'test_Raman_1Frame.tvb'
+    assert entry_archive.data.data_as_tvb_file == 'test_file_Raman_TVB_1Frame.tvb'
     
     
-def test_RamanMeasurementZIP_package():
-    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_RamanMeasurementZIP.archive.yaml')
+def test_MeasurementRaman_ZIP_package():
+    test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementRaman_ZIP.archive.yaml')
     entry_archive = parse(test_file)[0]
     #normalize_all(entry_archive)
     print("Run RamanMeasurement ZIP")

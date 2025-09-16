@@ -115,6 +115,20 @@ CRC1415MeasurementTEM = CRC1414MeasurementTEMEntryPoint(
     description='Schema package for CRC1415 - MeasurementTEM.',
 )
 
+class CRC1414MeasurementRamanEntryPoint(SchemaPackageEntryPoint):
+    parameter: int = Field(0, description='Custom configuration parameter for sample')
+
+    def load(self):
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementRaman import m_package
+
+        return m_package
+
+
+CRC1415MeasurementRaman = CRC1414MeasurementRamanEntryPoint(
+    name='CRC1415MeasurementRaman',
+    description='Schema package for CRC1415 - MeasurementRaman.',
+)
+
 # class CRCGMSchemaEntryPoint(SchemaPackageEntryPoint):
 #     parameter: int = Field(0, description='Custom configuration parameter here')
 # 

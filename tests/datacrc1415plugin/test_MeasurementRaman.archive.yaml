@@ -7,7 +7,7 @@ data:
   #m_def: crc1415testsample.schema_packages.ELNSample2_schema.MeasurementXRD
   #data_file: test.xyd
   #
-  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementRaman
+  m_def: crc1415plugin.schema_packages.schemas_measurement.MeasurementRaman
   #Raman_data_entries.RamanData with name, data_as_tvf_or_txt_file 
   #rd: RamanData
   #rd.name : "John Doe"
@@ -20,8 +20,8 @@ data:
   #Raman_data_entries: [RamanData]
   Raman_data_entries:
     - name: 'TestTXT'
-      data_as_tvf_or_txt_file: 'testTXTRaman.txt'
+      data_as_tvf_or_txt_file: 'test_file_Raman_TXT.txt'
     - name: 'TestTVF'
-      data_as_tvf_or_txt_file: 'testTVFRaman.tvf'
+      data_as_tvf_or_txt_file: 'test_file_Raman_TVF.tvf'
    #- name: 'Test3'
    #  data_as_tvf_or_txt_file: testTVFRaman.tvf
