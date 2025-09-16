@@ -74,6 +74,11 @@ if TYPE_CHECKING:
         BoundLogger,
     )
     
+class DataFileError(Exception):
+    """Custom exception for data file errors."""
+    pass
+
+
 class CRC1415CategoryMeasurement(EntryDataCategory):
     """
     A category for all plugins defined in the `crc1415-plugin` plugin.
