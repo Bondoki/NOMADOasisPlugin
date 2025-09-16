@@ -1,4 +1,4 @@
 data:
-  m_def: crc1415plugin.schema_packages.ELNSampleOverviewSchema.MeasurementXRD
+  m_def: crc1415plugin.schema_packages.schemas_measurement.MeasurementXRD
   data_as_raw_or_xyd_file: testXRD.raw
   data_as_xye_file: test_XRD_XYE_file.xye
