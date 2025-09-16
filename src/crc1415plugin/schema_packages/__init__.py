@@ -143,6 +143,21 @@ CRC1415MeasurementAdsorption = CRC1414MeasurementAdsorptionEntryPoint(
     description='Schema package for CRC1415 - MeasurementAdsorption.',
 )
 
+class CRC1414MeasurementTGAEntryPoint(SchemaPackageEntryPoint):
+    parameter: int = Field(0, description='Custom configuration parameter for sample')
+
+    def load(self):
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementTGA import m_package
+
+        return m_package
+
+
+CRC1415MeasurementTGA = CRC1414MeasurementTGAEntryPoint(
+    name='CRC1415MeasurementTGA',
+    description='Schema package for CRC1415 - MeasurementTGA.',
+)
+
+
 # class CRCGMSchemaEntryPoint(SchemaPackageEntryPoint):
 #     parameter: int = Field(0, description='Custom configuration parameter here')
 # 

@@ -1,7 +1,7 @@
 import os.path
 
 from nomad.client import normalize_all, parse
-from crc1415plugin.schema_packages.ELNSampleOverviewSchema import CRC1415SampleOverview
+#from crc1415plugin.schema_packages.ELNSampleOverviewSchema import CRC1415SampleOverview
 
 def test_schema_package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_sample.archive.yaml')
