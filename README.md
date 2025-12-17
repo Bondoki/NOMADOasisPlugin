@@ -11,8 +11,8 @@ If you want to develop locally this plugin, clone the project and in the plugin 
 ```sh
 git clone https://github.com/Bondoki/NOMADOasisPlugin.git
 cd NOMADOasisPlugin
-python3.11 -m venv .pyenv
-. .pyenv/bin/activate
+python3.12 -m venv .pyenv
+source .pyenv/bin/activate
 ```
 
 Make sure to have `pip` upgraded:
@@ -25,9 +25,9 @@ We recommend installing `uv` for fast pip installation of the packages:
 pip install uv
 ```
 
-Install the `nomad-lab` package:
+Install the `nomad-lab` package with minimum version v1.4.0:
 ```sh
-uv pip install '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
+uv pip install -e '.[dev]'
 ```
 
 **Note!**
