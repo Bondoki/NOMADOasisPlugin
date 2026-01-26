@@ -63,7 +63,6 @@ ruff check .
 ruff format . --check
 ```
 
-
 ### Debugging
 
 For interactive debugging of the tests, use `pytest` with the `--pdb` flag. We recommend using an IDE for debugging, e.g., _VSCode_. If that is the case, add the following snippet to your `.vscode/launch.json`:
@@ -94,7 +93,6 @@ where `<path-to-plugin-tests>` must be changed to the local path to the test mod
 
 The settings configuration file `.vscode/settings.json` automatically applies the linting and formatting upon saving the modified file.
 
-
 ### Documentation on Github pages
 
 To view the documentation locally, install the related packages using:
@@ -106,7 +104,6 @@ Run the documentation server:
 ```sh
 mkdocs serve
 ```
-
 
 ## Adding this plugin to NOMAD
 
