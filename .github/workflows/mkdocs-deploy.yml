@@ -1,5 +1,8 @@
 name: Deploy MkDocs Site
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -22,12 +25,12 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          version: {% raw -%}${{ env.UV_VERSION }}{% endraw %}
+          version: ${{ env.UV_VERSION }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: {% raw -%}${{ env.PYTHON_VERSION }}{% endraw %}
+          python-version: ${{ env.PYTHON_VERSION }}
 
       - name: Build and Deploy
         run: |
