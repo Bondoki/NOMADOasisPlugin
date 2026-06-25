@@ -425,11 +425,11 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                     while len(self.XRD_Data_Entries) < num_raw_or_xyd_file:
                         self.XRD_Data_Entries.append(XRD_Data_Entry_Experiment())  # Append a placeholder value
                     
-                    # Create new if not sufficient long enough - overwrites the default
-                    if len(self.XRD_Data_Entries) < num_raw_or_xyd_file:
-                        self.XRD_Data_Entries = []
-                        while len(self.XRD_Data_Entries) < num_raw_or_xyd_file:
-                            self.XRD_Data_Entries.append(XRD_Data_Entry_Experiment())  # Append a placeholder value
+                # Create new if not sufficient long enough - overwrites the default
+                if len(self.XRD_Data_Entries) < num_raw_or_xyd_file:
+                    self.XRD_Data_Entries = []
+                    while len(self.XRD_Data_Entries) < num_raw_or_xyd_file:
+                        self.XRD_Data_Entries.append(XRD_Data_Entry_Experiment())  # Append a placeholder value
                 
                 # Loop over all filenames
                 for index, data_file in enumerate(self.data_as_raw_or_xyd_file):
@@ -437,7 +437,8 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                     if not data_file.endswith('.xyd') and not data_file.endswith('.raw'):
                         raise DataFileError(f"The file '{data_file}' must have a .raw or .xyd extension.")
                     
-                    self.XRD_Data_Entries[index].name = data_file
+                    if getattr(self.XRD_Data_Entries[index], "name", None) is None:
+                        self.XRD_Data_Entries[index].name = data_file
                     
                     if data_file.endswith('.xyd'):
                         # Otherwise parse the file
