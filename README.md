@@ -7,7 +7,7 @@ This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`co
 
 ## Development
 
-If you want to develop locally this plugin, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.9, 3.10, or 3.11):
+If you want to develop locally this plugin, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.10, 3.11 or 3.12):
 ```sh
 git clone https://github.com/Bondoki/NOMADOasisPlugin.git
 cd NOMADOasisPlugin
@@ -36,7 +36,7 @@ sure to include NOMAD's internal package registry (via `--index-url` in the abov
 
 The plugin is still under development. If you would like to contribute, install the package in editable mode (with the added `-e` flag):
 ```sh
-uv pip install -e '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
+uv pip install -e '.[dev]'
 ```
 
 
@@ -62,7 +62,6 @@ We use [Ruff](https://docs.astral.sh/ruff/) for linting and formatting the code.
 ruff check .
 ruff format . --check
 ```
-
 
 ### Debugging
 
@@ -94,7 +93,6 @@ where `<path-to-plugin-tests>` must be changed to the local path to the test mod
 
 The settings configuration file `.vscode/settings.json` automatically applies the linting and formatting upon saving the modified file.
 
-
 ### Documentation on Github pages
 
 To view the documentation locally, install the related packages using:
@@ -106,7 +104,6 @@ Run the documentation server:
 ```sh
 mkdocs serve
 ```
-
 
 ## Adding this plugin to NOMAD
 
@@ -120,22 +117,10 @@ Read the [NOMAD plugin documentation](https://nomad-lab.eu/prod/v1/staging/docs/
 
 ### Adding this plugin in your local NOMAD installation and the source code of NOMAD
 
-Modify the text file under `/nomad/default_plugins.txt` and add:
-```sh
-<other-content-in-default_plugins.txt>
-crc1415testsample==x.y.z
-```
-where `x.y.z` represents the released version of this plugin.
+We now recommend using the dedicated [`nomad-distro-dev`](https://github.com/FAIRmat-NFDI/nomad-distro-dev) repository to simplify the process. Please refer to that repository for detailed instructions.
 
-Then, go to your NOMAD folder, activate your NOMAD virtual environment and run:
-```sh
-deactivate
-cd <route-to-NOMAD-folder>/nomad
-source .pyenv/bin/activate
-./scripts/setup_dev_env.sh
-```
-
-Alternatively and only valid for your local NOMAD installation, you can modify `nomad.yaml` to include this plugin, see [NOMAD Oasis - Install plugins](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/plugins_install.html).
+## Publish note
+In the [GitHub actions workflow](./.github/workflows/publish.yml) for publishing the crc1415plugin plugin to PyPI, we commented out the `deploy` job . If you want to publish the plugin to `PyPI`, you need to set up your project in `PyPI`. There are several online tutorials on publishing a Python package to PyPI, e.g., [How to Publish a Python Package to PyPI](https://realpython.com/pypi-publish-python-package/). After that, you can uncomment the `deploy` job in the workflow file and push the changes to GitHub. The workflow will be triggered and the package will be published to `PyPI` when you create a new release on GitHub.
 
 
 ### Build the python package
@@ -160,9 +145,7 @@ on the [PyPI documentation](https://packaging.python.org/en/latest/tutorials/pac
 
 ### Template update
 
-We use cruft to update the project based on template changes. A `cruft-update.yml` is included in Github workflows to automatically check for updates and create pull requests to apply updates. Follow the [instructions](https://github.blog/changelog/2022-05-03-github-actions-prevent-github-actions-from-creating-and-approving-pull-requests/) on how to enable Github Actions to create pull requests. 
-
-To run the check for updates locally, follow the instructions on [`cruft` website](https://cruft.github.io/cruft/#updating-a-project).
+We use [`cruft`](https://github.com/cruft/cruft) to update the project based on template changes. To run the check for updates locally, run `cruft update` in the root of the project. More details see the instructions on [`cruft` website](https://cruft.github.io/cruft/#updating-a-project).
 
 
 ## Main contributors
