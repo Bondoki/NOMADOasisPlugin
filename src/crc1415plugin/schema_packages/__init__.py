@@ -1,7 +1,6 @@
 from nomad.config.models.plugins import SchemaPackageEntryPoint
 from pydantic import Field
 
-
 # class NewSchemaPackageEntryPoint(SchemaPackageEntryPoint):
 #     parameter: int = Field(0, description='Custom configuration parameter')
 # 
@@ -49,7 +48,9 @@ class CRC1414MeasurementGenericEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementGeneric import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementGeneric import (
+            m_package,
+        )
 
         return m_package
 
@@ -63,7 +64,9 @@ class CRC1414MeasurementXRDEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementXRD import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementXRD import (
+            m_package,
+        )
 
         return m_package
 
@@ -77,7 +80,9 @@ class CRC1414MeasurementIREntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementIR import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementIR import (
+            m_package,
+        )
 
         return m_package
 
@@ -91,7 +96,9 @@ class CRC1414MeasurementSEMEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementSEM import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementSEM import (
+            m_package,
+        )
 
         return m_package
 
@@ -105,7 +112,9 @@ class CRC1414MeasurementTEMEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementTEM import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementTEM import (
+            m_package,
+        )
 
         return m_package
 
@@ -119,7 +128,9 @@ class CRC1414MeasurementRamanEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementRaman import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementRaman import (
+            m_package,
+        )
 
         return m_package
 
@@ -133,7 +144,9 @@ class CRC1414MeasurementAdsorptionEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementAdsorption import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementAdsorption import (
+            m_package,
+        )
 
         return m_package
 
@@ -147,7 +160,9 @@ class CRC1414MeasurementTGAEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementTGA import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementTGA import (
+            m_package,
+        )
 
         return m_package
 
@@ -161,7 +176,9 @@ class CRC1414MeasurementCVEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter for sample')
 
     def load(self):
-        from crc1415plugin.schema_packages.schemas_measurement.MeasurementCV import m_package
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementCV import (
+            m_package,
+        )
 
         return m_package
 

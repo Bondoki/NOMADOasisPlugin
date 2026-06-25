@@ -1,61 +1,29 @@
-import plotly.express as px
-import plotly.graph_objects as go
-
-import numpy as np
-import base64
-import io
-import pint
-import struct # for binary files
-
-import os    
-
-import re
-import json
-
-import zipfile
-
-from nomad.datamodel.metainfo.plot import PlotSection
-from nomad.datamodel.metainfo.eln import ELNMeasurement
-#from nomad.parsing.tabular import TableData
-from nomad.datamodel.data import UserReference, AuthorReference
-from nomad.datamodel.metainfo.eln import ELNSubstance
-from nomad.datamodel.metainfo.basesections.v1 import ReadableIdentifiers
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstanceSection
-from nomad.datamodel.metainfo.eln import ELNInstrument
-from nomad.datamodel.metainfo.eln import Chemical
-from nomad.datamodel.data import EntryData
-
-
 from typing import (
     TYPE_CHECKING,
 )
-from nomad.metainfo import (
-    MSection,
-    Package,
-    SchemaPackage,
-    Quantity,
-    SubSection,
-    MEnum,
-    Reference,
-    Datetime,
-    Section,
-)
+
+import numpy as np
+import plotly.graph_objects as go
 from nomad.datamodel.data import (
-    EntryData,
     ArchiveSection,
-)
-from nomad.datamodel.data import (
     EntryDataCategory,
+)
+
+#from nomad.parsing.tabular import TableData
+from nomad.datamodel.metainfo.eln import ELNMeasurement
+from nomad.datamodel.metainfo.plot import (
+    PlotlyFigure,
+    PlotSection,
+)
+from nomad.metainfo import (
+    MEnum,
+    Quantity,
+    Section,
 )
 from nomad.metainfo.metainfo import (
     Category,
 )
 from nomad.units import ureg
-from nomad.datamodel.metainfo.plot import (
-    PlotlyFigure,
-    PlotSection,
-)
 
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,

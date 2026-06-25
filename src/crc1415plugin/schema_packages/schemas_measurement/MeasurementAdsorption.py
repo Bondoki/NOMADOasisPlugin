@@ -1,63 +1,31 @@
-import plotly.express as px
-import plotly.graph_objects as go
-
-import numpy as np
-from PIL import Image
-import base64
-import io
-import pint
-import struct # for binary files
-
-import os    
-
 import re
-import json
-
-import zipfile
-
-from nomad.datamodel.metainfo.plot import PlotSection
-from nomad.datamodel.metainfo.eln import ELNMeasurement
-#from nomad.parsing.tabular import TableData
-from nomad.datamodel.data import UserReference, AuthorReference
-from nomad.datamodel.metainfo.eln import BasicEln
-from nomad.datamodel.metainfo.basesections.v1 import ReadableIdentifiers
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstanceSection
-from nomad.datamodel.metainfo.eln import ELNInstrument
-from nomad.datamodel.metainfo.eln import Chemical
-from nomad.datamodel.data import EntryData
-
-
 from typing import (
     TYPE_CHECKING,
 )
-from nomad.metainfo import (
-    MSection,
-    Package,
-    SchemaPackage,
-    Quantity,
-    SubSection,
-    MEnum,
-    Reference,
-    Datetime,
-    Section,
-)
+
+import numpy as np
+import plotly.graph_objects as go
 from nomad.datamodel.data import (
-    EntryData,
     ArchiveSection,
-)
-from nomad.datamodel.data import (
     EntryDataCategory,
+)
+
+#from nomad.parsing.tabular import TableData
+from nomad.datamodel.metainfo.eln import ELNMeasurement
+from nomad.datamodel.metainfo.plot import (
+    PlotlyFigure,
+    PlotSection,
+)
+from nomad.metainfo import (
+    Datetime,
+    Quantity,
+    Section,
 )
 from nomad.metainfo.metainfo import (
     Category,
 )
 from nomad.units import ureg
-from nomad.datamodel.metainfo.plot import (
-    PlotlyFigure,
-    PlotSection,
-)
-from nomad.config import config
+
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,
 #     material_entry_type,
@@ -202,49 +170,49 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
         description='The measured adsorped volume at relative pressure value, normalized by ideal gas molar volume 22.4 cm**3/mol.',
     )
     
-    def generate_plots(self) -> list[PlotlyFigure]:
-        """
-        Generate the plotly figures for the `MeasurementAdsorption` section.
-
-        Returns:
-            list[PlotlyFigure]: The plotly figures.
-        """
-        # figures = []
-        # #if self.wavelength is None:
-        # #    return figures
-        # 
-        # x_label = 'Wavenumber'
-        # xaxis_title = f'{x_label} (cm-1)'
-        # x = self.Wavenumber.to('1/cm').magnitude
-        # 
-        # y_label = 'Transmittance'
-        # yaxis_title = f'{y_label} (a.u.)'
-        # y = self.Transmittance.to('dimensionless').magnitude
-        # 
-        # line_linear = px.line(x=x, y=y)
-        # 
-        # line_linear.update_layout(
-        #     title=f'{y_label} over {x_label}',
-        #     xaxis_title=xaxis_title,
-        #     yaxis_title=yaxis_title,
-        #     xaxis=dict(
-        #         fixedrange=False,
-        #     ),
-        #     yaxis=dict(
-        #         fixedrange=False,
-        #     ),
-        #     template='plotly_white',
-        # )
-        # 
-        # figures.append(
-        #     PlotlyFigure(
-        #         label=f'{y_label} linear plot',
-        #         index=0,
-        #         figure=line_linear.to_plotly_json(),
-        #     ),
-        # )
-
-        return figures
+    # def generate_plots(self) -> list[PlotlyFigure]:
+    #     """
+    #     Generate the plotly figures for the `MeasurementAdsorption` section.
+    # 
+    #     Returns:
+    #         list[PlotlyFigure]: The plotly figures.
+    #     """
+    #     # figures = []
+    #     # #if self.wavelength is None:
+    #     # #    return figures
+    #     # 
+    #     # x_label = 'Wavenumber'
+    #     # xaxis_title = f'{x_label} (cm-1)'
+    #     # x = self.Wavenumber.to('1/cm').magnitude
+    #     # 
+    #     # y_label = 'Transmittance'
+    #     # yaxis_title = f'{y_label} (a.u.)'
+    #     # y = self.Transmittance.to('dimensionless').magnitude
+    #     # 
+    #     # line_linear = px.line(x=x, y=y)
+    #     # 
+    #     # line_linear.update_layout(
+    #     #     title=f'{y_label} over {x_label}',
+    #     #     xaxis_title=xaxis_title,
+    #     #     yaxis_title=yaxis_title,
+    #     #     xaxis=dict(
+    #     #         fixedrange=False,
+    #     #     ),
+    #     #     yaxis=dict(
+    #     #         fixedrange=False,
+    #     #     ),
+    #     #     template='plotly_white',
+    #     # )
+    #     # 
+    #     # figures.append(
+    #     #     PlotlyFigure(
+    #     #         label=f'{y_label} linear plot',
+    #     #         index=0,
+    #     #         figure=line_linear.to_plotly_json(),
+    #     #     ),
+    #     # )
+    # 
+    #     return figures
     
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger'):
         """
@@ -374,8 +342,9 @@ class MeasurementAdsorption(ELNMeasurement, PlotSection, ArchiveSection):
                 self.Sample_Weight = ureg.Quantity(float(report_data['Sample weight']), report_data['Sample weight unit'])
                 
                 # Convert the unpacked data as a datetime object
+                from datetime import timedelta
+
                 from dateutil import parser as dataparser
-                from datetime import datetime, timedelta
                 
                 self.Analysis_Time = ureg.Quantity(float(report_data['Analysis Time']), report_data['Analysis Time unit'])
                 #print(type(analysistime.to(ureg.minute).magnitude))

@@ -1,63 +1,30 @@
-import plotly.express as px
-import plotly.graph_objects as go
-
-import numpy as np
-from PIL import Image
-import base64
-import io
-import pint
-import struct # for binary files
-
-import os    
-
 import re
-import json
-
-import zipfile
-
-from nomad.datamodel.metainfo.plot import PlotSection
-from nomad.datamodel.metainfo.eln import ELNMeasurement
-#from nomad.parsing.tabular import TableData
-from nomad.datamodel.data import UserReference, AuthorReference
-from nomad.datamodel.metainfo.eln import BasicEln
-from nomad.datamodel.metainfo.basesections.v1 import ReadableIdentifiers
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstanceSection
-from nomad.datamodel.metainfo.eln import ELNInstrument
-from nomad.datamodel.metainfo.eln import Chemical
-from nomad.datamodel.data import EntryData
-
-
 from typing import (
     TYPE_CHECKING,
 )
-from nomad.metainfo import (
-    MSection,
-    Package,
-    SchemaPackage,
-    Quantity,
-    SubSection,
-    MEnum,
-    Reference,
-    Datetime,
-    Section,
-)
+
+import numpy as np
+import plotly.graph_objects as go
 from nomad.datamodel.data import (
-    EntryData,
     ArchiveSection,
-)
-from nomad.datamodel.data import (
     EntryDataCategory,
+)
+
+#from nomad.parsing.tabular import TableData
+from nomad.datamodel.metainfo.eln import ELNMeasurement
+from nomad.datamodel.metainfo.plot import (
+    PlotlyFigure,
+    PlotSection,
+)
+from nomad.metainfo import (
+    Quantity,
+    Section,
 )
 from nomad.metainfo.metainfo import (
     Category,
 )
 from nomad.units import ureg
-from nomad.datamodel.metainfo.plot import (
-    PlotlyFigure,
-    PlotSection,
-)
-from nomad.config import config
+
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,
 #     material_entry_type,
@@ -227,8 +194,10 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
                     
                     mass = re.search(r'#SAMPLE MASS /(\w+):(\d+),(\d+)', text, re.IGNORECASE)
                     
+                    GROUP_COUNT = 3
+                    
                     if mass:
-                        if len(mass.groups()) == 3:
+                        if len(mass.groups()) == GROUP_COUNT:
                             # Combine them to form the complete number
                             mass_decimal = f"{mass.group(2)}.{mass.group(3)}"  # Convert to standard decimal format
                             self.TGA_Sample_Mass = ureg.Quantity(float(mass_decimal), mass.group(1).lower()) # decimal[comma]decimal, mg
@@ -238,8 +207,10 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
                     #print(len(temp_range.groups()))
                     #print(temp_range.groups())
                     
+                    TEMP_RANGE_GROUP = 6
+                    
                     if temp_range:
-                        if len(temp_range.groups()) == 6: # start, degC, rate, K/min, stop, degC
+                        if len(temp_range.groups()) == TEMP_RANGE_GROUP: # start, degC, rate, K/min, stop, degC
                             
                             self.TGA_Temperature_Start = ureg.Quantity(float(temp_range.group(1)), temp_range.group(2))  # decimal, degC
                             
@@ -254,6 +225,7 @@ class MeasurementTGA(ELNMeasurement, PlotSection, ArchiveSection):
                     if time_exp:
                         # Convert the unpacked data as a datetime object
                         from datetime import datetime
+
                         import pytz
                         exp_time = datetime.strptime(time_exp.group(1), "%d.%m.%Y %H:%M")
                         

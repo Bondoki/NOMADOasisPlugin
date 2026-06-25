@@ -1,64 +1,34 @@
 
-import plotly.express as px
-import plotly.graph_objects as go
-
-import numpy as np
-from PIL import Image
 import base64
 import io
-import pint
-import struct # for binary files
-
-import os    
-
 import re
-import json
-
-import zipfile
-
-from nomad.datamodel.metainfo.plot import PlotSection
-from nomad.datamodel.metainfo.eln import ELNMeasurement
-#from nomad.parsing.tabular import TableData
-from nomad.datamodel.data import UserReference, AuthorReference
-from nomad.datamodel.metainfo.eln import BasicEln
-from nomad.datamodel.metainfo.basesections.v1 import ReadableIdentifiers
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstanceSection
-from nomad.datamodel.metainfo.eln import ELNInstrument
-from nomad.datamodel.metainfo.eln import Chemical
-from nomad.datamodel.data import EntryData
-
-
 from typing import (
     TYPE_CHECKING,
 )
-from nomad.metainfo import (
-    MSection,
-    Package,
-    SchemaPackage,
-    Quantity,
-    SubSection,
-    MEnum,
-    Reference,
-    Datetime,
-    Section,
-)
+
+import numpy as np
+import plotly.graph_objects as go
 from nomad.datamodel.data import (
-    EntryData,
     ArchiveSection,
-)
-from nomad.datamodel.data import (
     EntryDataCategory,
+)
+
+#from nomad.parsing.tabular import TableData
+from nomad.datamodel.metainfo.eln import ELNMeasurement
+from nomad.datamodel.metainfo.plot import (
+    PlotlyFigure,
+    PlotSection,
+)
+from nomad.metainfo import (
+    Quantity,
+    Section,
 )
 from nomad.metainfo.metainfo import (
     Category,
 )
 from nomad.units import ureg
-from nomad.datamodel.metainfo.plot import (
-    PlotlyFigure,
-    PlotSection,
-)
-from nomad.config import config
+from PIL import Image
+
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,
 #     material_entry_type,
@@ -208,11 +178,11 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                             # print(f"Width: {img_width}, Height: {img_height}")
                             
                              # Convert the image to RGB (necessary for JPEG)
-                            img = img.convert('RGB')
+                            rgb_img = img.convert('RGB')
                             # Create a BytesIO object to hold the image data
                             buffered = io.BytesIO()
                             # Save the image to the BytesIO object in JPEG format
-                            img.save(buffered, format="JPEG")
+                            rgb_img.save(buffered, format="JPEG")
                             # Get the byte data
                             img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
                             # Create the URI image string
@@ -293,8 +263,9 @@ class MeasurementSEM(ELNMeasurement, PlotSection, ArchiveSection):
                     TIME = re.search(r'Time=([\d.]+):([\d.]+):([\d.]+)', text, re.IGNORECASE) # HH:MM:SS
                     
                     if DATE and TIME:
-                        import pytz
                         import datetime
+
+                        import pytz
                         # Should follow:    DD-MM-YYYY HH:MM:SS in Berlin/Europe time zone
                         exp_time = datetime.datetime(int(DATE.group(3)),
                                                      int(DATE.group(1)),

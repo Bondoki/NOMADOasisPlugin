@@ -1,63 +1,34 @@
-import plotly.express as px
-import plotly.graph_objects as go
-
-import numpy as np
-from PIL import Image
-import base64
-import io
-import pint
-import struct # for binary files
-
-import os    
-
-import re
-import json
-
-import zipfile
-
-from nomad.datamodel.metainfo.plot import PlotSection
-from nomad.datamodel.metainfo.eln import ELNMeasurement
-#from nomad.parsing.tabular import TableData
-from nomad.datamodel.data import UserReference, AuthorReference
-from nomad.datamodel.metainfo.eln import BasicEln
-from nomad.datamodel.metainfo.basesections.v1 import ReadableIdentifiers
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstanceSection
-from nomad.datamodel.metainfo.eln import ELNInstrument
-from nomad.datamodel.metainfo.eln import Chemical
-from nomad.datamodel.data import EntryData
-
-
 from typing import (
     TYPE_CHECKING,
 )
-from nomad.metainfo import (
-    MSection,
-    Package,
-    SchemaPackage,
-    Quantity,
-    SubSection,
-    MEnum,
-    Reference,
-    Datetime,
-    Section,
-)
+
+import numpy as np
+import plotly.express as px
+import plotly.graph_objects as go
+
+#from nomad.parsing.tabular import TableData
 from nomad.datamodel.data import (
-    EntryData,
     ArchiveSection,
-)
-from nomad.datamodel.data import (
     EntryDataCategory,
+)
+from nomad.datamodel.metainfo.eln import (
+    ELNMeasurement,
+)
+from nomad.datamodel.metainfo.plot import (
+    PlotlyFigure,
+    PlotSection,
+)
+from nomad.metainfo import (
+    Datetime,
+    Quantity,
+    Section,
+    SubSection,
 )
 from nomad.metainfo.metainfo import (
     Category,
 )
 from nomad.units import ureg
-from nomad.datamodel.metainfo.plot import (
-    PlotlyFigure,
-    PlotSection,
-)
-from nomad.config import config
+
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,
 #     material_entry_type,
@@ -404,14 +375,14 @@ class MeasurementCV(ELNMeasurement, PlotSection, ArchiveSection):
                         if found_data >= 0:
                             # first occurrence: start time and date of frame
                             # next line: end time and date of frame
-                            positions_startdate.append((line_number, contentIDSlines[line_number], contentIDSlines[line_number+1]))  
+                            positions_startdate.append((line_number, line, contentIDSlines[line_number+1]))  
                             #start_index += 1  # Move to the next character to continue searching
                             
                     #print(positions_startdate)
                     
                     # Convert Europe/Berlin to UTC
                     import pytz
-                    from dateutil import parser as dataparser 
+                    from dateutil import parser as dataparser
                     # dates:    DD.MM.YYYY HH:MM:SS in Berlin/Europe time zone
                     starttime = positions_startdate[1][1].strip().split("=")[1] # starttime=14.10.2022 16:42:50 -> 14.10.2022 16:42:50
                     exp_time_start = dataparser.parse(starttime, dayfirst=True)

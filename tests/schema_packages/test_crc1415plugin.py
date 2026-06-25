@@ -1,6 +1,7 @@
 import os.path
 
 from nomad.client import normalize_all, parse
+
 #from crc1415plugin.schema_packages.ELNSampleOverviewSchema import CRC1415SampleOverview
 
 def test_schema_package():
@@ -22,7 +23,9 @@ def test_MeasurementIR_package():
 
     assert entry_archive.data.data_as_dpt_file == 'test_file_IR.dpt' 
     
-    assert len(entry_archive.data.Transmittance) == 3525 
+    LEN_TRANSMITTANCE = 3525
+    
+    assert len(entry_archive.data.Transmittance) == LEN_TRANSMITTANCE 
 
 def test_MeasurementSEM_package():
     test_file = os.path.join('tests', 'datacrc1415plugin', 'test_MeasurementSEM.archive.yaml')

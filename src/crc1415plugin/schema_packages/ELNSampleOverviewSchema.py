@@ -16,66 +16,52 @@
 # limitations under the License.
 #
 
-import plotly.express as px
-import plotly.graph_objects as go
-
-import numpy as np
-from PIL import Image
-import base64
-import io
-import pint
-import struct # for binary files
-
-import os    
-
-import re
-import json
-
-import zipfile
-
-from nomad.datamodel.metainfo.plot import PlotSection
-from nomad.datamodel.metainfo.eln import ELNMeasurement
-#from nomad.parsing.tabular import TableData
-from nomad.datamodel.data import UserReference, AuthorReference
-from nomad.datamodel.metainfo.eln import BasicEln
-from nomad.datamodel.metainfo.basesections.v1 import ReadableIdentifiers
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstanceSection
-from nomad.datamodel.metainfo.eln import ELNInstrument
-from nomad.datamodel.metainfo.eln import Chemical
-from nomad.datamodel.data import EntryData
-
-
 from typing import (
     TYPE_CHECKING,
 )
-from nomad.metainfo import (
-    MSection,
-    Package,
-    SchemaPackage,
-    Quantity,
-    SubSection,
-    MEnum,
-    Reference,
-    Datetime,
-    Section,
-)
+
+from nomad.config import config
+
+#from nomad.parsing.tabular import TableData
 from nomad.datamodel.data import (
-    EntryData,
     ArchiveSection,
-)
-from nomad.datamodel.data import (
+    AuthorReference,
+    EntryData,
     EntryDataCategory,
+    Schema,
+)
+from nomad.datamodel.metainfo.basesections.v1 import ReadableIdentifiers
+from nomad.datamodel.metainfo.eln import (
+    BasicEln,
+    Chemical,
+    ELNInstrument,
+    ELNMeasurement,
+)
+from nomad.metainfo import (
+    MEnum,
+    Quantity,
+    SchemaPackage,
+    Section,
+    SubSection,
 )
 from nomad.metainfo.metainfo import (
     Category,
 )
-from nomad.units import ureg
-from nomad.datamodel.metainfo.plot import (
-    PlotlyFigure,
-    PlotSection,
+
+# Release candidate
+# Released Schemas
+from .schemas_measurement import (
+    MeasurementAdsorption,
+    MeasurementCV,
+    MeasurementGeneric,
+    MeasurementIR,
+    MeasurementRaman,
+    MeasurementSEM,
+    MeasurementTEM,
+    MeasurementTGA,
+    MeasurementXRD,
 )
-from nomad.config import config
+
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,
 #     material_entry_type,
@@ -95,18 +81,6 @@ configuration = config.get_plugin_entry_point(
     'crc1415plugin.schema_packages:CRC1415SampleOverview'
 )
 
-# Release candidate
-from .schemas_measurement import MeasurementGeneric
-
-# Released Schemas
-from .schemas_measurement import MeasurementAdsorption
-from .schemas_measurement import MeasurementCV
-from .schemas_measurement import MeasurementIR
-from .schemas_measurement import MeasurementRaman
-from .schemas_measurement import MeasurementSEM
-from .schemas_measurement import MeasurementTEM
-from .schemas_measurement import MeasurementTGA
-from .schemas_measurement import MeasurementXRD
 
 
 m_package = SchemaPackage(name='CRC1415 Sample ELN')
@@ -254,7 +228,9 @@ class Contributors(ArchiveSection):
 
 #from nomad.datamodel.metainfo.eln import BasicEln # ElnWithStructureFile
 #class OverviewClass(ElnWithStructureFile, Schema):
-from nomad.datamodel.data import Schema
+#from nomad.datamodel.data import Schema
+
+
 class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, Schema): #EntryData, ArchiveSection):
 #class CRC1415SampleOverview(ELNSubstance, ReadableIdentifiers, EntryData, ArchiveSection):
 
@@ -472,9 +448,7 @@ class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, Schema): #EntryData, 
                     raise DataFileError(f"The file '{self.data_as_cif_file}' must have a .cif extension.")
                 
                 from ase.io import read
-
                 from nomad.normalizing import normalizers
-                from nomad.normalizing.results import ResultsNormalizer
 
                 system_normalizer_cls = None
                 for normalizer in normalizers:
@@ -482,12 +456,10 @@ class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, Schema): #EntryData, 
                         system_normalizer_cls = normalizer
                         break
 
-                from nomad.datamodel.metainfo import runschema
-                from nomad.normalizing.optimade import OptimadeNormalizer
                 from nomad.atomutils import Formula
                 from nomad.datamodel.results import Material, System
                 from nomad.normalizing.common import nomad_atoms_from_ase_atoms
-                from nomad.normalizing.topology import add_system_info, add_system
+                from nomad.normalizing.topology import add_system, add_system_info
 
                 with archive.m_context.raw_file(self.data_as_cif_file) as f:
                     try:
