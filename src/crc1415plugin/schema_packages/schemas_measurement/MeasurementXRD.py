@@ -53,7 +53,7 @@ class CRC1415CategoryMeasurement(EntryDataCategory):
 
     m_def = Category(label='CRC1415-Measurement', categories=[EntryDataCategory])
 
-class XRD_Data_Entry_Experiment(ArchiveSection):
+class XRD_Data_Entry(ArchiveSection):
     """General data section for Raman spectroscopy"""
 
     m_def = Section(
@@ -72,7 +72,7 @@ class XRD_Data_Entry_Experiment(ArchiveSection):
                     "name",
                     "XRD_Datetime_Start",
                     "XRD_Datetime_End",
-                    "XRD_Experiment_Wavelength",
+                    "XRD_Wavelength",
                     #"data_as_tvf_or_txt_file",
                 ]
             }
@@ -97,7 +97,7 @@ class XRD_Data_Entry_Experiment(ArchiveSection):
         a_eln=dict(component='DateTimeEditQuantity', label='Experiment Ending Time'),
     )
     
-    XRD_Experiment_Wavelength = Quantity(
+    XRD_Wavelength = Quantity(
         type=np.float64,
         unit='nanometer',
         description='The wavelength of Cu K alpha (1.5406 Angstrom) used for XRD experiment.',
@@ -258,7 +258,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         description='The simulated count at each 2-theta value, dimensionless',
     )
     
-    XRD_Data_Entries = SubSection(section_def=XRD_Data_Entry_Experiment, repeats=True)
+    XRD_Data_Entries_Experiment = SubSection(section_def=XRD_Data_Entry, repeats=True)
     
     def generate_plots(self) -> list[PlotlyFigure]:
         """
@@ -304,8 +304,8 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         fig = go.Figure()
 
         # Add the scatter trace
-        if self.XRD_Data_Entries:
-            for idx, xrd_data_entry in enumerate(self.XRD_Data_Entries):
+        if self.XRD_Data_Entries_Experiment:
+            for idx, xrd_data_entry in enumerate(self.XRD_Data_Entries_Experiment):
                 xExp = xrd_data_entry.XRD_Deg2Theta.to('degree').magnitude
                 yExp = xrd_data_entry.XRD_Intensity.to('dimensionless').magnitude
                 
@@ -419,17 +419,17 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                 num_raw_or_xyd_file = len(self.data_as_raw_or_xyd_file)
                 
                 # Create subsection if not existing
-                if not self.XRD_Data_Entries:
-                    self.XRD_Data_Entries = []
+                if not self.XRD_Data_Entries_Experiment:
+                    self.XRD_Data_Entries_Experiment = []
                     # Ensure the list is long enough
-                    while len(self.XRD_Data_Entries) < num_raw_or_xyd_file:
-                        self.XRD_Data_Entries.append(XRD_Data_Entry_Experiment())  # Append a placeholder value
+                    while len(self.XRD_Data_Entries_Experiment) < num_raw_or_xyd_file:
+                        self.XRD_Data_Entries_Experiment.append(XRD_Data_Entry())  # Append a placeholder value
                     
                 # Create new if not sufficient long enough - overwrites the default
-                if len(self.XRD_Data_Entries) < num_raw_or_xyd_file:
-                    self.XRD_Data_Entries = []
-                    while len(self.XRD_Data_Entries) < num_raw_or_xyd_file:
-                        self.XRD_Data_Entries.append(XRD_Data_Entry_Experiment())  # Append a placeholder value
+                if len(self.XRD_Data_Entries_Experiment) < num_raw_or_xyd_file:
+                    self.XRD_Data_Entries_Experiment = []
+                    while len(self.XRD_Data_Entries_Experiment) < num_raw_or_xyd_file:
+                        self.XRD_Data_Entries_Experiment.append(XRD_Data_Entry())  # Append a placeholder value
                 
                 # Loop over all filenames
                 for index, data_file in enumerate(self.data_as_raw_or_xyd_file):
@@ -437,8 +437,8 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                     if not data_file.endswith('.xyd') and not data_file.endswith('.raw'):
                         raise DataFileError(f"The file '{data_file}' must have a .raw or .xyd extension.")
                     
-                    if getattr(self.XRD_Data_Entries[index], "name", None) is None:
-                        self.XRD_Data_Entries[index].name = data_file
+                    if getattr(self.XRD_Data_Entries_Experiment[index], "name", None) is None:
+                        self.XRD_Data_Entries_Experiment[index].name = data_file
                     
                     if data_file.endswith('.xyd'):
                         # Otherwise parse the file
@@ -447,8 +447,8 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                             dataxydfile = np.loadtxt(xydfile)
                             
                             # Separate the columns into two variables and copy to 
-                            self.XRD_Data_Entries[index].XRD_Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
-                            self.XRD_Data_Entries[index].XRD_Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
+                            self.XRD_Data_Entries_Experiment[index].XRD_Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
+                            self.XRD_Data_Entries_Experiment[index].XRD_Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
                             
                             # Otherwise create plot
                             # self.figures = self.generate_plots()
@@ -497,7 +497,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                             dt = target_tz.normalize(dt) #transfer to UTC
                             
                             self.datetime = dt
-                            self.XRD_Data_Entries[index].XRD_Datetime_Start = dt
+                            self.XRD_Data_Entries_Experiment[index].XRD_Datetime_Start = dt
                             
                             ###
                             # File Name And Comments?
@@ -537,7 +537,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                             #print(unpacked_data)
                             
                             # self.Experiment_Wavelength = ureg.Quantity(float(unpacked_data[0]), 'angstrom')
-                            self.XRD_Data_Entries[index].XRD_Experiment_Wavelength = ureg.Quantity(float(unpacked_data[0]), 'angstrom')
+                            self.XRD_Data_Entries_Experiment[index].XRD_Wavelength = ureg.Quantity(float(unpacked_data[0]), 'angstrom')
                             
                             ###
                             # Start and End Time
@@ -576,7 +576,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                                 dt = target_tz.normalize(dt) #transfer to UTC
                                 
                                 #self.datetime_end = dt
-                                self.XRD_Data_Entries[index].XRD_Datetime_End = dt
+                                self.XRD_Data_Entries_Experiment[index].XRD_Datetime_End = dt
                             
                             ###
                             # Number of Data Entries
@@ -615,7 +615,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                             #print(len(x_range))
                             
                             # self.Deg2Theta = ureg.Quantity(x_range, 'degree') # dataxydfile[:, 0]  # First column
-                            self.XRD_Data_Entries[index].XRD_Deg2Theta = self.Deg2Theta = ureg.Quantity(x_range, 'degree')
+                            self.XRD_Data_Entries_Experiment[index].XRD_Deg2Theta = self.Deg2Theta = ureg.Quantity(x_range, 'degree')
                             
                             ###
                             # Data
@@ -636,7 +636,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                             #print(len(y_data))
                             
                             #self.Intensity = ureg.Quantity(y_data, 'dimensionless') #dataxydfile[:, 1]  # Second column
-                            self.XRD_Data_Entries[index].XRD_Intensity = ureg.Quantity(y_data, 'dimensionless')
+                            self.XRD_Data_Entries_Experiment[index].XRD_Intensity = ureg.Quantity(y_data, 'dimensionless')
                             
                             # Sanity check
                             if len(x_range) != len(y_data):
