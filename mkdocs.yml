@@ -1,8 +1,8 @@
-site_name: crc1415testsample
+site_name: CRC1415Plugin
 site_description: This is a schema package plugin for testing purpose.
 site_author: Ron Dockhorn
 
-repo_url: https://github.com/Bondoki/crc1415testsample
+repo_url: https://github.com/Bondoki/NOMADOasisPlugin
 edit_uri: ""
 
 nav:
@@ -13,7 +13,9 @@ nav:
       - Use this Plugin: how_to/use_this_plugin.md
       - Contribute to this plugin: how_to/contribute_to_this_plugin.md
       - Contribute to the documentation: how_to/contribute_to_the_documentation.md
-  - Explanation: explanation/explanation.md
+  - Explanation:
+      - Overview: explanation/explanation.md
+      - Project Structure: explanation/structure.md
   - Reference: reference/references.md
 plugins:
   - search
@@ -48,6 +50,9 @@ markdown_extensions:
   - attr_list
   - mkdocs-click
   - pymdownx.extra
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
 extra:
   generator: false
   homepage: https://nomad-lab.eu

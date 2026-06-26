@@ -1,18 +1,17 @@
-# Welcome to the `crc1415testsample` documentation
+# Welcome to the `CRC1415Plugin` documentation
 
-This is a schema package plugin for testing purpose.
+This is a schema package plugin designed to integrate CRC1415 measurement data into the NOMAD ecosystem.
 
 ## Introduction
 
-!!! note "Attention"
-    TODO
+The `CRC1415Plugin` plugin provides the necessary schema definitions and mapping logic to ensure that raw data from various analytical instruments is correctly parsed and stored in a standardized format. This enables consistent data discovery, archiving, and analysis across different measurement techniques.
 
 <div markdown="block" class="home-grid">
 <div markdown="block">
 
 ### Tutorial
 
-TODO
+Get started with a step-by-step guide on how to use the plugin for your first dataset.
 
 - [Tutorial](tutorial/tutorial.md)
 
@@ -34,7 +33,7 @@ How-to guides provide step-by-step instructions for a wide range of tasks, with 
 
 ### Explanation
 
-The explanation [section](explanation/explanation.md) provides background knowledge on this plugin.
+The explanation [section](explanation/explanation.md) provides background knowledge on this plugin, including its architecture and the mapping process.
 
 </div>
 <div markdown="block">
