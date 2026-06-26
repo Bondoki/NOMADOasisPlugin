@@ -202,6 +202,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
     
     data_as_xye_file = Quantity(
         type=str,
+        shape=["*"],
         description='''
         A reference to an uploaded .xye produced by XRD simulation.
         ''',
@@ -211,6 +212,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln={
             "component": "FileEditQuantity"
         },
+        repeats=True,
     )
     
     # Experiment_Wavelength = Quantity(
@@ -259,6 +261,8 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
     )
     
     XRD_Data_Entries_Experiment = SubSection(section_def=XRD_Data_Entry, repeats=True)
+    
+    XRD_Data_Entries_Simulation = SubSection(section_def=XRD_Data_Entry, repeats=True)
     
     def generate_plots(self) -> list[PlotlyFigure]:
         """
@@ -330,24 +334,31 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                     # ),
                 ))
             
-        if self.data_as_xye_file:
-            xSim = self.Simulated_Deg2Theta.to('degree').magnitude
-            ySim = self.Simulated_Intensity.to('dimensionless').magnitude
-            
-            fig.add_trace(go.Scatter( 
-                x=xSim, # Variable in the x-axis
-                y=ySim/np.max(ySim), # Variable in the y-axis
-                mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
-                name='Simulation',
-                hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
-                # Properties associated with points 
-                # marker=dict(
-                #     size=12, # Size
-                #     color='#cb1dd1', # Color
-                #     opacity=0.8, # Point transparency 
-                #     line=dict(width=1, color='black') # Properties of the edges
-                # ),
-            ))
+        if self.XRD_Data_Entries_Simulation:
+            for idx, xrd_data_entry in enumerate(self.XRD_Data_Entries_Simulation):
+                xSim = xrd_data_entry.XRD_Deg2Theta.to('degree').magnitude
+                ySim = xrd_data_entry.XRD_Intensity.to('dimensionless').magnitude
+                
+                short_str = lambda s, k=5: (
+                    (lambda t: t[:k] + "..." + t[-k:])(
+                    s[:s.rfind(".")] if (i := s.rfind(".")) != -1 and i + 1 < len(s) else s
+                    )
+                )
+                
+                fig.add_trace(go.Scatter( 
+                    x=xSim, # Variable in the x-axis
+                    y=ySim/np.max(ySim), # Variable in the y-axis
+                    mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
+                    name=short_str(xrd_data_entry.name) , #'Simulation',
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
+                    # Properties associated with points 
+                    # marker=dict(
+                    #     size=12, # Size
+                    #     color='#cb1dd1', # Color
+                    #     opacity=0.8, # Point transparency 
+                    #     line=dict(width=1, color='black') # Properties of the edges
+                    # ),
+                ))
         
 
         # Customize the layout
@@ -645,31 +656,71 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                             # Create plot
                             #self.figures = self.generate_plots()
                 
-                
-             # Check if any experimental (raw/xyd) or simulation (xye) file is provided
+            # Check if any experimental (raw/xyd) or simulation (xye) file is provided
             if self.data_as_xye_file:
-                # Check if the simulation file has the correct extension
-                if not self.data_as_xye_file.endswith('.xye'):
-                    raise DataFileError(f"The file '{self.data_as_xye_file}' must have a .xye extension.")
+                
+                num_xye_file = len(self.data_as_xye_file)
+                
+                # Create subsection if not existing
+                if not self.XRD_Data_Entries_Simulation:
+                    self.XRD_Data_Entries_Simulation = []
+                    # Ensure the list is long enough
+                    while len(self.XRD_Data_Entries_Simulation) < num_xye_file:
+                        self.XRD_Data_Entries_Simulation.append(XRD_Data_Entry())  # Append a placeholder value
                     
-                if self.data_as_xye_file.endswith('.xye'):
-                    # Otherwise parse the file
-                    with archive.m_context.raw_file(self.data_as_xye_file) as xyefile:
-                        # The first line is the Cu K alpha wavelength
-                        first_line = xyefile.readline().strip()
-                        #first_value = float(first_line)
-                        self.Simulation_Wavelength = ureg.Quantity(float(first_line), 'angstrom')
-                        
-                        # Load the data from the file, skipping the first line
-                        dataxyefile = np.loadtxt(xyefile, skiprows=1)
-                        
-                        # Split the data into three distinct arrays
-                        Sim_TwoTheta = dataxyefile[:, 0]  # 2Theta
-                        Sim_Intensity = dataxyefile[:, 1]  # Simulated Intensity
-                        #array3 = dataxyefile[:, 2]  # Simulated Intensity with Offset?!
-                        self.Simulated_Deg2Theta = ureg.Quantity(Sim_TwoTheta, 'degree')
-                        self.Simulated_Intensity = ureg.Quantity(Sim_Intensity, 'dimensionless')
-                        
+                # Create new if not sufficient long enough - overwrites the default
+                if len(self.XRD_Data_Entries_Simulation) < num_xye_file:
+                    self.XRD_Data_Entries_Simulation = []
+                    while len(self.XRD_Data_Entries_Simulation) < num_xye_file:
+                        self.XRD_Data_Entries_Simulation.append(XRD_Data_Entry())  # Append a placeholder value
+                
+                # Loop over all filenames
+                for index, data_file in enumerate(self.data_as_xye_file):
+                    # Check if the file has the correct extension
+                    if not data_file.endswith('.xye'):
+                        raise DataFileError(f"The file '{data_file}' must have a .xye extension.")
+                    
+                    if getattr(self.XRD_Data_Entries_Simulation[index], "name", None) is None:
+                        self.XRD_Data_Entries_Simulation[index].name = data_file
+
+                    if data_file.endswith('.xye'):
+                        # Otherwise parse the file
+                        with archive.m_context.raw_file(data_file) as xyefile:
+                            # The first line is the Cu K alpha wavelength
+                            first_line = xyefile.readline().strip()
+                            first_val = first_line.split(',')[0]  # "1.54056"
+                            
+                            # in case is csv
+                            parts = first_line.strip().split(',')
+                            # default
+                            delimiter = None
+                            # if there is at least 2 comma-separated fields, use comma
+                            NUM_CSV_PARTS = 2
+                            
+                            if len(parts) >= NUM_CSV_PARTS:
+                                delimiter = ','
+                            
+#                             delimiter = ' '
+#                             if first_line.split(',')[1] is not None and first_line.split(',')[1] = ',':
+#                                 delimiter = ','
+#                             
+                            #self.Simulation_Wavelength = ureg.Quantity(float(first_line), 'angstrom')
+                            self.XRD_Data_Entries_Simulation[index].XRD_Wavelength = ureg.Quantity(float(first_val), 'angstrom')
+                            
+                            # Load the data from the file, skipping the first line
+                            dataxyefile = np.loadtxt(xyefile, skiprows=1, delimiter=delimiter)
+                                
+                            # Split the data into three distinct arrays
+                            Sim_TwoTheta = dataxyefile[:, 0]  # 2Theta
+                            Sim_Intensity = dataxyefile[:, 1]  # Simulated Intensity
+                            
+                            #self.Simulated_Deg2Theta = ureg.Quantity(Sim_TwoTheta, 'degree')
+                            #self.Simulated_Intensity = ureg.Quantity(Sim_Intensity, 'dimensionless')
+
+                            # Separate the columns into two variables and copy to 
+                            self.XRD_Data_Entries_Simulation[index].XRD_Deg2Theta = ureg.Quantity(Sim_TwoTheta, 'degree') # dataxydfile[:, 0]  # First column
+                            self.XRD_Data_Entries_Simulation[index].XRD_Intensity = ureg.Quantity(Sim_Intensity, 'dimensionless') #dataxydfile[:, 1]  # Second column
+                            
              # Check if any experimental (raw/xyd) or simulation (xye) file is provided
             if self.data_as_raw_or_xyd_file or self.data_as_xye_file:
                 # Create plot
