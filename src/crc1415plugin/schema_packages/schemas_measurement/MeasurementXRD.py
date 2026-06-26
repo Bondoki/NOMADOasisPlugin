@@ -151,7 +151,9 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                     "location",
                     "data_as_raw_or_xyd_file",
                     "data_as_xye_file",
-                    "description"
+                    "description",
+                    "XRD_Data_Entries_Experiment",
+                    "XRD_Data_Entries_Simulation",
                 ]
             }
         },
@@ -221,11 +223,11 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
     #     description='The wavelength of Cu K alpha (1.5406 Angstrom) used for XRD experiment.',
     # )
     
-    Simulation_Wavelength = Quantity(
-        type=np.float64,
-        unit='nanometer',
-        description='The wavelength of Cu K alpha used for XRD simulations.',
-    )
+    # Simulation_Wavelength = Quantity(
+    #     type=np.float64,
+    #     unit='nanometer',
+    #     description='The wavelength of Cu K alpha used for XRD simulations.',
+    # )
     
     # Deg2Theta = Quantity(
     #     type=np.float64,
@@ -247,18 +249,18 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
     #     description='The count at each 2-theta value, dimensionless',
     # )
     
-    Simulated_Deg2Theta = Quantity(
-        type=np.float64,
-        shape=["*"],
-        unit='deg',
-        description='The 2-theta range of the simulated diffractogram',
-    )
-    Simulated_Intensity = Quantity(
-        type=np.float64,
-        shape=["*"],
-        unit='dimensionless',
-        description='The simulated count at each 2-theta value, dimensionless',
-    )
+    # Simulated_Deg2Theta = Quantity(
+    #     type=np.float64,
+    #     shape=["*"],
+    #     unit='deg',
+    #     description='The 2-theta range of the simulated diffractogram',
+    # )
+    # Simulated_Intensity = Quantity(
+    #     type=np.float64,
+    #     shape=["*"],
+    #     unit='dimensionless',
+    #     description='The simulated count at each 2-theta value, dimensionless',
+    # )
     
     XRD_Data_Entries_Experiment = SubSection(section_def=XRD_Data_Entry, repeats=True)
     
