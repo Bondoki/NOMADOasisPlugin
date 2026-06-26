@@ -45,11 +45,13 @@ The `src/` directory contains the core logic of the plugin. The primary package 
 
 ### `tests/`
 The `tests/` directory is divided into two main areas:
+
 - **`schema_packages/`**: Contains unit tests to validate the logic and structure of individual schemas.
 - **`datacrc1415plugin/`**: Acts as a repository for test fixtures. This includes both raw measurement files (e.g. `.cif`, `.tif`, `.raw`, `.txt`) and pre-processed NOMAD archive YAML files used to verify that the plugin correctly parses and maps data to the schemas.
 
 ### `docs/`
 The `docs/` directory follows a structured documentation hierarchy:
+
 - **`how_to/`**: Practical guides for installation and contribution.
 - **`explanation/`**: High-level technical explanations of the "why" and "how" behind the plugin's design.
 - **`reference/`**: Detailed technical specifications.

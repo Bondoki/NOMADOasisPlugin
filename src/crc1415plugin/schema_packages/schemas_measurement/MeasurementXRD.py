@@ -20,6 +20,7 @@ from nomad.metainfo import (
     Datetime,
     Quantity,
     Section,
+    SubSection,
 )
 from nomad.metainfo.metainfo import (
     Category,
@@ -52,6 +53,76 @@ class CRC1415CategoryMeasurement(EntryDataCategory):
 
     m_def = Category(label='CRC1415-Measurement', categories=[EntryDataCategory])
 
+class XRD_Data_Entry(ArchiveSection):
+    """General data section for Raman spectroscopy"""
+
+    m_def = Section(
+        label_quantity='name',
+        a_eln={
+            # "overview": False,
+            # "hide": [
+            #     "name",
+            #     "lab_id",
+            #     "method",
+            #     "samples",
+            #     "measurement_identifiers"
+            # ],
+            "properties": {
+                "order": [
+                    "name",
+                    "XRD_Datetime_Start",
+                    "XRD_Datetime_End",
+                    "XRD_Wavelength",
+                    #"data_as_tvf_or_txt_file",
+                ]
+            }
+        },
+    )
+    
+    name = Quantity(
+        type=str,
+        description='Name of the section or XRD measurement',
+        a_eln={'component': 'StringEditQuantity'},
+    )
+    
+    XRD_Datetime_Start = Quantity(
+        type=Datetime,
+        description='The date and time when this activity has started.',
+        a_eln=dict(component='DateTimeEditQuantity', label='Experiment Starting Time'),
+    )
+    
+    XRD_Datetime_End = Quantity(
+        type=Datetime,
+        description='The date and time when this activity has ended.',
+        a_eln=dict(component='DateTimeEditQuantity', label='Experiment Ending Time'),
+    )
+    
+    XRD_Wavelength = Quantity(
+        type=np.float64,
+        unit='nanometer',
+        description='The wavelength of Cu K alpha (1.5406 Angstrom) used for XRD experiment.',
+    )
+    
+    XRD_Deg2Theta = Quantity(
+        type=np.float64,
+        a_tabular={
+            "name": "Deg2Theta"
+        },
+        shape=["*"],
+        unit='deg',
+        description='The 2-theta range of the diffractogram',
+    )
+    XRD_Intensity = Quantity(
+        type=np.float64,
+        a_tabular={
+            "name": "Counts"
+        },
+        shape=["*"],
+        unit='dimensionless',
+        description='The count at each 2-theta value, dimensionless',
+    )
+    
+
 
 #class XRDMeasurement(ELNMeasurement, TableData, PlotSection, ArchiveSection):
 class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
@@ -68,18 +139,21 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                 "lab_id",
                 "method",
                 "samples",
-                "measurement_identifiers"
+                "measurement_identifiers",
+                "datetime",
             ],
             "properties": {
                 "order": [
                     "tags",
                     "name",
-                    "datetime",
-                    "datetime_end",
+                    #"datetime",
+                    #"datetime_end",
                     "location",
                     "data_as_raw_or_xyd_file",
                     "data_as_xye_file",
-                    "description"
+                    "description",
+                    "XRD_Data_Entries_Experiment",
+                    "XRD_Data_Entries_Simulation",
                 ]
             }
         },
@@ -113,14 +187,9 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln={'component': 'StringEditQuantity', 'label': 'XRD: Brief title of the measurement'},
     )
     
-    datetime_end = Quantity(
-        type=Datetime,
-        description='The date and time when this activity has ended.',
-        a_eln=dict(component='DateTimeEditQuantity', label='ending Time'),
-    )
-    
     data_as_raw_or_xyd_file = Quantity(
         type=str,
+        shape=["*"],
         description='''
         A reference to an uploaded .raw or .xyd produced by the XRD instrument.
         ''',
@@ -130,10 +199,12 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln={
             "component": "FileEditQuantity"
         },
+        repeats=True,
     )
     
     data_as_xye_file = Quantity(
         type=str,
+        shape=["*"],
         description='''
         A reference to an uploaded .xye produced by XRD simulation.
         ''',
@@ -143,51 +214,57 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         a_eln={
             "component": "FileEditQuantity"
         },
+        repeats=True,
     )
     
-    Experiment_Wavelength = Quantity(
-        type=np.float64,
-        unit='nanometer',
-        description='The wavelength of Cu K alpha (1.5406 Angstrom) used for XRD experiment.',
-    )
+    # Experiment_Wavelength = Quantity(
+    #     type=np.float64,
+    #     unit='nanometer',
+    #     description='The wavelength of Cu K alpha (1.5406 Angstrom) used for XRD experiment.',
+    # )
     
-    Simulation_Wavelength = Quantity(
-        type=np.float64,
-        unit='nanometer',
-        description='The wavelength of Cu K alpha used for XRD simulations.',
-    )
+    # Simulation_Wavelength = Quantity(
+    #     type=np.float64,
+    #     unit='nanometer',
+    #     description='The wavelength of Cu K alpha used for XRD simulations.',
+    # )
     
-    Deg2Theta = Quantity(
-        type=np.float64,
-        a_tabular={
-            "name": "Deg2Theta"
-        },
-        shape=["*"],
-        unit='deg',
-        description='The 2-theta range of the diffractogram',
-    )
-    Intensity = Quantity(
-        type=np.float64,
-        a_tabular={
-            "name": "Counts"
-        },
-        shape=["*"],
-        unit='dimensionless',
-        description='The count at each 2-theta value, dimensionless',
-    )
+    # Deg2Theta = Quantity(
+    #     type=np.float64,
+    #     a_tabular={
+    #         "name": "Deg2Theta"
+    #     },
+    #     shape=["*"],
+    #     unit='deg',
+    #     description='The 2-theta range of the diffractogram',
+    # )
     
-    Simulated_Deg2Theta = Quantity(
-        type=np.float64,
-        shape=["*"],
-        unit='deg',
-        description='The 2-theta range of the simulated diffractogram',
-    )
-    Simulated_Intensity = Quantity(
-        type=np.float64,
-        shape=["*"],
-        unit='dimensionless',
-        description='The simulated count at each 2-theta value, dimensionless',
-    )
+    # Intensity = Quantity(
+    #     type=np.float64,
+    #     a_tabular={
+    #         "name": "Counts"
+    #     },
+    #     shape=["*"],
+    #     unit='dimensionless',
+    #     description='The count at each 2-theta value, dimensionless',
+    # )
+    
+    # Simulated_Deg2Theta = Quantity(
+    #     type=np.float64,
+    #     shape=["*"],
+    #     unit='deg',
+    #     description='The 2-theta range of the simulated diffractogram',
+    # )
+    # Simulated_Intensity = Quantity(
+    #     type=np.float64,
+    #     shape=["*"],
+    #     unit='dimensionless',
+    #     description='The simulated count at each 2-theta value, dimensionless',
+    # )
+    
+    XRD_Data_Entries_Experiment = SubSection(section_def=XRD_Data_Entry, repeats=True)
+    
+    XRD_Data_Entries_Simulation = SubSection(section_def=XRD_Data_Entry, repeats=True)
     
     def generate_plots(self) -> list[PlotlyFigure]:
         """
@@ -233,43 +310,57 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         fig = go.Figure()
 
         # Add the scatter trace
-        if self.data_as_raw_or_xyd_file:
-            xExp = self.Deg2Theta.to('degree').magnitude
-            yExp = self.Intensity.to('dimensionless').magnitude
+        if self.XRD_Data_Entries_Experiment:
+            for idx, xrd_data_entry in enumerate(self.XRD_Data_Entries_Experiment):
+                xExp = xrd_data_entry.XRD_Deg2Theta.to('degree').magnitude
+                yExp = xrd_data_entry.XRD_Intensity.to('dimensionless').magnitude
+                
+                short_str = lambda s, k=5: (
+                    (lambda t: t[:k] + "..." + t[-k:])(
+                    s[:s.rfind(".")] if (i := s.rfind(".")) != -1 and i + 1 < len(s) else s
+                    )
+                )
+                
+                fig.add_trace(go.Scatter( 
+                    x=xExp, # Variable in the x-axis
+                    y=yExp/np.max(yExp), # Variable in the y-axis
+                    mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
+                    name= short_str(xrd_data_entry.name) , #'Experiment',
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
+                    # Properties associated with points 
+                    # marker=dict(
+                    #     size=12, # Size
+                    #     color='#cb1dd1', # Color
+                    #     opacity=0.8, # Point transparency 
+                    #     line=dict(width=1, color='black') # Properties of the edges
+                    # ),
+                ))
             
-            fig.add_trace(go.Scatter( 
-                x=xExp, # Variable in the x-axis
-                y=yExp/np.max(yExp), # Variable in the y-axis
-                mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
-                name='Experiment',
-                hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
-                # Properties associated with points 
-                # marker=dict(
-                #     size=12, # Size
-                #     color='#cb1dd1', # Color
-                #     opacity=0.8, # Point transparency 
-                #     line=dict(width=1, color='black') # Properties of the edges
-                # ),
-            ))
-            
-        if self.data_as_xye_file:
-            xSim = self.Simulated_Deg2Theta.to('degree').magnitude
-            ySim = self.Simulated_Intensity.to('dimensionless').magnitude
-            
-            fig.add_trace(go.Scatter( 
-                x=xSim, # Variable in the x-axis
-                y=ySim/np.max(ySim), # Variable in the y-axis
-                mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
-                name='Simulation',
-                hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
-                # Properties associated with points 
-                # marker=dict(
-                #     size=12, # Size
-                #     color='#cb1dd1', # Color
-                #     opacity=0.8, # Point transparency 
-                #     line=dict(width=1, color='black') # Properties of the edges
-                # ),
-            ))
+        if self.XRD_Data_Entries_Simulation:
+            for idx, xrd_data_entry in enumerate(self.XRD_Data_Entries_Simulation):
+                xSim = xrd_data_entry.XRD_Deg2Theta.to('degree').magnitude
+                ySim = xrd_data_entry.XRD_Intensity.to('dimensionless').magnitude
+                
+                short_str = lambda s, k=5: (
+                    (lambda t: t[:k] + "..." + t[-k:])(
+                    s[:s.rfind(".")] if (i := s.rfind(".")) != -1 and i + 1 < len(s) else s
+                    )
+                )
+                
+                fig.add_trace(go.Scatter( 
+                    x=xSim, # Variable in the x-axis
+                    y=ySim/np.max(ySim), # Variable in the y-axis
+                    mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
+                    name=short_str(xrd_data_entry.name) , #'Simulation',
+                    hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
+                    # Properties associated with points 
+                    # marker=dict(
+                    #     size=12, # Size
+                    #     color='#cb1dd1', # Color
+                    #     opacity=0.8, # Point transparency 
+                    #     line=dict(width=1, color='black') # Properties of the edges
+                    # ),
+                ))
         
 
         # Customize the layout
@@ -333,238 +424,305 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
         # super().normalize(archive, logger)
         
         try:
+            # Check if any file is provided
+            
             # Check if any experimental (raw/xyd) or simulation (xye) file is provided
             if self.data_as_raw_or_xyd_file:
-                # Check if the file has the correct extension
-                if not self.data_as_raw_or_xyd_file.endswith('.xyd') and not self.data_as_raw_or_xyd_file.endswith('.raw'):
-                    raise DataFileError(f"The file '{self.data_as_raw_or_xyd_file}' must have a .raw or .xyd extension.")
+                
+                num_raw_or_xyd_file = len(self.data_as_raw_or_xyd_file)
+                
+                # Create subsection if not existing
+                if not self.XRD_Data_Entries_Experiment:
+                    self.XRD_Data_Entries_Experiment = []
+                    # Ensure the list is long enough
+                    while len(self.XRD_Data_Entries_Experiment) < num_raw_or_xyd_file:
+                        self.XRD_Data_Entries_Experiment.append(XRD_Data_Entry())  # Append a placeholder value
                     
-                if self.data_as_raw_or_xyd_file.endswith('.xyd'):
-                    # Otherwise parse the file
-                    with archive.m_context.raw_file(self.data_as_raw_or_xyd_file) as xydfile:
-                        # Load the data from the file
-                        dataxydfile = np.loadtxt(xydfile)
-                        
-                        # Separate the columns into two variables and copy to 
-                        self.Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
-                        self.Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
-                        
-                        # Otherwise create plot
-                        # self.figures = self.generate_plots()
-                        
-                if self.data_as_raw_or_xyd_file.endswith('.raw'):
-                    # Otherwise parse the file
-                    with archive.m_context.raw_file(self.data_as_raw_or_xyd_file,'rb') as rawfile:
-                        # Load the data from the file
-                        contentrawfile = rawfile.read()
-                        
-                        ###
-                        # File Type Version
-                        ###
-                        count = len(contentrawfile[0x00:0x0D + 1])//1 # Number of bytes to unpack
-                        #print(count)
-                        unpacked_data = self.unpack_repeated_bytes(contentrawfile[0x00:0x0D + 1], 'b', count)
+                # Create new if not sufficient long enough - overwrites the default
+                if len(self.XRD_Data_Entries_Experiment) < num_raw_or_xyd_file:
+                    self.XRD_Data_Entries_Experiment = []
+                    while len(self.XRD_Data_Entries_Experiment) < num_raw_or_xyd_file:
+                        self.XRD_Data_Entries_Experiment.append(XRD_Data_Entry())  # Append a placeholder value
+                
+                # Loop over all filenames
+                for index, data_file in enumerate(self.data_as_raw_or_xyd_file):
+                    # Check if the file has the correct extension
+                    if not data_file.endswith('.xyd') and not data_file.endswith('.raw'):
+                        raise DataFileError(f"The file '{data_file}' must have a .raw or .xyd extension.")
+                    
+                    if getattr(self.XRD_Data_Entries_Experiment[index], "name", None) is None:
+                        self.XRD_Data_Entries_Experiment[index].name = data_file
+                    
+                    if data_file.endswith('.xyd'):
+                        # Otherwise parse the file
+                        with archive.m_context.raw_file(data_file) as xydfile:
+                            # Load the data from the file
+                            dataxydfile = np.loadtxt(xydfile)
                             
-                        # Convert unpacked data to a string
-                        string_output_file_type = ''.join(chr(b) for b in unpacked_data)
-                        
-                        if string_output_file_type != 'RAW_1.06Powdat':
-                            logger.warn(f'This reader may not work for raw file with header: "{string_output_file_type}"')
-                        
-                        ###
-                        # Date of Experiment
-                        ###
-
-                        datasplice = contentrawfile[0x0010:0x001F + 1]
-                        count = len(datasplice)//1 # Number of bytes to unpack
-                        #print(count)
-                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'b', count)
+                            # Separate the columns into two variables and copy to 
+                            self.XRD_Data_Entries_Experiment[index].XRD_Deg2Theta = ureg.Quantity(dataxydfile[:, 0], 'degree') # dataxydfile[:, 0]  # First column
+                            self.XRD_Data_Entries_Experiment[index].XRD_Intensity = ureg.Quantity(dataxydfile[:, 1], 'dimensionless') #dataxydfile[:, 1]  # Second column
                             
-                        # Convert unpacked data to a string
-                        string_output_day = ''.join(chr(b) for b in unpacked_data)
-                        
-                        # Convert the unpacked data as a datetime object
-                        from dateutil import parser as dataparser
-                        dt = dataparser.parse(string_output_day)
-                        
-                        import pytz
-                        
-                        local_tz = pytz.timezone('Europe/Berlin')
-                        target_tz = pytz.timezone('UTC')
-                        
-                        dt = local_tz.localize(dt) # set to Berlin time
-                        dt = target_tz.normalize(dt) #transfer to UTC
-                        
-                        self.datetime = dt
-                        
-                        ###
-                        # File Name And Comments?
-                        ###
-                        datasplice = contentrawfile[0x0020:0x012F + 1]
-                        
-                        # Get all chunks separated by NULL bytes in the data slice
-                        chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
-                        
-                        # Only add description if nothing is there
-                        if not self.description:
-                            self.description = ''
+                            # Otherwise create plot
+                            # self.figures = self.generate_plots()
                             
-                            # Print the result chunks
-                            for i, chunk in enumerate(chunks):
-                                #print(f'Chunk {i}: {chunk}')
-                                count = len(chunk)//1 # Number of bytes to unpack (1 for char)
-                                unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
-                                string_output_description = ''.join(chr(b) for b in unpacked_data)
-                                # Print the unpacked data as a string
-                                # The comments in the file is not needed - uncomment if necessary
-                                # self.description += '<p>'+string_output_description + '</p>\n'
+                    if data_file.endswith('.raw'):
+                        # Otherwise parse the file
+                        with archive.m_context.raw_file(data_file,'rb') as rawfile:
+                            # Load the data from the file
+                            contentrawfile = rawfile.read()
+                            
+                            ###
+                            # File Type Version
+                            ###
+                            count = len(contentrawfile[0x00:0x0D + 1])//1 # Number of bytes to unpack
+                            #print(count)
+                            unpacked_data = self.unpack_repeated_bytes(contentrawfile[0x00:0x0D + 1], 'b', count)
                                 
+                            # Convert unpacked data to a string
+                            string_output_file_type = ''.join(chr(b) for b in unpacked_data)
+                            
+                            if string_output_file_type != 'RAW_1.06Powdat':
+                                logger.warn(f'This reader may not work for raw file with header: "{string_output_file_type}"')
+                            
+                            ###
+                            # Date of Experiment
+                            ###
+    
+                            datasplice = contentrawfile[0x0010:0x001F + 1]
+                            count = len(datasplice)//1 # Number of bytes to unpack
+                            #print(count)
+                            unpacked_data = self.unpack_repeated_bytes(datasplice, 'b', count)
                                 
-                        ###
-                        # Experimental setup
-                        # Copper K Alpha x-ray wavelength of 1.5406 Angstrom used by the experiment.
-                        ###
-                        datasplice = contentrawfile[0x0142:0x0146]
-                        #'i': Integer (4 bytes)
-                        #'f': Float (4 bytes)
-                        #'d': Double (8 bytes)
-                        #'h': Short (2 bytes)
-                        count = len(datasplice)//4 # Number of bytes to unpack (4 for float)
-                        #print(count)
-                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
-                        #print(unpacked_data)
-                        
-                        self.Experiment_Wavelength = ureg.Quantity(float(unpacked_data[0]), 'angstrom')
-                        
-                        
-                        ###
-                        # Start and End Time
-                        ###
-                        datasplice = contentrawfile[4*0x10000+0x0600:4*0x10000+0x0620]
-                        #print(datasplice)
-                        # Get all chunks separated by NULL bytes in the data slice
-                        chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
+                            # Convert unpacked data to a string
+                            string_output_day = ''.join(chr(b) for b in unpacked_data)
                             
-                        # Print the result chunks
-                        # for i, chunk in enumerate(chunks):
-                        #     print(f'Chunk {i}: {chunk}')
-                        #     count = len(chunk)//1 # Number of bytes to unpack (1 for char)
-                        #     unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
-                        #     string_output_time = ''.join(chr(b) for b in unpacked_data)
-                        #     # Print the unpacked data as a string
-                        #     print(string_output_time)
-                        #
-                        # print(len(chunks), chunks[1])
-                        
-                        
-                        if len(chunks) > 1:
-                            count = len(chunks[1])//1 # Number of bytes to unpack (1 for char)
-                            unpacked_data = self.unpack_repeated_bytes(chunks[1], 'b', count)
-                            string_output_time = ''.join(chr(b) for b in unpacked_data)
-                            
+                            # Convert the unpacked data as a datetime object
                             from dateutil import parser as dataparser
-                            dt = dataparser.parse(string_output_time)
+                            dt = dataparser.parse(string_output_day)
                             
                             import pytz
-                        
+                            
                             local_tz = pytz.timezone('Europe/Berlin')
                             target_tz = pytz.timezone('UTC')
                             
                             dt = local_tz.localize(dt) # set to Berlin time
                             dt = target_tz.normalize(dt) #transfer to UTC
                             
-                            self.datetime_end = dt
-                        
-                        ###
-                        # Number of Data Entries
-                        ###
-                        datasplice = contentrawfile[4*0x10000+0x0622:4*0x10000+0x0624]
-                        # 'i': Integer (4 bytes)
-                        # 'f': Float (4 bytes)
-                        # 'd': Double (8 bytes)
-                        # 'h': Short (2 bytes)
-                        count = len(datasplice)//2 # Number of bytes to unpack (1 for char)
-                        #print(count)
-                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'h', count)
-                        countDataEntries=int(unpacked_data[0])
-                        # print(countDataEntries)
-                        
-                        ###
-                        # x-range
-                        ###
-                        datasplice = contentrawfile[4*0x10000+0x062C:4*0x10000+0x0638]
-                        
-                        #'i': Integer (4 bytes)
-                        #'f': Float (4 bytes)
-                        #'d': Double (8 bytes)
-                        #'h': Short (2 bytes)
-                        count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
-                        #print(count)
-                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
-                        #print(unpacked_data)
-                        
-                        x_start = unpacked_data[0]
-                        x_end = unpacked_data[2]
-
-                        x_range = np.linspace(x_start, x_end, countDataEntries, True)
-                        #print(type(x_range))
-                        #print(x_range)
-                        #print(len(x_range))
-                        
-                        self.Deg2Theta = ureg.Quantity(x_range, 'degree') # dataxydfile[:, 0]  # First column
-                        
-                        ###
-                        # Data
-                        ###
-
-                        datasplice = contentrawfile[0x40800:0x40800+4*countDataEntries]
-                        #'i': Integer (4 bytes)
-                        #'f': Float (4 bytes)
-                        #'d': Double (8 bytes)
-                        count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
-                        #print(count)
-                        unpacked_data = self.unpack_repeated_bytes(datasplice, 'i', count)
-
-                        #print(unpacked_data)
-                        #type(unpacked_data)
-                        y_data = np.array(unpacked_data, dtype=np.int64)
-                        #print(y_data)
-                        #print(len(y_data))
-                        
-                        self.Intensity = ureg.Quantity(y_data, 'dimensionless') #dataxydfile[:, 1]  # Second column
-                        
-                        # Sanity check
-                        if len(x_range) != len(y_data):
-                            raise DataFileError(f"The data in file '{self.data_as_raw_or_xyd_file}' could not parsed. '{countDataEntries}' expected, but {len(y_data)} found!")
-                        
-                        # Create plot
-                        #self.figures = self.generate_plots()
-            
-            
-             # Check if any experimental (raw/xyd) or simulation (xye) file is provided
+                            self.datetime = dt
+                            self.XRD_Data_Entries_Experiment[index].XRD_Datetime_Start = dt
+                            
+                            ###
+                            # File Name And Comments?
+                            ###
+                            datasplice = contentrawfile[0x0020:0x012F + 1]
+                            
+                            # Get all chunks separated by NULL bytes in the data slice
+                            chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
+                            
+                            # Only add description if nothing is there
+                            if not self.description:
+                                self.description = ''
+                                
+                                # Print the result chunks
+                                for i, chunk in enumerate(chunks):
+                                    #print(f'Chunk {i}: {chunk}')
+                                    count = len(chunk)//1 # Number of bytes to unpack (1 for char)
+                                    unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
+                                    string_output_description = ''.join(chr(b) for b in unpacked_data)
+                                    # Print the unpacked data as a string
+                                    # The comments in the file is not needed - uncomment if necessary
+                                    # self.description += '<p>'+string_output_description + '</p>\n'
+                                    
+                                    
+                            ###
+                            # Experimental setup
+                            # Copper K Alpha x-ray wavelength of 1.5406 Angstrom used by the experiment.
+                            ###
+                            datasplice = contentrawfile[0x0142:0x0146]
+                            #'i': Integer (4 bytes)
+                            #'f': Float (4 bytes)
+                            #'d': Double (8 bytes)
+                            #'h': Short (2 bytes)
+                            count = len(datasplice)//4 # Number of bytes to unpack (4 for float)
+                            #print(count)
+                            unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
+                            #print(unpacked_data)
+                            
+                            # self.Experiment_Wavelength = ureg.Quantity(float(unpacked_data[0]), 'angstrom')
+                            self.XRD_Data_Entries_Experiment[index].XRD_Wavelength = ureg.Quantity(float(unpacked_data[0]), 'angstrom')
+                            
+                            ###
+                            # Start and End Time
+                            ###
+                            datasplice = contentrawfile[4*0x10000+0x0600:4*0x10000+0x0620]
+                            #print(datasplice)
+                            # Get all chunks separated by NULL bytes in the data slice
+                            chunks = self.get_non_empty_chunks_separated_by_null(datasplice)
+                                
+                            # Print the result chunks
+                            # for i, chunk in enumerate(chunks):
+                            #     print(f'Chunk {i}: {chunk}')
+                            #     count = len(chunk)//1 # Number of bytes to unpack (1 for char)
+                            #     unpacked_data = self.unpack_repeated_bytes(chunk, 'b', count)
+                            #     string_output_time = ''.join(chr(b) for b in unpacked_data)
+                            #     # Print the unpacked data as a string
+                            #     print(string_output_time)
+                            #
+                            # print(len(chunks), chunks[1])
+                            
+                            
+                            if len(chunks) > 1:
+                                count = len(chunks[1])//1 # Number of bytes to unpack (1 for char)
+                                unpacked_data = self.unpack_repeated_bytes(chunks[1], 'b', count)
+                                string_output_time = ''.join(chr(b) for b in unpacked_data)
+                                
+                                from dateutil import parser as dataparser
+                                dt = dataparser.parse(string_output_time)
+                                
+                                import pytz
+                            
+                                local_tz = pytz.timezone('Europe/Berlin')
+                                target_tz = pytz.timezone('UTC')
+                                
+                                dt = local_tz.localize(dt) # set to Berlin time
+                                dt = target_tz.normalize(dt) #transfer to UTC
+                                
+                                #self.datetime_end = dt
+                                self.XRD_Data_Entries_Experiment[index].XRD_Datetime_End = dt
+                            
+                            ###
+                            # Number of Data Entries
+                            ###
+                            datasplice = contentrawfile[4*0x10000+0x0622:4*0x10000+0x0624]
+                            # 'i': Integer (4 bytes)
+                            # 'f': Float (4 bytes)
+                            # 'd': Double (8 bytes)
+                            # 'h': Short (2 bytes)
+                            count = len(datasplice)//2 # Number of bytes to unpack (1 for char)
+                            #print(count)
+                            unpacked_data = self.unpack_repeated_bytes(datasplice, 'h', count)
+                            countDataEntries=int(unpacked_data[0])
+                            # print(countDataEntries)
+                            
+                            ###
+                            # x-range
+                            ###
+                            datasplice = contentrawfile[4*0x10000+0x062C:4*0x10000+0x0638]
+                            
+                            #'i': Integer (4 bytes)
+                            #'f': Float (4 bytes)
+                            #'d': Double (8 bytes)
+                            #'h': Short (2 bytes)
+                            count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+                            #print(count)
+                            unpacked_data = self.unpack_repeated_bytes(datasplice, 'f', count)
+                            #print(unpacked_data)
+                            
+                            x_start = unpacked_data[0]
+                            x_end = unpacked_data[2]
+    
+                            x_range = np.linspace(x_start, x_end, countDataEntries, True)
+                            #print(type(x_range))
+                            #print(x_range)
+                            #print(len(x_range))
+                            
+                            # self.Deg2Theta = ureg.Quantity(x_range, 'degree') # dataxydfile[:, 0]  # First column
+                            self.XRD_Data_Entries_Experiment[index].XRD_Deg2Theta = self.Deg2Theta = ureg.Quantity(x_range, 'degree')
+                            
+                            ###
+                            # Data
+                            ###
+    
+                            datasplice = contentrawfile[0x40800:0x40800+4*countDataEntries]
+                            #'i': Integer (4 bytes)
+                            #'f': Float (4 bytes)
+                            #'d': Double (8 bytes)
+                            count = len(datasplice)//4 # Number of bytes to unpack (1 for char)
+                            #print(count)
+                            unpacked_data = self.unpack_repeated_bytes(datasplice, 'i', count)
+    
+                            #print(unpacked_data)
+                            #type(unpacked_data)
+                            y_data = np.array(unpacked_data, dtype=np.int64)
+                            #print(y_data)
+                            #print(len(y_data))
+                            
+                            #self.Intensity = ureg.Quantity(y_data, 'dimensionless') #dataxydfile[:, 1]  # Second column
+                            self.XRD_Data_Entries_Experiment[index].XRD_Intensity = ureg.Quantity(y_data, 'dimensionless')
+                            
+                            # Sanity check
+                            if len(x_range) != len(y_data):
+                                raise DataFileError(f"The data in file '{data_file}' could not parsed. '{countDataEntries}' expected, but {len(y_data)} found!")
+                            
+                            # Create plot
+                            #self.figures = self.generate_plots()
+                
+            # Check if any experimental (raw/xyd) or simulation (xye) file is provided
             if self.data_as_xye_file:
-                # Check if the simulation file has the correct extension
-                if not self.data_as_xye_file.endswith('.xye'):
-                    raise DataFileError(f"The file '{self.data_as_xye_file}' must have a .xye extension.")
+                
+                num_xye_file = len(self.data_as_xye_file)
+                
+                # Create subsection if not existing
+                if not self.XRD_Data_Entries_Simulation:
+                    self.XRD_Data_Entries_Simulation = []
+                    # Ensure the list is long enough
+                    while len(self.XRD_Data_Entries_Simulation) < num_xye_file:
+                        self.XRD_Data_Entries_Simulation.append(XRD_Data_Entry())  # Append a placeholder value
                     
-                if self.data_as_xye_file.endswith('.xye'):
-                    # Otherwise parse the file
-                    with archive.m_context.raw_file(self.data_as_xye_file) as xyefile:
-                        # The first line is the Cu K alpha wavelength
-                        first_line = xyefile.readline().strip()
-                        #first_value = float(first_line)
-                        self.Simulation_Wavelength = ureg.Quantity(float(first_line), 'angstrom')
-                        
-                        # Load the data from the file, skipping the first line
-                        dataxyefile = np.loadtxt(xyefile, skiprows=1)
-                        
-                        # Split the data into three distinct arrays
-                        Sim_TwoTheta = dataxyefile[:, 0]  # 2Theta
-                        Sim_Intensity = dataxyefile[:, 1]  # Simulated Intensity
-                        #array3 = dataxyefile[:, 2]  # Simulated Intensity with Offset?!
-                        self.Simulated_Deg2Theta = ureg.Quantity(Sim_TwoTheta, 'degree')
-                        self.Simulated_Intensity = ureg.Quantity(Sim_Intensity, 'dimensionless')
-                        
+                # Create new if not sufficient long enough - overwrites the default
+                if len(self.XRD_Data_Entries_Simulation) < num_xye_file:
+                    self.XRD_Data_Entries_Simulation = []
+                    while len(self.XRD_Data_Entries_Simulation) < num_xye_file:
+                        self.XRD_Data_Entries_Simulation.append(XRD_Data_Entry())  # Append a placeholder value
+                
+                # Loop over all filenames
+                for index, data_file in enumerate(self.data_as_xye_file):
+                    # Check if the file has the correct extension
+                    if not data_file.endswith('.xye'):
+                        raise DataFileError(f"The file '{data_file}' must have a .xye extension.")
+                    
+                    if getattr(self.XRD_Data_Entries_Simulation[index], "name", None) is None:
+                        self.XRD_Data_Entries_Simulation[index].name = data_file
+
+                    if data_file.endswith('.xye'):
+                        # Otherwise parse the file
+                        with archive.m_context.raw_file(data_file) as xyefile:
+                            # The first line is the Cu K alpha wavelength
+                            first_line = xyefile.readline().strip()
+                            first_val = first_line.split(',')[0]  # "1.54056"
+                            
+                            # in case is csv
+                            parts = first_line.strip().split(',')
+                            # default
+                            delimiter = None
+                            # if there is at least 2 comma-separated fields, use comma
+                            NUM_CSV_PARTS = 2
+                            
+                            if len(parts) >= NUM_CSV_PARTS:
+                                delimiter = ','
+                            
+#                             delimiter = ' '
+#                             if first_line.split(',')[1] is not None and first_line.split(',')[1] = ',':
+#                                 delimiter = ','
+#                             
+                            #self.Simulation_Wavelength = ureg.Quantity(float(first_line), 'angstrom')
+                            self.XRD_Data_Entries_Simulation[index].XRD_Wavelength = ureg.Quantity(float(first_val), 'angstrom')
+                            
+                            # Load the data from the file, skipping the first line
+                            dataxyefile = np.loadtxt(xyefile, skiprows=1, delimiter=delimiter)
+                                
+                            # Split the data into three distinct arrays
+                            Sim_TwoTheta = dataxyefile[:, 0]  # 2Theta
+                            Sim_Intensity = dataxyefile[:, 1]  # Simulated Intensity
+                            
+                            #self.Simulated_Deg2Theta = ureg.Quantity(Sim_TwoTheta, 'degree')
+                            #self.Simulated_Intensity = ureg.Quantity(Sim_Intensity, 'dimensionless')
+
+                            # Separate the columns into two variables and copy to 
+                            self.XRD_Data_Entries_Simulation[index].XRD_Deg2Theta = ureg.Quantity(Sim_TwoTheta, 'degree') # dataxydfile[:, 0]  # First column
+                            self.XRD_Data_Entries_Simulation[index].XRD_Intensity = ureg.Quantity(Sim_Intensity, 'dimensionless') #dataxydfile[:, 1]  # Second column
+                            
              # Check if any experimental (raw/xyd) or simulation (xye) file is provided
             if self.data_as_raw_or_xyd_file or self.data_as_xye_file:
                 # Create plot

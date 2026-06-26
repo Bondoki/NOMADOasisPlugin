@@ -100,10 +100,13 @@ ignore = [
     "F403", # 'from module import *' used; unable to detect undefined names
     "PLC0415", # `import` should be at the top-level of a file
     "E501", # line too long
+    "E731", # Do not assign a `lambda` expression, use a `def`
     "F841", # Local variable `numDatasetLength` is assigned to but never used
     "F401", # ... imported but unused;
     "PLR0912", # Too many branches
     "PLR0915", # Too many statements
+    "PLC3002", # Lambda expression called directly. Execute the expression inline instead.
+
 ]
 
 fixable = ["ALL"]
