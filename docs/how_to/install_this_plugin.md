@@ -1,6 +1,6 @@
 # Install This Plugin
 
-To use the `crc1415testsample` plugin, it must be installed in your NOMAD Oasis environment.
+To use the `CRC1415Plugin` plugin, it must be installed in your NOMAD Oasis environment.
 
 ## Prerequisites
 

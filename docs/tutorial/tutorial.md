@@ -1,10 +1,11 @@
 # Tutorial
 
-This tutorial guides you through the process of using the `crc1415testsample` plugin to upload and visualize measurement data in NOMAD.
+This tutorial guides you through the process of using the `CRC1415Plugin` plugin to upload and visualize measurement data in NOMAD.
 
 ## Step 1: Prepare Your Data
 
-Ensure your measurement files are in the format expected by the plugin. The plugin supports several measurement types:
+Ensure your measurement files are in the format expected by the plugin. The plugin supports several measurement types:  
+
 - **XRD**: X-Ray Diffraction
 - **Raman**: Raman Spectroscopy
 - **SEM/TEM**: Scanning/Transmission Electron Microscopy

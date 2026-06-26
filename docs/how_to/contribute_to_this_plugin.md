@@ -1,6 +1,6 @@
 # Contribute to This Plugin
 
-We welcome contributions to the `crc1415testsample` plugin. Whether you are adding a new measurement type or fixing a bug, please follow these guidelines.
+We welcome contributions to the `CRC1415Plugin` plugin. Whether you are adding a new measurement type or fixing a bug, please follow these guidelines.
 
 ## Development Environment
 

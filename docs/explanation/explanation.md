@@ -1,4 +1,4 @@
-# Explanation
+# Explanation - Overview
 
 This section provides high-level conceptual and architectural guides to help you understand the design and purpose of the `NOMAD-CRC1415Plugin`.
 
@@ -14,7 +14,8 @@ The plugin operates as a schema package, defining how data from various instrume
 
 ### Data Mapping
 
-Mapping is the process of converting raw instrument output into the structured format required by NOMAD schemas. This plugin implements specific mapping logic for each supported measurement technique:
+Mapping is the process of converting raw instrument output into the structured format required by NOMAD schemas. This plugin implements specific mapping logic for each supported measurement technique:  
+
 - **Binary Parsing**: For XRD and Raman, the plugin includes methods to unpack repeated bytes and handle null-separated chunks.
 - **Image Handling**: For SEM and TEM, the plugin manages base64 encoded data.
 - **Plotting**: Each measurement class (e.g., `MeasurementCV`, `MeasurementXRD`) implements a `generate_plots` method to provide immediate visual feedback.
