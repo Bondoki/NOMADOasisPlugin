@@ -10,11 +10,14 @@ The `NOMAD-CRC1415Plugin` is designed to extend the NOMAD data ecosystem by prov
 
 ### NOMAD Schema Packages
 
-The plugin operates as a schema package, defining how data from various instruments (e.g., XRD, Raman, SEM) should be structured within the NOMAD database. By utilizing a modular approach, the plugin allows for the easy addition of new measurement types without altering the core infrastructure.
+The plugin operates as a schema package, defining how data from various instruments should be structured within the NOMAD database. It implements several entry points (e.g., `CRC1415MeasurementXRDEntryPoint`) to route different file types to their respective handlers.
 
 ### Data Mapping
 
-Mapping is the process of converting raw instrument output into the structured format required by NOMAD schemas. This plugin implements specific mapping logic for each supported measurement technique, ensuring that metadata and measurement values are placed in the correct schema fields.
+Mapping is the process of converting raw instrument output into the structured format required by NOMAD schemas. This plugin implements specific mapping logic for each supported measurement technique:
+- **Binary Parsing**: For XRD and Raman, the plugin includes methods to unpack repeated bytes and handle null-separated chunks.
+- **Image Handling**: For SEM and TEM, the plugin manages base64 encoded data.
+- **Plotting**: Each measurement class (e.g., `MeasurementCV`, `MeasurementXRD`) implements a `generate_plots` method to provide immediate visual feedback.
 
 ## Architectural Guides
 
