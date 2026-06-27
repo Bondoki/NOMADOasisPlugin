@@ -2,7 +2,7 @@
   "data": {
     "m_def": "crc1415plugin.schema_packages.schemas_measurement.MeasurementXRD.MeasurementXRD",
     "name": "test MeasurementXRD XYE",
-    "datetime": "2026-06-26T11:45:53.575014+00:00",
+    "datetime": "2026-06-27T11:25:57.274865+00:00",
     "data_as_xye_file": [
       "test_file_XRD_XYE_file.xye",
       "test_file_XRD_XYE_file02.xye"
@@ -14474,7 +14474,7 @@
       },
       {
         "name": "test_file_XRD_XYE_file02.xye",
-        "XRD_Wavelength": 0.15405599999999997,
+        "XRD_Wavelength": 0.154058,
         "XRD_Deg2Theta": [
           3.03,
           3.06,
@@ -19290,10 +19290,10 @@
     "entry_type": "MeasurementXRD",
     "mainfile": "/home/bondoki_vdr/workspace/CRC1415/NOMAD-CRC1415Plugin/tests/datacrc1415plugin/test_MeasurementXRD_XYE.archive.yaml",
     "text_search_contents": [
-      "test MeasurementXRD XYE",
-      "test_file_XRD_XYE_file.xye",
       "Normalized Intensity-2Theta linear plot",
-      "test_file_XRD_XYE_file02.xye"
+      "test MeasurementXRD XYE",
+      "test_file_XRD_XYE_file02.xye",
+      "test_file_XRD_XYE_file.xye"
     ],
     "n_quantities": 29,
     "quantities": [
@@ -19343,7 +19343,7 @@
     "section_defs": [
       {
         "definition_qualified_name": "crc1415plugin.schema_packages.schemas_measurement.MeasurementXRD.MeasurementXRD",
-        "definition_id": "b0b494301fa19178f6a5f586f9d79fde6196f54d",
+        "definition_id": "01d6cd030b20ef92470a09758af6ca3b2869e4db",
         "used_directly": true
       },
       {
@@ -19587,7 +19587,7 @@
             ]
           }
         },
-        "float_value": 0.15405599999999997
+        "float_value": 0.154058
       },
       {
         "id": "data.name#crc1415plugin.schema_packages.schemas_measurement.MeasurementXRD.MeasurementXRD",
@@ -19637,7 +19637,7 @@
             ]
           }
         },
-        "datetime_value": "2026-06-26T11:45:53.575014+00:00"
+        "datetime_value": "2026-06-27T11:25:57.274865+00:00"
       }
     ]
   },

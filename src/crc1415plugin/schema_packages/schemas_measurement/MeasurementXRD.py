@@ -690,22 +690,15 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                         with archive.m_context.raw_file(data_file) as xyefile:
                             # The first line is the Cu K alpha wavelength
                             first_line = xyefile.readline().strip()
-                            first_val = first_line.split(',')[0]  # "1.54056"
                             
-                            # in case is csv
-                            parts = first_line.strip().split(',')
-                            # default
-                            delimiter = None
-                            # if there is at least 2 comma-separated fields, use comma
-                            NUM_CSV_PARTS = 2
+                            if isinstance(first_line, (bytes, bytearray)):
+                                first_line = first_line.decode("utf-8", errors="replace").strip()
                             
-                            if len(parts) >= NUM_CSV_PARTS:
-                                delimiter = ','
+                            parts = first_line.split(',')
+                            delimiter = ',' if len(parts) >= 2 else None
                             
-#                             delimiter = ' '
-#                             if first_line.split(',')[1] is not None and first_line.split(',')[1] = ',':
-#                                 delimiter = ','
-#                             
+                            first_val = parts[0]
+                            
                             #self.Simulation_Wavelength = ureg.Quantity(float(first_line), 'angstrom')
                             self.XRD_Data_Entries_Simulation[index].XRD_Wavelength = ureg.Quantity(float(first_val), 'angstrom')
                             
