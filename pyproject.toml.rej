@@ -1,0 +1,9 @@
+diff a/pyproject.toml b/pyproject.toml	(rejected hunks)
+@@ -138,6 +138,7 @@ schema_package_entry_point = "crc1415plugin.schema_packages:schema_package_entry
+ action_entry_point = "crc1415plugin.actions:simple_action_entry_point"
+ 
+ 
++
+ [tool.cruft]
+ # Avoid updating workflow files, this leads to permissions issues
+ skip = [".github/*"]
