@@ -73,6 +73,7 @@ class XRD_Data_Entry(ArchiveSection):
                     "XRD_Datetime_Start",
                     "XRD_Datetime_End",
                     "XRD_Wavelength",
+                    "XRD_Offset",
                     #"data_as_tvf_or_txt_file",
                 ]
             }
@@ -88,13 +89,21 @@ class XRD_Data_Entry(ArchiveSection):
     XRD_Datetime_Start = Quantity(
         type=Datetime,
         description='The date and time when this activity has started.',
-        a_eln=dict(component='DateTimeEditQuantity', label='Experiment Starting Time'),
+        a_eln=dict(component='DateTimeEditQuantity', label='Experiment Starting Time.'),
     )
     
     XRD_Datetime_End = Quantity(
         type=Datetime,
         description='The date and time when this activity has ended.',
-        a_eln=dict(component='DateTimeEditQuantity', label='Experiment Ending Time'),
+        a_eln=dict(component='DateTimeEditQuantity', label='Experiment Ending Time.'),
+    )
+    
+    XRD_Offset = Quantity(
+        type=np.float64,
+        description='The offset on the y-axis in the plot.',
+        unit='dimensionless',
+        default = 0.0,
+        a_eln=dict(component='NumberEditQuantity', label='Offset y-axis in plot.'),
     )
     
     XRD_Wavelength = Quantity(
@@ -314,6 +323,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
             for idx, xrd_data_entry in enumerate(self.XRD_Data_Entries_Experiment):
                 xExp = xrd_data_entry.XRD_Deg2Theta.to('degree').magnitude
                 yExp = xrd_data_entry.XRD_Intensity.to('dimensionless').magnitude
+                yOffset = xrd_data_entry.XRD_Offset.to('dimensionless').magnitude
                 
                 short_str = lambda s, k=5: (
                     (lambda t: t[:k] + "..." + t[-k:])(
@@ -323,7 +333,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                 
                 fig.add_trace(go.Scatter( 
                     x=xExp, # Variable in the x-axis
-                    y=yExp/np.max(yExp), # Variable in the y-axis
+                    y=yExp/np.max(yExp) + yOffset, # Variable in the y-axis
                     mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
                     name= short_str(xrd_data_entry.name) , #'Experiment',
                     hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
@@ -340,6 +350,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
             for idx, xrd_data_entry in enumerate(self.XRD_Data_Entries_Simulation):
                 xSim = xrd_data_entry.XRD_Deg2Theta.to('degree').magnitude
                 ySim = xrd_data_entry.XRD_Intensity.to('dimensionless').magnitude
+                yOffset = xrd_data_entry.XRD_Offset.to('dimensionless').magnitude
                 
                 short_str = lambda s, k=5: (
                     (lambda t: t[:k] + "..." + t[-k:])(
@@ -349,7 +360,7 @@ class MeasurementXRD(ELNMeasurement, PlotSection, ArchiveSection):
                 
                 fig.add_trace(go.Scatter( 
                     x=xSim, # Variable in the x-axis
-                    y=ySim/np.max(ySim), # Variable in the y-axis
+                    y=ySim/np.max(ySim) + yOffset, # Variable in the y-axis
                     mode='lines', # This explicitly states that we want our observations to be represented by lines or use 'lines+markers'
                     name=short_str(xrd_data_entry.name) , #'Simulation',
                     hovertemplate='(x: %{x}, y: %{y})<extra></extra>',  # Custom hovertemplate
