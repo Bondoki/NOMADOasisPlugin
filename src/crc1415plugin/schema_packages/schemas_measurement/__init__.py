@@ -1,9 +1,11 @@
 from .MeasurementAdsorption import MeasurementAdsorption
 from .MeasurementCV import MeasurementCV
 from .MeasurementGeneric import MeasurementGeneric
+from .MeasurementImages import MeasurementImages
 from .MeasurementIR import MeasurementIR
 from .MeasurementRaman import MeasurementRaman
 from .MeasurementSEM import MeasurementSEM
 from .MeasurementTEM import MeasurementTEM
 from .MeasurementTGA import MeasurementTGA
 from .MeasurementXRD import MeasurementXRD
+

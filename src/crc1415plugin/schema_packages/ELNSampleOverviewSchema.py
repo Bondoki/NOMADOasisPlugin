@@ -54,6 +54,7 @@ from .schemas_measurement import (
     MeasurementAdsorption,
     MeasurementCV,
     MeasurementGeneric,
+    MeasurementImages,
     MeasurementIR,
     MeasurementRaman,
     MeasurementSEM,
@@ -387,6 +388,11 @@ class CRC1415SampleOverview(BasicEln, ReadableIdentifiers, Schema): #EntryData, 
     
     Measurement_Adsorption=SubSection(
        section_def=MeasurementAdsorption,
+       repeats=True,
+    )
+    
+    Measurement_Images=SubSection(
+       section_def=MeasurementImages,
        repeats=True,
     )
     

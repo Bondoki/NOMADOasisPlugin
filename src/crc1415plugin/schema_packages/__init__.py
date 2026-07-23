@@ -187,6 +187,23 @@ CRC1415MeasurementCV = CRC1414MeasurementCVEntryPoint(
     name='CRC1415MeasurementCV',
     description='Schema package for CRC1415 - MeasurementCV.',
 )
+
+class CRC1414MeasurementImagesEntryPoint(SchemaPackageEntryPoint):
+    parameter: int = Field(0, description='Custom configuration parameter for sample')
+
+    def load(self):
+        from crc1415plugin.schema_packages.schemas_measurement.MeasurementImages import (
+            m_package,
+        )
+
+        return m_package
+
+
+CRC1415MeasurementImages = CRC1414MeasurementImagesEntryPoint(
+    name='CRC1415MeasurementImages',
+    description='Schema package for CRC1415 - MeasurementImages.',
+)
+
 # class CRCGMSchemaEntryPoint(SchemaPackageEntryPoint):
 #     parameter: int = Field(0, description='Custom configuration parameter here')
 # 
