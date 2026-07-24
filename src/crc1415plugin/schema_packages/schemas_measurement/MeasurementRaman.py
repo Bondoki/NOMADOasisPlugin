@@ -188,6 +188,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     "Groove_Density",
                     "Accumulation_Time",
                     "No_of_Accumulations",
+                    "data_image_files",
                     "description",
                     "Raman_data_entries",
                     "Raman_processed_data_entries",
@@ -277,6 +278,21 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         },
     )
     
+    data_image_files = Quantity(
+        type=str,
+        shape=["*"],
+        description='''
+        A reference to an uploaded image file (*.tif, *.jpeg, *.png) for Raman experiments.
+        ''',
+        a_browser={
+            "adaptor": "RawFileAdaptor"
+        },
+        a_eln={
+            'component': 'FileEditQuantity',
+            'label': 'Raman: Image files',
+        },
+        repeats=True,
+    )
     
     Raman_data_entries = SubSection(section_def=RamanData, repeats=True)
     
@@ -503,7 +519,94 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                     )
                 )
         
-        
+        ###
+        # Check if any file is provided for image preview
+        ###
+        if self.data_image_files:
+            # Loop over all filenames
+            for data_file in self.data_image_files: #.split(" "):
+                # Check if the file has the correct extension
+                lower = data_file.lower()
+                if not (lower.endswith(('.tif', '.tiff', '.jpeg', '.jpg', '.png'))):
+                    raise DataFileError(
+                        f"The file '{data_file}' must have a .tif, .tiff, .jpeg, .jpg or .png extension."
+                        )
+            
+                with archive.m_context.raw_file(data_file, 'rb') as imagefile:
+                    with Image.open(imagefile) as img:
+                        # Get the size of the image
+                        img_width, img_height = img.size
+                        # print(f"Width: {img_width}, Height: {img_height}")
+                        
+                        # Convert the image to RGB (necessary for JPEG)
+                        rgb_img = img.convert('RGB')
+                        # Create a BytesIO object to hold the image data
+                        buffered = io.BytesIO()
+                        # Save the image to the BytesIO object in JPEG format
+                        rgb_img.save(buffered, format="JPEG")
+                        # Get the byte data
+                        img_str = base64.b64encode(buffered.getvalue()).decode('utf-8')
+                        # Create the URI image string
+                        uri = f"data:image/jpeg;base64,{img_str}"
+                        
+                        # see https://plotly.com/python/images/#zoom-on-static-images
+                        fig = go.Figure()
+                        # As TEM images are usually very big we scale it
+                        # down to fixed size
+                        if img_width <= 0:
+                            raise ValueError("Invalid image width")
+                        
+                        #scale_factor = 800.0/img_width 
+                        max_width = 800.0
+                        scale_factor = 1.0 if img_width <= max_width else (max_width / img_width)
+                        
+                        fig.add_trace(
+                            go.Scatter(
+                                x=[0, img_width * scale_factor],
+                                y=[0, img_height * scale_factor],
+                                mode="markers",
+                                marker_opacity=0
+                                )
+                        )
+                        # Configure axes
+                        fig.update_xaxes(
+                            visible=False,
+                            range=[0, img_width * scale_factor]
+                            )
+                        
+                        fig.update_yaxes(
+                            visible=False,
+                            range=[0, img_height * scale_factor],
+                            # the scaleanchor attribute ensures that the aspect ratio stays constant
+                            scaleanchor="x"
+                            )
+                        
+                        # Add image
+                        fig.add_layout_image(
+                            dict(
+                                x=0,
+                                sizex=img_width * scale_factor,
+                                y=img_height * scale_factor,
+                                sizey=img_height * scale_factor,
+                                xref="x",
+                                yref="y",
+                                opacity=1.0,
+                                layer="below",
+                                sizing="stretch",
+                                source=uri)
+                            )
+                        # Configure other layout
+                        fig.update_layout(
+                                width=img_width * scale_factor,
+                                height=img_height * scale_factor,
+                                margin={"l": 0, "r": 0, "t": 0, "b": 0},
+                                )
+                        
+                        figure_json = fig.to_plotly_json()
+                        figure_json['config'] = {'staticPlot': True, 'displayModeBar': False, 'scrollZoom': True, 'responsive': False, 'displaylogo': False, 'dragmode': False}
+                        
+                        self.figures.append(PlotlyFigure(label=f'Image: {data_file}', figure=figure_json))
+                            
         self.figures = figures
 
         return figures
