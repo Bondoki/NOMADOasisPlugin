@@ -1,4 +1,6 @@
 
+import base64
+import io
 import re
 import struct  # for binary files
 import zipfile
@@ -31,6 +33,7 @@ from nomad.metainfo.metainfo import (
     Category,
 )
 from nomad.units import ureg
+from PIL import Image
 
 # from nomad.metainfo.elasticsearch_extension import (
 #     Elasticsearch,
@@ -301,7 +304,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
     Raman_referenced_data_entries = SubSection(section_def=ReferencedRamanData)#, repeats=True)
     
     
-    def generate_plots(self) -> list[PlotlyFigure]:
+    def generate_plots(self, archive: 'EntryArchive') -> list[PlotlyFigure]:
         """
         Generate the plotly figures for the `MeasurementRaman` section.
 
@@ -605,7 +608,7 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
                         figure_json = fig.to_plotly_json()
                         figure_json['config'] = {'staticPlot': True, 'displayModeBar': False, 'scrollZoom': True, 'responsive': False, 'displaylogo': False, 'dragmode': False}
                         
-                        self.figures.append(PlotlyFigure(label=f'Image: {data_file}', figure=figure_json))
+                        figures.append(PlotlyFigure(label=f'Image: {data_file}', figure=figure_json))
                             
         self.figures = figures
 
@@ -1030,6 +1033,6 @@ class MeasurementRaman(ELNMeasurement, PlotSection, ArchiveSection):
         
         # if self.Raman_data_entries:
         #Otherwise create plot
-        self.figures = self.generate_plots()
+        self.figures = self.generate_plots(archive)
         
         super().normalize(archive, logger)
